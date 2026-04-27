@@ -37,6 +37,9 @@ export default async function ReportsPage() {
     buildGapInsightsForOrg(active.organizationId),
     listWeeklyDigests(active.organizationId)
   ]);
+  const latestSnapshot = snapshots.at(-1) ?? null;
+  const latestPipelineRun = pipelineRuns[0] ?? null;
+  const latestDigest = weeklyDigests[0] ?? null;
 
   return (
     <section>
@@ -81,10 +84,63 @@ export default async function ReportsPage() {
 
       <p>Export CSV is scoped to this workspace only.</p>
       <p>
-        <Link href="/api/reports/export.csv">Download CSV</Link>
+        <Link href="/api/reports/export.csv">Download full report CSV</Link>
+        {' | '}
+        <Link href="/api/reports/trends.csv">Download trends-only CSV</Link>
         {' | '}
         <Link href="/api/reports/pipeline-runs.csv">Download pipeline runs CSV</Link>
       </p>
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 10,
+          border: '1px solid #e5e7eb',
+          borderRadius: 6,
+          background: '#fcfcfd',
+          color: '#374151'
+        }}
+      >
+        <strong>Which CSV should I use?</strong>
+        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+          <li>
+            <code>full report CSV</code>: trends + gap opportunities + topic recommendations in one file.
+          </li>
+          <li>
+            <code>trends-only CSV</code>: legacy trend schema for existing imports/dashboards.
+          </li>
+          <li>
+            <code>pipeline runs CSV</code>: per-run operational metrics (docs, triggers, clusters, query).
+          </li>
+        </ul>
+      </div>
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 10,
+          border: '1px solid #e5e7eb',
+          borderRadius: 6,
+          background: '#f8fafc',
+          color: '#374151'
+        }}
+      >
+        <strong>Data freshness</strong>
+        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+          <li>
+            <code>Pipeline run</code>:{' '}
+            {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
+          </li>
+          <li>
+            <code>Trend snapshot</code>:{' '}
+            {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
+          </li>
+          <li>
+            <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
+          </li>
+          <li>
+            <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
+          </li>
+        </ul>
+      </div>
       <RunActions />
 
       <h2>Competitor gap insights (v1)</h2>
