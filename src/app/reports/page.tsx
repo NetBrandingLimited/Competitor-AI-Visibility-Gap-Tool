@@ -28,6 +28,7 @@ function envHours(name: string, fallback: number): number {
 
 const FRESH_HOURS = envHours('FRESH_HOURS', 24);
 const AGING_HOURS = envHours('AGING_HOURS', 72);
+const THRESHOLDS_MISCONFIGURED = AGING_HOURS < FRESH_HOURS;
 
 function freshnessFor(iso: string | null): { label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'; color: string } {
   if (!iso) {
@@ -175,6 +176,23 @@ export default async function ReportsPage() {
         <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
           Thresholds: Fresh ≤ {FRESH_HOURS}h, Aging ≤ {AGING_HOURS}h, otherwise Stale.
         </p>
+        {THRESHOLDS_MISCONFIGURED ? (
+          <p
+            style={{
+              marginTop: 8,
+              marginBottom: 8,
+              color: '#b91c1c',
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              borderRadius: 6,
+              padding: '8px 10px',
+              maxWidth: 760
+            }}
+          >
+            Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Set
+            <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
+          </p>
+        ) : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             <code>Pipeline run</code>:{' '}

@@ -34,6 +34,7 @@ export default async function OpsPage() {
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const freshHours = envHours('FRESH_HOURS', 24);
   const agingHours = envHours('AGING_HOURS', 72);
+  const thresholdsMisconfigured = agingHours < freshHours;
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -103,6 +104,21 @@ export default async function OpsPage() {
         {' '}
         otherwise <code>Stale</code>.
       </p>
+      {thresholdsMisconfigured ? (
+        <p
+          style={{
+            color: '#b91c1c',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: 6,
+            padding: '8px 10px',
+            maxWidth: 760
+          }}
+        >
+          Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Use
+          <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
+        </p>
+      ) : null}
 
       <h2>Recent scheduler jobs</h2>
       {jobs.length === 0 ? (
