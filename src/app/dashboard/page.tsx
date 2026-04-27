@@ -15,6 +15,7 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
+  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
@@ -69,6 +70,10 @@ export default async function DashboardPage() {
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
   const thresholds = getFreshnessThresholds();
+  const freshnessThresholds: FreshnessThresholdInput = {
+    freshHours: thresholds.freshHours,
+    agingHours: thresholds.agingHours
+  };
 
   return (
     <section>
@@ -120,19 +125,19 @@ export default async function DashboardPage() {
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             Pipeline run:{' '}
-            <FreshnessLine iso={latestRun?.createdAt ?? null} thresholds={thresholds} />
+            <FreshnessLine iso={latestRun?.createdAt ?? null} thresholds={freshnessThresholds} />
           </li>
           <li>
             Trend snapshot:{' '}
-            <FreshnessLine iso={latestTrend?.generatedAt ?? null} thresholds={thresholds} />
+            <FreshnessLine iso={latestTrend?.generatedAt ?? null} thresholds={freshnessThresholds} />
           </li>
           <li>
             Visibility score:{' '}
-            <FreshnessLine iso={visibility?.createdAt ?? null} thresholds={thresholds} />
+            <FreshnessLine iso={visibility?.createdAt ?? null} thresholds={freshnessThresholds} />
           </li>
           <li>
             Weekly digest:{' '}
-            <FreshnessLine iso={latestDigest?.generatedAt ?? null} thresholds={thresholds} />
+            <FreshnessLine iso={latestDigest?.generatedAt ?? null} thresholds={freshnessThresholds} />
           </li>
         </ul>
       </FreshnessSectionCard>

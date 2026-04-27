@@ -13,6 +13,7 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
+  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
@@ -46,7 +47,7 @@ export default async function ReportsPage() {
     listWeeklyDigests(active.organizationId)
   ]);
   const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds = { freshHours, agingHours };
+  const freshnessThresholds: FreshnessThresholdInput = { freshHours, agingHours };
   const latestSnapshot = snapshots.at(-1) ?? null;
   const latestPipelineRun = pipelineRuns[0] ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
@@ -337,6 +338,7 @@ export default async function ReportsPage() {
     </section>
   );
 }
+
 
 
 

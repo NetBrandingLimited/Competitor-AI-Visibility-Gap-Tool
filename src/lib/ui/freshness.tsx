@@ -2,10 +2,14 @@ import { formatAge } from '@/lib/format/age';
 import type { ReactNode } from 'react';
 
 export type FreshnessLabel = 'Fresh' | 'Aging' | 'Stale' | 'Missing';
+export type FreshnessThresholdInput = {
+  freshHours: number;
+  agingHours: number;
+};
 
 export function getFreshnessLabel(
   iso: string | null,
-  thresholds: { freshHours: number; agingHours: number }
+  thresholds: FreshnessThresholdInput
 ): FreshnessLabel {
   if (!iso) {
     return 'Missing';
@@ -59,7 +63,7 @@ export function FreshnessLine({
   parenthesized = false
 }: {
   iso: string | null;
-  thresholds: { freshHours: number; agingHours: number };
+  thresholds: FreshnessThresholdInput;
   missingText?: string;
   muted?: boolean;
   parenthesized?: boolean;

@@ -14,6 +14,7 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
+  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 
@@ -29,7 +30,7 @@ export default async function OpsPage() {
   const trendSnapshots = await readTrendSnapshots(active.organizationId);
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds = { freshHours, agingHours };
+  const freshnessThresholds: FreshnessThresholdInput = { freshHours, agingHours };
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -177,6 +178,7 @@ export default async function OpsPage() {
     </section>
   );
 }
+
 
 
 
