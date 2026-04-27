@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import CopyDebugConfigButton from './CopyDebugConfigButton';
+import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
@@ -129,13 +129,7 @@ export default async function OpsPage() {
       </ul>
       <FreshnessSectionCard title="Freshness thresholds">
         <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} prefix="Reports badges use:" />
-        <p style={{ marginTop: 6 }}>
-          Runtime debug JSON:{' '}
-          <a href="/api/debug/config" target="_blank" rel="noreferrer">
-            /api/debug/config
-          </a>
-          <CopyDebugConfigButton />
-        </p>
+        <DebugConfigActions />
         {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
       </FreshnessSectionCard>
 

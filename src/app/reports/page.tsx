@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessThresholds } from '@/lib/config/freshness';
@@ -126,12 +127,7 @@ export default async function ReportsPage() {
       </div>
       <FreshnessSectionCard>
         <FreshnessThresholdsHint freshHours={FRESH_HOURS} agingHours={AGING_HOURS} />
-        <p style={{ marginTop: 6 }}>
-          Runtime debug JSON:{' '}
-          <a href="/api/debug/config" target="_blank" rel="noreferrer">
-            /api/debug/config
-          </a>
-        </p>
+        <DebugConfigActions />
         {THRESHOLDS_MISCONFIGURED ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>

@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
-export default function CopyDebugConfigButton() {
+type DebugConfigActionsProps = {
+  className?: string;
+};
+
+export default function DebugConfigActions({ className }: DebugConfigActionsProps) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
-  const [copiedAt, setCopiedAt] = useState<string | null>(null);
+  const [actionAt, setActionAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!message) {
@@ -13,30 +17,32 @@ export default function CopyDebugConfigButton() {
     }
     const timer = window.setTimeout(() => {
       setMessage('');
-      setCopiedAt(null);
+      setActionAt(null);
     }, 4000);
     return () => window.clearTimeout(timer);
   }, [message]);
+
+  async function fetchDebugConfig(): Promise<unknown> {
+    const response = await fetch('/api/debug/config', {
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      throw new Error(`Config fetch failed (${response.status})`);
+    }
+    return response.json();
+  }
 
   async function copyJson() {
     setBusy(true);
     setMessage('');
     try {
-      const response = await fetch('/api/debug/config', {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error(`Config fetch failed (${response.status})`);
-      }
-      const payload = (await response.json()) as unknown;
-      const text = JSON.stringify(payload, null, 2);
-      await navigator.clipboard.writeText(text);
+      const payload = await fetchDebugConfig();
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
       setMessage('Copied debug config JSON.');
-      setCopiedAt(new Date().toLocaleTimeString());
+      setActionAt(new Date().toLocaleTimeString());
     } catch (error) {
-      const text = error instanceof Error ? error.message : 'Copy failed.';
-      setMessage(text);
-      setCopiedAt(null);
+      setMessage(error instanceof Error ? error.message : 'Copy failed.');
+      setActionAt(null);
     } finally {
       setBusy(false);
     }
@@ -46,13 +52,7 @@ export default function CopyDebugConfigButton() {
     setBusy(true);
     setMessage('');
     try {
-      const response = await fetch('/api/debug/config', {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        throw new Error(`Config fetch failed (${response.status})`);
-      }
-      const payload = (await response.json()) as unknown;
+      const payload = await fetchDebugConfig();
       const text = JSON.stringify(payload, null, 2);
       const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
@@ -64,19 +64,22 @@ export default function CopyDebugConfigButton() {
       anchor.remove();
       URL.revokeObjectURL(url);
       setMessage('Downloaded debug config JSON.');
-      setCopiedAt(new Date().toLocaleTimeString());
+      setActionAt(new Date().toLocaleTimeString());
     } catch (error) {
-      const text = error instanceof Error ? error.message : 'Download failed.';
-      setMessage(text);
-      setCopiedAt(null);
+      setMessage(error instanceof Error ? error.message : 'Download failed.');
+      setActionAt(null);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <span style={{ marginLeft: 10 }}>
-      <button type="button" onClick={copyJson} disabled={busy} style={{ padding: '4px 10px' }}>
+    <p style={{ marginTop: 6 }} className={className}>
+      Runtime debug JSON:{' '}
+      <a href="/api/debug/config" target="_blank" rel="noreferrer">
+        /api/debug/config
+      </a>
+      <button type="button" onClick={copyJson} disabled={busy} style={{ marginLeft: 10, padding: '4px 10px' }}>
         {busy ? 'Copying...' : 'Copy JSON'}
       </button>
       <button type="button" onClick={downloadJson} disabled={busy} style={{ marginLeft: 8, padding: '4px 10px' }}>
@@ -90,9 +93,9 @@ export default function CopyDebugConfigButton() {
           }}
         >
           {message}
-          {copiedAt ? <span style={{ marginLeft: 6, color: '#6b7280' }}>at {copiedAt}</span> : null}
+          {actionAt ? <span style={{ marginLeft: 6, color: '#6b7280' }}>at {actionAt}</span> : null}
         </span>
       ) : null}
-    </span>
+    </p>
   );
 }
