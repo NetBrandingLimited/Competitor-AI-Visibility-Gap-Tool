@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { getFreshnessThresholds } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
+import { formatAge } from '@/lib/format/age';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
@@ -15,6 +17,23 @@ import VisibilityScoreCard from './VisibilityScoreCard';
 
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function freshnessLabel(
+  iso: string | null,
+  thresholds: { freshHours: number; agingHours: number }
+): 'Fresh' | 'Aging' | 'Stale' | 'Missing' {
+  if (!iso) {
+    return 'Missing';
+  }
+  const ageMs = Date.now() - new Date(iso).getTime();
+  if (ageMs <= thresholds.freshHours * 60 * 60 * 1000) {
+    return 'Fresh';
+  }
+  if (ageMs <= thresholds.agingHours * 60 * 60 * 1000) {
+    return 'Aging';
+  }
+  return 'Stale';
 }
 
 export default async function DashboardPage() {
@@ -60,6 +79,7 @@ export default async function DashboardPage() {
   const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
+  const thresholds = getFreshnessThresholds();
 
   return (
     <section>
@@ -104,6 +124,44 @@ export default async function DashboardPage() {
           <Link href="/reports">Generate one from Reports</Link>.
         </p>
       )}
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 10,
+          border: '1px solid #e5e7eb',
+          borderRadius: 6,
+          background: '#f8fafc',
+          color: '#374151'
+        }}
+      >
+        <strong>Data freshness</strong>
+        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+          <li>
+            Pipeline run:{' '}
+            {latestRun
+              ? `${formatAge(latestRun.createdAt)} (${freshnessLabel(latestRun.createdAt, thresholds)})`
+              : 'no data'}
+          </li>
+          <li>
+            Trend snapshot:{' '}
+            {latestTrend
+              ? `${formatAge(latestTrend.generatedAt)} (${freshnessLabel(latestTrend.generatedAt, thresholds)})`
+              : 'no data'}
+          </li>
+          <li>
+            Visibility score:{' '}
+            {visibility
+              ? `${formatAge(visibility.createdAt)} (${freshnessLabel(visibility.createdAt, thresholds)})`
+              : 'no data'}
+          </li>
+          <li>
+            Weekly digest:{' '}
+            {latestDigest
+              ? `${formatAge(latestDigest.generatedAt)} (${freshnessLabel(latestDigest.generatedAt, thresholds)})`
+              : 'no data'}
+          </li>
+        </ul>
+      </div>
 
       <p>
         Tables below use your organization&apos;s <strong>Brand</strong> and <strong>Competitors</strong> from{' '}
