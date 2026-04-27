@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function CopyDebugConfigButton() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [copiedAt, setCopiedAt] = useState<string | null>(null);
 
   async function copyJson() {
     setBusy(true);
@@ -20,9 +21,11 @@ export default function CopyDebugConfigButton() {
       const text = JSON.stringify(payload, null, 2);
       await navigator.clipboard.writeText(text);
       setMessage('Copied debug config JSON.');
+      setCopiedAt(new Date().toLocaleTimeString());
     } catch (error) {
       const text = error instanceof Error ? error.message : 'Copy failed.';
       setMessage(text);
+      setCopiedAt(null);
     } finally {
       setBusy(false);
     }
@@ -34,7 +37,10 @@ export default function CopyDebugConfigButton() {
         {busy ? 'Copying...' : 'Copy JSON'}
       </button>
       {message ? (
-        <span style={{ marginLeft: 8, color: message.startsWith('Copied') ? '#166534' : '#b91c1c' }}>{message}</span>
+        <span style={{ marginLeft: 8, color: message.startsWith('Copied') ? '#166534' : '#b91c1c' }}>
+          {message}
+          {copiedAt ? <span style={{ marginLeft: 6, color: '#6b7280' }}>at {copiedAt}</span> : null}
+        </span>
       ) : null}
     </span>
   );
