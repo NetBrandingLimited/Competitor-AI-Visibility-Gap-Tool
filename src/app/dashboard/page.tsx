@@ -11,60 +11,13 @@ import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
+import { FreshnessPill, getFreshnessLabel } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
 
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
-}
-
-function freshnessLabel(
-  iso: string | null,
-  thresholds: { freshHours: number; agingHours: number }
-): 'Fresh' | 'Aging' | 'Stale' | 'Missing' {
-  if (!iso) {
-    return 'Missing';
-  }
-  const ageMs = Date.now() - new Date(iso).getTime();
-  if (ageMs <= thresholds.freshHours * 60 * 60 * 1000) {
-    return 'Fresh';
-  }
-  if (ageMs <= thresholds.agingHours * 60 * 60 * 1000) {
-    return 'Aging';
-  }
-  return 'Stale';
-}
-
-function freshnessColor(label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'): string {
-  switch (label) {
-    case 'Fresh':
-      return '#166534';
-    case 'Aging':
-      return '#a16207';
-    case 'Stale':
-      return '#b91c1c';
-    default:
-      return '#6b7280';
-  }
-}
-
-function freshnessPill(label: 'Fresh' | 'Aging' | 'Stale' | 'Missing') {
-  return (
-    <span
-      style={{
-        marginLeft: 8,
-        padding: '2px 8px',
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 600,
-        color: '#fff',
-        background: freshnessColor(label)
-      }}
-    >
-      {label}
-    </span>
-  );
 }
 
 export default async function DashboardPage() {
@@ -172,12 +125,12 @@ export default async function DashboardPage() {
             {latestRun ? (
               <>
                 {formatAge(latestRun.createdAt)}
-                {freshnessPill(freshnessLabel(latestRun.createdAt, thresholds))}
+                <FreshnessPill label={getFreshnessLabel(latestRun.createdAt, thresholds)} />
               </>
             ) : (
               <>
                 no data
-                {freshnessPill('Missing')}
+                <FreshnessPill label="Missing" />
               </>
             )}
           </li>
@@ -186,12 +139,12 @@ export default async function DashboardPage() {
             {latestTrend ? (
               <>
                 {formatAge(latestTrend.generatedAt)}
-                {freshnessPill(freshnessLabel(latestTrend.generatedAt, thresholds))}
+                <FreshnessPill label={getFreshnessLabel(latestTrend.generatedAt, thresholds)} />
               </>
             ) : (
               <>
                 no data
-                {freshnessPill('Missing')}
+                <FreshnessPill label="Missing" />
               </>
             )}
           </li>
@@ -200,12 +153,12 @@ export default async function DashboardPage() {
             {visibility ? (
               <>
                 {formatAge(visibility.createdAt)}
-                {freshnessPill(freshnessLabel(visibility.createdAt, thresholds))}
+                <FreshnessPill label={getFreshnessLabel(visibility.createdAt, thresholds)} />
               </>
             ) : (
               <>
                 no data
-                {freshnessPill('Missing')}
+                <FreshnessPill label="Missing" />
               </>
             )}
           </li>
@@ -214,12 +167,12 @@ export default async function DashboardPage() {
             {latestDigest ? (
               <>
                 {formatAge(latestDigest.generatedAt)}
-                {freshnessPill(freshnessLabel(latestDigest.generatedAt, thresholds))}
+                <FreshnessPill label={getFreshnessLabel(latestDigest.generatedAt, thresholds)} />
               </>
             ) : (
               <>
                 no data
-                {freshnessPill('Missing')}
+                <FreshnessPill label="Missing" />
               </>
             )}
           </li>

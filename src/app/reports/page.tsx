@@ -9,6 +9,7 @@ import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
+import { FreshnessPill, getFreshnessLabel } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -19,37 +20,8 @@ function display(value: string | null | undefined): string {
 const { freshHours: FRESH_HOURS, agingHours: AGING_HOURS, misconfigured: THRESHOLDS_MISCONFIGURED } =
   getFreshnessThresholds();
 
-function freshnessFor(iso: string | null): { label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'; color: string } {
-  if (!iso) {
-    return { label: 'Missing', color: '#6b7280' };
-  }
-  const ageMs = Date.now() - new Date(iso).getTime();
-  if (ageMs <= FRESH_HOURS * 60 * 60 * 1000) {
-    return { label: 'Fresh', color: '#166534' };
-  }
-  if (ageMs <= AGING_HOURS * 60 * 60 * 1000) {
-    return { label: 'Aging', color: '#a16207' };
-  }
-  return { label: 'Stale', color: '#b91c1c' };
-}
-
 function freshnessBadge(iso: string | null) {
-  const info = freshnessFor(iso);
-  return (
-    <span
-      style={{
-        marginLeft: 8,
-        padding: '2px 8px',
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 600,
-        color: '#fff',
-        background: info.color
-      }}
-    >
-      {info.label}
-    </span>
-  );
+  return <FreshnessPill label={getFreshnessLabel(iso, { freshHours: FRESH_HOURS, agingHours: AGING_HOURS })} />;
 }
 
 export default async function ReportsPage() {
