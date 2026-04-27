@@ -30,3 +30,10 @@ export function getFreshnessThresholds(): FreshnessThresholds {
     misconfigured: agingHours < freshHours
   };
 }
+
+export function toFreshnessInput(thresholds: FreshnessThresholds): FreshnessThresholdInput {
+  return {
+    freshHours: thresholds.freshHours,
+    agingHours: thresholds.agingHours
+  };
+}

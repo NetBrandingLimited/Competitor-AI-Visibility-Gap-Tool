@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
+import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -46,7 +46,7 @@ export default async function ReportsPage() {
     listWeeklyDigests(active.organizationId)
   ]);
   const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds: FreshnessThresholdInput = { freshHours, agingHours };
+  const freshnessThresholds = toFreshnessInput({ freshHours, agingHours, misconfigured: thresholdsMisconfigured });
   const latestSnapshot = snapshots.at(-1) ?? null;
   const latestPipelineRun = pipelineRuns[0] ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
@@ -337,6 +337,7 @@ export default async function ReportsPage() {
     </section>
   );
 }
+
 
 
 

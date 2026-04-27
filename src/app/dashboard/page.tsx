@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import DebugConfigActions from '@/app/components/DebugConfigActions';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
+import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
@@ -69,10 +69,7 @@ export default async function DashboardPage() {
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
   const thresholds = getFreshnessThresholds();
-  const freshnessThresholds: FreshnessThresholdInput = {
-    freshHours: thresholds.freshHours,
-    agingHours: thresholds.agingHours
-  };
+  const freshnessThresholds = toFreshnessInput(thresholds);
 
   return (
     <section>
@@ -297,6 +294,7 @@ export default async function DashboardPage() {
     </section>
   );
 }
+
 
 
 

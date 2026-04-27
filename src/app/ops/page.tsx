@@ -5,7 +5,7 @@ import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
+import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -29,7 +29,7 @@ export default async function OpsPage() {
   const trendSnapshots = await readTrendSnapshots(active.organizationId);
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds: FreshnessThresholdInput = { freshHours, agingHours };
+  const freshnessThresholds = toFreshnessInput({ freshHours, agingHours, misconfigured: thresholdsMisconfigured });
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -177,6 +177,7 @@ export default async function OpsPage() {
     </section>
   );
 }
+
 
 
 
