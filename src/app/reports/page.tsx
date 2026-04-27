@@ -22,10 +22,6 @@ function display(value: string | null | undefined): string {
   return t && t.length > 0 ? t : '—';
 }
 
-const { freshHours: FRESH_HOURS, agingHours: AGING_HOURS, misconfigured: THRESHOLDS_MISCONFIGURED } =
-  getFreshnessThresholds();
-const freshnessThresholds = { freshHours: FRESH_HOURS, agingHours: AGING_HOURS };
-
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -49,6 +45,8 @@ export default async function ReportsPage() {
     buildGapInsightsForOrg(active.organizationId),
     listWeeklyDigests(active.organizationId)
   ]);
+  const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
+  const freshnessThresholds = { freshHours, agingHours };
   const latestSnapshot = snapshots.at(-1) ?? null;
   const latestPipelineRun = pipelineRuns[0] ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
@@ -126,9 +124,9 @@ export default async function ReportsPage() {
         </ul>
       </div>
       <FreshnessSectionCard>
-        <FreshnessThresholdsHint freshHours={FRESH_HOURS} agingHours={AGING_HOURS} />
+        <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} />
         <DebugConfigActions />
-        {THRESHOLDS_MISCONFIGURED ? <FreshnessMisconfiguredNotice /> : null}
+        {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             <code>Pipeline run</code>:{' '}

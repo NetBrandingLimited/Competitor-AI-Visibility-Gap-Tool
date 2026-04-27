@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type DebugConfigActionsProps = {
   className?: string;
@@ -10,6 +10,14 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
   const [busyAction, setBusyAction] = useState<null | 'copy' | 'download'>(null);
   const [message, setMessage] = useState('');
   const [actionAt, setActionAt] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!message) {
@@ -38,13 +46,19 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
     try {
       const payload = await fetchDebugConfig();
       await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-      setMessage('Copied debug config JSON.');
-      setActionAt(new Date().toLocaleTimeString());
+      if (mountedRef.current) {
+        setMessage('Copied debug config JSON.');
+        setActionAt(new Date().toLocaleTimeString());
+      }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Copy failed.');
-      setActionAt(null);
+      if (mountedRef.current) {
+        setMessage(error instanceof Error ? error.message : 'Copy failed.');
+        setActionAt(null);
+      }
     } finally {
-      setBusyAction(null);
+      if (mountedRef.current) {
+        setBusyAction(null);
+      }
     }
   }
 
@@ -63,13 +77,19 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
       anchor.click();
       anchor.remove();
       URL.revokeObjectURL(url);
-      setMessage('Downloaded debug config JSON.');
-      setActionAt(new Date().toLocaleTimeString());
+      if (mountedRef.current) {
+        setMessage('Downloaded debug config JSON.');
+        setActionAt(new Date().toLocaleTimeString());
+      }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Download failed.');
-      setActionAt(null);
+      if (mountedRef.current) {
+        setMessage(error instanceof Error ? error.message : 'Download failed.');
+        setActionAt(null);
+      }
     } finally {
-      setBusyAction(null);
+      if (mountedRef.current) {
+        setBusyAction(null);
+      }
     }
   }
 
