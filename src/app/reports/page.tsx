@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessThresholds } from '@/lib/config/freshness';
+import { formatAge } from '@/lib/format/age';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -49,29 +50,6 @@ function freshnessBadge(iso: string | null) {
       {info.label}
     </span>
   );
-}
-
-function formatAge(iso: string | null): string {
-  if (!iso) {
-    return 'no data';
-  }
-  const deltaMs = Date.now() - new Date(iso).getTime();
-  if (!Number.isFinite(deltaMs) || deltaMs < 0) {
-    return 'just now';
-  }
-  const mins = Math.floor(deltaMs / 60000);
-  if (mins < 1) {
-    return 'just now';
-  }
-  if (mins < 60) {
-    return `${mins}m ago`;
-  }
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) {
-    return `${hours}h ago`;
-  }
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 export default async function ReportsPage() {
@@ -390,3 +368,4 @@ export default async function ReportsPage() {
     </section>
   );
 }
+

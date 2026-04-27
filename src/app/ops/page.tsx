@@ -6,6 +6,7 @@ import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessThresholds } from '@/lib/config/freshness';
+import { formatAge } from '@/lib/format/age';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -70,16 +71,33 @@ export default async function OpsPage() {
           {latestJob ? (
             <>
               <code>{latestJob.id}</code> ({latestJob.status})
+              <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestJob.completedAt)})</span>
             </>
           ) : (
             'none'
           )}
         </li>
         <li>
-          Latest unified run: {latestRun ? <code>{latestRun.id}</code> : 'none'}
+          Latest unified run:{' '}
+          {latestRun ? (
+            <>
+              <code>{latestRun.id}</code>
+              <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestRun.createdAt)})</span>
+            </>
+          ) : (
+            'none'
+          )}
         </li>
         <li>
-          Latest trend snapshot: {latestTrend ? <code>{latestTrend.date}</code> : 'none'}
+          Latest trend snapshot:{' '}
+          {latestTrend ? (
+            <>
+              <code>{latestTrend.date}</code>
+              <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestTrend.generatedAt)})</span>
+            </>
+          ) : (
+            'none'
+          )}
         </li>
       </ul>
       <h2>Freshness thresholds</h2>
@@ -159,3 +177,4 @@ export default async function OpsPage() {
     </section>
   );
 }
+
