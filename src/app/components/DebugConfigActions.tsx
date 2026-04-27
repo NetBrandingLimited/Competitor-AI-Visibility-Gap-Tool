@@ -11,11 +11,13 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
   const [message, setMessage] = useState('');
   const [actionAt, setActionAt] = useState<string | null>(null);
   const mountedRef = useRef(true);
+  const requestControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      requestControllerRef.current?.abort();
     };
   }, []);
 
@@ -31,8 +33,12 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
   }, [message]);
 
   async function fetchDebugConfig(): Promise<unknown> {
+    requestControllerRef.current?.abort();
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
     const response = await fetch('/api/debug/config', {
-      credentials: 'include'
+      credentials: 'include',
+      signal: controller.signal
     });
     if (!response.ok) {
       throw new Error(`Config fetch failed (${response.status})`);
@@ -51,7 +57,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         setActionAt(new Date().toLocaleTimeString());
       }
     } catch (error) {
-      if (mountedRef.current) {
+      if (mountedRef.current && !(error instanceof DOMException && error.name === 'AbortError')) {
         setMessage(error instanceof Error ? error.message : 'Copy failed.');
         setActionAt(null);
       }
@@ -82,7 +88,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         setActionAt(new Date().toLocaleTimeString());
       }
     } catch (error) {
-      if (mountedRef.current) {
+      if (mountedRef.current && !(error instanceof DOMException && error.name === 'AbortError')) {
         setMessage(error instanceof Error ? error.message : 'Download failed.');
         setActionAt(null);
       }
