@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
+import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
@@ -9,10 +10,7 @@ import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import {
-  FreshnessLine,
-  FreshnessSectionCard
-} from '@/lib/ui/freshness';
+import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -130,52 +128,30 @@ export default async function ReportsPage() {
           misconfigured={thresholdsMisconfigured}
         />
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-          <li>
-            <code>Pipeline run</code>:{' '}
-            {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
-            <span style={{ marginLeft: 6 }}>
-              <FreshnessLine
-                iso={latestPipelineRun?.createdAt ?? null}
-                thresholds={freshnessThresholds}
-                muted
-                parenthesized
-              />
-            </span>
-          </li>
-          <li>
-            <code>Trend snapshot</code>:{' '}
-            {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6 }}>
-              <FreshnessLine
-                iso={latestSnapshot?.generatedAt ?? null}
-                thresholds={freshnessThresholds}
-                muted
-                parenthesized
-              />
-            </span>
-          </li>
-          <li>
-            <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
-            <span style={{ marginLeft: 6 }}>
-              <FreshnessLine
-                iso={gapInsights.generatedAt}
-                thresholds={freshnessThresholds}
-                muted
-                parenthesized
-              />
-            </span>
-          </li>
-          <li>
-            <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6 }}>
-              <FreshnessLine
-                iso={latestDigest?.generatedAt ?? null}
-                thresholds={freshnessThresholds}
-                muted
-                parenthesized
-              />
-            </span>
-          </li>
+          <FreshnessTimestampListItem
+            label="Pipeline run"
+            iso={latestPipelineRun?.createdAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not run yet"
+          />
+          <FreshnessTimestampListItem
+            label="Trend snapshot"
+            iso={latestSnapshot?.generatedAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+          />
+          <FreshnessTimestampListItem
+            label="Gap insights"
+            iso={gapInsights.generatedAt}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+          />
+          <FreshnessTimestampListItem
+            label="Weekly digest"
+            iso={latestDigest?.generatedAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+          />
         </ul>
       </FreshnessSectionCard>
       <RunActions />

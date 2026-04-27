@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
+import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
@@ -11,10 +12,7 @@ import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import {
-  FreshnessLine,
-  FreshnessSectionCard
-} from '@/lib/ui/freshness';
+import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -118,22 +116,34 @@ export default async function DashboardPage() {
           misconfigured={thresholds.misconfigured}
         />
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
-          <li>
-            Pipeline run:{' '}
-            <FreshnessLine iso={latestRun?.createdAt ?? null} thresholds={freshnessThresholds} />
-          </li>
-          <li>
-            Trend snapshot:{' '}
-            <FreshnessLine iso={latestTrend?.generatedAt ?? null} thresholds={freshnessThresholds} />
-          </li>
-          <li>
-            Visibility score:{' '}
-            <FreshnessLine iso={visibility?.createdAt ?? null} thresholds={freshnessThresholds} />
-          </li>
-          <li>
-            Weekly digest:{' '}
-            <FreshnessLine iso={latestDigest?.generatedAt ?? null} thresholds={freshnessThresholds} />
-          </li>
+          <FreshnessTimestampListItem
+            label="Pipeline run"
+            iso={latestRun?.createdAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not run yet"
+            showTimestamp={false}
+          />
+          <FreshnessTimestampListItem
+            label="Trend snapshot"
+            iso={latestTrend?.generatedAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+            showTimestamp={false}
+          />
+          <FreshnessTimestampListItem
+            label="Visibility score"
+            iso={visibility?.createdAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+            showTimestamp={false}
+          />
+          <FreshnessTimestampListItem
+            label="Weekly digest"
+            iso={latestDigest?.generatedAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
+            showTimestamp={false}
+          />
         </ul>
       </FreshnessSectionCard>
 
