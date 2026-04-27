@@ -1,11 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function CopyDebugConfigButton() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [copiedAt, setCopiedAt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setMessage('');
+      setCopiedAt(null);
+    }, 4000);
+    return () => window.clearTimeout(timer);
+  }, [message]);
 
   async function copyJson() {
     setBusy(true);
