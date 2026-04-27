@@ -5,13 +5,12 @@ import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/l
 import { getFreshnessThresholds } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
-import { formatAge } from '@/lib/format/age';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessPill, getFreshnessLabel } from '@/lib/ui/freshness';
+import { FreshnessLine } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -122,59 +121,19 @@ export default async function DashboardPage() {
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             Pipeline run:{' '}
-            {latestRun ? (
-              <>
-                {formatAge(latestRun.createdAt)}
-                <FreshnessPill label={getFreshnessLabel(latestRun.createdAt, thresholds)} />
-              </>
-            ) : (
-              <>
-                no data
-                <FreshnessPill label="Missing" />
-              </>
-            )}
+            <FreshnessLine iso={latestRun?.createdAt ?? null} thresholds={thresholds} />
           </li>
           <li>
             Trend snapshot:{' '}
-            {latestTrend ? (
-              <>
-                {formatAge(latestTrend.generatedAt)}
-                <FreshnessPill label={getFreshnessLabel(latestTrend.generatedAt, thresholds)} />
-              </>
-            ) : (
-              <>
-                no data
-                <FreshnessPill label="Missing" />
-              </>
-            )}
+            <FreshnessLine iso={latestTrend?.generatedAt ?? null} thresholds={thresholds} />
           </li>
           <li>
             Visibility score:{' '}
-            {visibility ? (
-              <>
-                {formatAge(visibility.createdAt)}
-                <FreshnessPill label={getFreshnessLabel(visibility.createdAt, thresholds)} />
-              </>
-            ) : (
-              <>
-                no data
-                <FreshnessPill label="Missing" />
-              </>
-            )}
+            <FreshnessLine iso={visibility?.createdAt ?? null} thresholds={thresholds} />
           </li>
           <li>
             Weekly digest:{' '}
-            {latestDigest ? (
-              <>
-                {formatAge(latestDigest.generatedAt)}
-                <FreshnessPill label={getFreshnessLabel(latestDigest.generatedAt, thresholds)} />
-              </>
-            ) : (
-              <>
-                no data
-                <FreshnessPill label="Missing" />
-              </>
-            )}
+            <FreshnessLine iso={latestDigest?.generatedAt ?? null} thresholds={thresholds} />
           </li>
         </ul>
       </div>

@@ -1,3 +1,5 @@
+import { formatAge } from '@/lib/format/age';
+
 export type FreshnessLabel = 'Fresh' | 'Aging' | 'Stale' | 'Missing';
 
 export function getFreshnessLabel(
@@ -45,5 +47,30 @@ export function FreshnessPill({ label }: { label: FreshnessLabel }) {
     >
       {label}
     </span>
+  );
+}
+
+export function FreshnessLine({
+  iso,
+  thresholds,
+  missingText = 'no data'
+}: {
+  iso: string | null;
+  thresholds: { freshHours: number; agingHours: number };
+  missingText?: string;
+}) {
+  if (!iso) {
+    return (
+      <>
+        {missingText}
+        <FreshnessPill label="Missing" />
+      </>
+    );
+  }
+  return (
+    <>
+      {formatAge(iso)}
+      <FreshnessPill label={getFreshnessLabel(iso, thresholds)} />
+    </>
   );
 }
