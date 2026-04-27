@@ -1,19 +1,17 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import DebugConfigActions from '@/app/components/DebugConfigActions';
+import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
+import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import {
   FreshnessLine,
-  FreshnessMisconfiguredNotice,
-  FreshnessSectionCard,
-  FreshnessThresholdsHint
+  FreshnessSectionCard
 } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
@@ -45,8 +43,10 @@ export default async function ReportsPage() {
     buildGapInsightsForOrg(active.organizationId),
     listWeeklyDigests(active.organizationId)
   ]);
-  const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds = toFreshnessInput({ freshHours, agingHours, misconfigured: thresholdsMisconfigured });
+  const {
+    thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
+    input: freshnessThresholds
+  } = getFreshnessConfig();
   const latestSnapshot = snapshots.at(-1) ?? null;
   const latestPipelineRun = pipelineRuns[0] ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
@@ -124,9 +124,11 @@ export default async function ReportsPage() {
         </ul>
       </div>
       <FreshnessSectionCard>
-        <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} />
-        <DebugConfigActions />
-        {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
+        <FreshnessConfigInfo
+          freshHours={freshHours}
+          agingHours={agingHours}
+          misconfigured={thresholdsMisconfigured}
+        />
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             <code>Pipeline run</code>:{' '}
@@ -337,6 +339,7 @@ export default async function ReportsPage() {
     </section>
   );
 }
+
 
 
 

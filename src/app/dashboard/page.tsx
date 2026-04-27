@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import DebugConfigActions from '@/app/components/DebugConfigActions';
+import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
+import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
@@ -13,9 +13,7 @@ import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import {
   FreshnessLine,
-  FreshnessMisconfiguredNotice,
-  FreshnessSectionCard,
-  FreshnessThresholdsHint
+  FreshnessSectionCard
 } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
@@ -68,8 +66,7 @@ export default async function DashboardPage() {
   const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
-  const thresholds = getFreshnessThresholds();
-  const freshnessThresholds = toFreshnessInput(thresholds);
+  const { thresholds, input: freshnessThresholds } = getFreshnessConfig();
 
   return (
     <section>
@@ -115,9 +112,11 @@ export default async function DashboardPage() {
         </p>
       )}
       <FreshnessSectionCard>
-        <FreshnessThresholdsHint freshHours={thresholds.freshHours} agingHours={thresholds.agingHours} />
-        <DebugConfigActions />
-        {thresholds.misconfigured ? <FreshnessMisconfiguredNotice /> : null}
+        <FreshnessConfigInfo
+          freshHours={thresholds.freshHours}
+          agingHours={thresholds.agingHours}
+          misconfigured={thresholds.misconfigured}
+        />
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             Pipeline run:{' '}
@@ -294,6 +293,7 @@ export default async function DashboardPage() {
     </section>
   );
 }
+
 
 
 

@@ -1,20 +1,18 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import DebugConfigActions from '@/app/components/DebugConfigActions';
+import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds, toFreshnessInput } from '@/lib/config/freshness';
+import { getFreshnessConfig } from '@/lib/config/freshness';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import {
   FreshnessLine,
-  FreshnessMisconfiguredNotice,
-  FreshnessSectionCard,
-  FreshnessThresholdsHint
+  FreshnessSectionCard
 } from '@/lib/ui/freshness';
 
 export default async function OpsPage() {
@@ -28,8 +26,10 @@ export default async function OpsPage() {
   const latestRun = await readLatestPipelineRun(active.organizationId);
   const trendSnapshots = await readTrendSnapshots(active.organizationId);
   const latestTrend = trendSnapshots.at(-1) ?? null;
-  const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
-  const freshnessThresholds = toFreshnessInput({ freshHours, agingHours, misconfigured: thresholdsMisconfigured });
+  const {
+    thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
+    input: freshnessThresholds
+  } = getFreshnessConfig();
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -128,9 +128,12 @@ export default async function OpsPage() {
         </li>
       </ul>
       <FreshnessSectionCard title="Freshness thresholds">
-        <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} prefix="Reports badges use:" />
-        <DebugConfigActions />
-        {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
+        <FreshnessConfigInfo
+          freshHours={freshHours}
+          agingHours={agingHours}
+          misconfigured={thresholdsMisconfigured}
+          prefix="Reports badges use:"
+        />
       </FreshnessSectionCard>
 
       <h2>Recent scheduler jobs</h2>
@@ -177,6 +180,7 @@ export default async function OpsPage() {
     </section>
   );
 }
+
 
 
 

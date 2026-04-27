@@ -37,3 +37,11 @@ export function toFreshnessInput(thresholds: FreshnessThresholds): FreshnessThre
     agingHours: thresholds.agingHours
   };
 }
+
+export function getFreshnessConfig() {
+  const thresholds = getFreshnessThresholds();
+  return {
+    thresholds,
+    input: toFreshnessInput(thresholds)
+  };
+}
