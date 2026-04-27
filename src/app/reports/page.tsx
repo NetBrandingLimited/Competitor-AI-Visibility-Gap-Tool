@@ -8,7 +8,7 @@ import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine } from '@/lib/ui/freshness';
+import { FreshnessLine, FreshnessMisconfiguredNotice } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -132,23 +132,7 @@ export default async function ReportsPage() {
         <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
           Thresholds: Fresh ≤ {FRESH_HOURS}h, Aging ≤ {AGING_HOURS}h, otherwise Stale.
         </p>
-        {THRESHOLDS_MISCONFIGURED ? (
-          <p
-            style={{
-              marginTop: 8,
-              marginBottom: 8,
-              color: '#b91c1c',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: 6,
-              padding: '8px 10px',
-              maxWidth: 760
-            }}
-          >
-            Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Set
-            <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
-          </p>
-        ) : null}
+        {THRESHOLDS_MISCONFIGURED ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             <code>Pipeline run</code>:{' '}
@@ -359,4 +343,6 @@ export default async function ReportsPage() {
     </section>
   );
 }
+
+
 

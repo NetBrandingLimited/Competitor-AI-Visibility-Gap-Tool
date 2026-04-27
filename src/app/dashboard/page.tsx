@@ -10,7 +10,7 @@ import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine } from '@/lib/ui/freshness';
+import { FreshnessLine, FreshnessMisconfiguredNotice } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -118,23 +118,7 @@ export default async function DashboardPage() {
         }}
       >
         <strong>Data freshness</strong>
-        {thresholds.misconfigured ? (
-          <p
-            style={{
-              marginTop: 8,
-              marginBottom: 8,
-              color: '#b91c1c',
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              borderRadius: 6,
-              padding: '8px 10px',
-              maxWidth: 760
-            }}
-          >
-            Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Set
-            <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
-          </p>
-        ) : null}
+        {thresholds.misconfigured ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             Pipeline run:{' '}
@@ -311,3 +295,5 @@ export default async function DashboardPage() {
     </section>
   );
 }
+
+

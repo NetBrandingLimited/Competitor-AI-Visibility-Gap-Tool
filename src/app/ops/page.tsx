@@ -10,7 +10,7 @@ import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine } from '@/lib/ui/freshness';
+import { FreshnessLine, FreshnessMisconfiguredNotice } from '@/lib/ui/freshness';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -123,21 +123,7 @@ export default async function OpsPage() {
         </a>
         <CopyDebugConfigButton />
       </p>
-      {thresholdsMisconfigured ? (
-        <p
-          style={{
-            color: '#b91c1c',
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            borderRadius: 6,
-            padding: '8px 10px',
-            maxWidth: 760
-          }}
-        >
-          Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Use
-          <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
-        </p>
-      ) : null}
+      {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
 
       <h2>Recent scheduler jobs</h2>
       {jobs.length === 0 ? (
@@ -183,4 +169,6 @@ export default async function OpsPage() {
     </section>
   );
 }
+
+
 

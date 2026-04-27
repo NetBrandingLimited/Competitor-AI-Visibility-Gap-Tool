@@ -74,3 +74,23 @@ export function FreshnessLine({
     </>
   );
 }
+
+export function FreshnessMisconfiguredNotice() {
+  return (
+    <p
+      style={{
+        marginTop: 8,
+        marginBottom: 8,
+        color: '#b91c1c',
+        background: '#fef2f2',
+        border: '1px solid #fecaca',
+        borderRadius: 6,
+        padding: '8px 10px',
+        maxWidth: 760
+      }}
+    >
+      Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Set
+      <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
+    </p>
+  );
+}
