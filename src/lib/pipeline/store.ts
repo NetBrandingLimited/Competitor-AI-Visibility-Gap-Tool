@@ -103,6 +103,18 @@ export async function readLatestPipelineRun(
   return rowToRun(run);
 }
 
+export async function readRecentPipelineRuns(
+  organizationId: string,
+  take: number
+): Promise<UnifiedPipelineRun[]> {
+  const rows = await prisma.pipelineRun.findMany({
+    where: { organizationId },
+    orderBy: { createdAt: 'desc' },
+    take
+  });
+  return rows.map((row) => rowToRun(row)).filter((r): r is UnifiedPipelineRun => r !== null);
+}
+
 export async function readPipelineRunById(
   organizationId: string,
   runId: string

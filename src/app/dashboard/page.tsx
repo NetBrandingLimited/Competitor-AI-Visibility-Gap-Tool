@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
-import { readLatestPipelineRun } from '@/lib/pipeline/store';
+import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
@@ -31,23 +32,30 @@ export default async function DashboardPage() {
       competitorC: true
     }
   });
-  const snapshot = getDashboardSnapshotForOrganization(
-    org
-      ? {
-          brandName: org.brandName,
-          category: org.category,
-          competitorA: org.competitorA,
-          competitorB: org.competitorB,
-          competitorC: org.competitorC
-        }
-      : {}
-  );
-  const [latestRun, trendSnapshots, visibility, weeklyDigests] = await Promise.all([
-    readLatestPipelineRun(active.organizationId),
+  const orgFields = org
+    ? {
+        brandName: org.brandName,
+        category: org.category,
+        competitorA: org.competitorA,
+        competitorB: org.competitorB,
+        competitorC: org.competitorC
+      }
+    : {};
+
+  const [recentRuns, trendSnapshots, visibility, weeklyDigests] = await Promise.all([
+    readRecentPipelineRuns(active.organizationId, 2),
     readTrendSnapshots(active.organizationId),
     getLatestVisibilityScore(active.organizationId),
     listWeeklyDigests(active.organizationId)
   ]);
+  const latestRun = recentRuns[0] ?? null;
+  const previousRun = recentRuns[1] ?? null;
+
+  const pipelineSnapshot =
+    latestRun ? buildPipelineDashboardSnapshot(orgFields, latestRun, previousRun) : null;
+  const mockSnapshot = getDashboardSnapshotForOrganization(orgFields);
+  const snapshot = pipelineSnapshot ?? mockSnapshot;
+  const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
 
@@ -96,23 +104,43 @@ export default async function DashboardPage() {
       )}
 
       <p>
-        Snapshot below uses your organization&apos;s <strong>Brand</strong> and <strong>Competitors</strong> from{' '}
+        Tables below use your organization&apos;s <strong>Brand</strong> and <strong>Competitors</strong> from{' '}
         <a href="/settings/brand">Brand settings</a>. Optional analytics wiring:{' '}
         <a href="/settings/connectors">Data connectors</a>.
+      </p>
+      <p style={{ color: leaderboardSource === 'pipeline' ? '#0f5132' : '#664d03' }}>
+        {leaderboardSource === 'pipeline' ? (
+          <>
+            <strong>Live data</strong> from your latest pipeline run (mention counts in ingested text).{' '}
+            {previousRun ? (
+              <>Share-of-voice change vs the prior run is shown in the last column.</>
+            ) : (
+              <>Run the pipeline again to populate the &quot;vs prior run&quot; column.</>
+            )}
+          </>
+        ) : (
+          <>
+            <strong>Preview data</strong> — set brand and competitors, run the unified pipeline from{' '}
+            <Link href="/reports">Reports</Link>, then refresh to see mention counts from real documents.
+          </>
+        )}
       </p>
       <p>
         Last generated: <code>{snapshot.generatedAt}</code>
       </p>
       {latestRun ? (
         <p>
-          Latest unified run: <code>{latestRun.id}</code> ({latestRun.documentCount} docs,{' '}
-          {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
+          Latest unified run:{' '}
+          <Link href={`/reports/runs/${latestRun.id}`}>
+            <code>{latestRun.id}</code>
+          </Link>{' '}
+          ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
           <code>{latestRun.query}</code>
         </p>
       ) : (
         <p>
           No unified pipeline run for this workspace yet. Run it from{' '}
-          <a href="/reports">Reports</a>.
+          <Link href="/reports">Reports</Link>.
         </p>
       )}
       {latestTrend ? (
@@ -138,7 +166,9 @@ export default async function DashboardPage() {
             <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Brand</th>
             <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Mentions</th>
             <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Share of voice</th>
-            <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>7d delta</th>
+            <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>
+              {leaderboardSource === 'pipeline' ? 'Δ vs prior run' : '7d delta'}
+            </th>
           </tr>
         </thead>
         <tbody>
