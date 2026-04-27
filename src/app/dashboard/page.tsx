@@ -36,6 +36,37 @@ function freshnessLabel(
   return 'Stale';
 }
 
+function freshnessColor(label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'): string {
+  switch (label) {
+    case 'Fresh':
+      return '#166534';
+    case 'Aging':
+      return '#a16207';
+    case 'Stale':
+      return '#b91c1c';
+    default:
+      return '#6b7280';
+  }
+}
+
+function freshnessPill(label: 'Fresh' | 'Aging' | 'Stale' | 'Missing') {
+  return (
+    <span
+      style={{
+        marginLeft: 8,
+        padding: '2px 8px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        color: '#fff',
+        background: freshnessColor(label)
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
 export default async function DashboardPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -138,27 +169,59 @@ export default async function DashboardPage() {
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             Pipeline run:{' '}
-            {latestRun
-              ? `${formatAge(latestRun.createdAt)} (${freshnessLabel(latestRun.createdAt, thresholds)})`
-              : 'no data'}
+            {latestRun ? (
+              <>
+                {formatAge(latestRun.createdAt)}
+                {freshnessPill(freshnessLabel(latestRun.createdAt, thresholds))}
+              </>
+            ) : (
+              <>
+                no data
+                {freshnessPill('Missing')}
+              </>
+            )}
           </li>
           <li>
             Trend snapshot:{' '}
-            {latestTrend
-              ? `${formatAge(latestTrend.generatedAt)} (${freshnessLabel(latestTrend.generatedAt, thresholds)})`
-              : 'no data'}
+            {latestTrend ? (
+              <>
+                {formatAge(latestTrend.generatedAt)}
+                {freshnessPill(freshnessLabel(latestTrend.generatedAt, thresholds))}
+              </>
+            ) : (
+              <>
+                no data
+                {freshnessPill('Missing')}
+              </>
+            )}
           </li>
           <li>
             Visibility score:{' '}
-            {visibility
-              ? `${formatAge(visibility.createdAt)} (${freshnessLabel(visibility.createdAt, thresholds)})`
-              : 'no data'}
+            {visibility ? (
+              <>
+                {formatAge(visibility.createdAt)}
+                {freshnessPill(freshnessLabel(visibility.createdAt, thresholds))}
+              </>
+            ) : (
+              <>
+                no data
+                {freshnessPill('Missing')}
+              </>
+            )}
           </li>
           <li>
             Weekly digest:{' '}
-            {latestDigest
-              ? `${formatAge(latestDigest.generatedAt)} (${freshnessLabel(latestDigest.generatedAt, thresholds)})`
-              : 'no data'}
+            {latestDigest ? (
+              <>
+                {formatAge(latestDigest.generatedAt)}
+                {freshnessPill(freshnessLabel(latestDigest.generatedAt, thresholds))}
+              </>
+            ) : (
+              <>
+                no data
+                {freshnessPill('Missing')}
+              </>
+            )}
           </li>
         </ul>
       </div>
