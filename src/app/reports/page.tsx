@@ -4,12 +4,11 @@ import { redirect } from 'next/navigation';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessThresholds } from '@/lib/config/freshness';
-import { formatAge } from '@/lib/format/age';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessPill, getFreshnessLabel } from '@/lib/ui/freshness';
+import { FreshnessLine } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -19,10 +18,6 @@ function display(value: string | null | undefined): string {
 
 const { freshHours: FRESH_HOURS, agingHours: AGING_HOURS, misconfigured: THRESHOLDS_MISCONFIGURED } =
   getFreshnessThresholds();
-
-function freshnessBadge(iso: string | null) {
-  return <FreshnessPill label={getFreshnessLabel(iso, { freshHours: FRESH_HOURS, agingHours: AGING_HOURS })} />;
-}
 
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -158,24 +153,48 @@ export default async function ReportsPage() {
           <li>
             <code>Pipeline run</code>:{' '}
             {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestPipelineRun?.createdAt ?? null)})</span>
-            {freshnessBadge(latestPipelineRun?.createdAt ?? null)}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>
+              (
+              <FreshnessLine
+                iso={latestPipelineRun?.createdAt ?? null}
+                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+              />
+              )
+            </span>
           </li>
           <li>
             <code>Trend snapshot</code>:{' '}
             {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestSnapshot?.generatedAt ?? null)})</span>
-            {freshnessBadge(latestSnapshot?.generatedAt ?? null)}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>
+              (
+              <FreshnessLine
+                iso={latestSnapshot?.generatedAt ?? null}
+                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+              />
+              )
+            </span>
           </li>
           <li>
             <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(gapInsights.generatedAt)})</span>
-            {freshnessBadge(gapInsights.generatedAt)}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>
+              (
+              <FreshnessLine
+                iso={gapInsights.generatedAt}
+                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+              />
+              )
+            </span>
           </li>
           <li>
             <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestDigest?.generatedAt ?? null)})</span>
-            {freshnessBadge(latestDigest?.generatedAt ?? null)}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>
+              (
+              <FreshnessLine
+                iso={latestDigest?.generatedAt ?? null}
+                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+              />
+              )
+            </span>
           </li>
         </ul>
       </div>
