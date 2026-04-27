@@ -11,6 +11,7 @@ import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
+import { FreshnessPill, getFreshnessLabel } from '@/lib/ui/freshness';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -72,9 +73,15 @@ export default async function OpsPage() {
             <>
               <code>{latestJob.id}</code> ({latestJob.status})
               <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestJob.completedAt)})</span>
+              <FreshnessPill
+                label={getFreshnessLabel(latestJob.completedAt, { freshHours, agingHours })}
+              />
             </>
           ) : (
-            'none'
+            <>
+              none
+              <FreshnessPill label="Missing" />
+            </>
           )}
         </li>
         <li>
@@ -83,9 +90,13 @@ export default async function OpsPage() {
             <>
               <code>{latestRun.id}</code>
               <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestRun.createdAt)})</span>
+              <FreshnessPill label={getFreshnessLabel(latestRun.createdAt, { freshHours, agingHours })} />
             </>
           ) : (
-            'none'
+            <>
+              none
+              <FreshnessPill label="Missing" />
+            </>
           )}
         </li>
         <li>
@@ -94,9 +105,13 @@ export default async function OpsPage() {
             <>
               <code>{latestTrend.date}</code>
               <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestTrend.generatedAt)})</span>
+              <FreshnessPill label={getFreshnessLabel(latestTrend.generatedAt, { freshHours, agingHours })} />
             </>
           ) : (
-            'none'
+            <>
+              none
+              <FreshnessPill label="Missing" />
+            </>
           )}
         </li>
       </ul>
