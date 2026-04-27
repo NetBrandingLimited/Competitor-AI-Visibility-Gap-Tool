@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import CopyDebugConfigButton from './CopyDebugConfigButton';
 import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
@@ -109,6 +110,7 @@ export default async function OpsPage() {
         <a href="/api/debug/config" target="_blank" rel="noreferrer">
           /api/debug/config
         </a>
+        <CopyDebugConfigButton />
       </p>
       {thresholdsMisconfigured ? (
         <p
