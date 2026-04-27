@@ -10,7 +10,12 @@ import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine, FreshnessMisconfiguredNotice, FreshnessThresholdsHint } from '@/lib/ui/freshness';
+import {
+  FreshnessLine,
+  FreshnessMisconfiguredNotice,
+  FreshnessSectionCard,
+  FreshnessThresholdsHint
+} from '@/lib/ui/freshness';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -122,16 +127,17 @@ export default async function OpsPage() {
           )}
         </li>
       </ul>
-      <h2>Freshness thresholds</h2>
-      <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} prefix="Reports badges use:" />
-      <p style={{ marginTop: 6 }}>
-        Runtime debug JSON:{' '}
-        <a href="/api/debug/config" target="_blank" rel="noreferrer">
-          /api/debug/config
-        </a>
-        <CopyDebugConfigButton />
-      </p>
-      {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
+      <FreshnessSectionCard title="Freshness thresholds">
+        <FreshnessThresholdsHint freshHours={freshHours} agingHours={agingHours} prefix="Reports badges use:" />
+        <p style={{ marginTop: 6 }}>
+          Runtime debug JSON:{' '}
+          <a href="/api/debug/config" target="_blank" rel="noreferrer">
+            /api/debug/config
+          </a>
+          <CopyDebugConfigButton />
+        </p>
+        {thresholdsMisconfigured ? <FreshnessMisconfiguredNotice /> : null}
+      </FreshnessSectionCard>
 
       <h2>Recent scheduler jobs</h2>
       {jobs.length === 0 ? (

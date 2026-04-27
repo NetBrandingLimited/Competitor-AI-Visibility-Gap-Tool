@@ -114,6 +114,12 @@ export default async function DashboardPage() {
       )}
       <FreshnessSectionCard>
         <FreshnessThresholdsHint freshHours={thresholds.freshHours} agingHours={thresholds.agingHours} />
+        <p style={{ marginTop: 6 }}>
+          Runtime debug JSON:{' '}
+          <a href="/api/debug/config" target="_blank" rel="noreferrer">
+            /api/debug/config
+          </a>
+        </p>
         {thresholds.misconfigured ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
