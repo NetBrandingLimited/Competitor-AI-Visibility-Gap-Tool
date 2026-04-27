@@ -135,47 +135,47 @@ export default async function ReportsPage() {
           <li>
             <code>Pipeline run</code>:{' '}
             {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>
-              (
+            <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestPipelineRun?.createdAt ?? null}
                 thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                muted
+                parenthesized
               />
-              )
             </span>
           </li>
           <li>
             <code>Trend snapshot</code>:{' '}
             {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>
-              (
+            <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestSnapshot?.generatedAt ?? null}
                 thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                muted
+                parenthesized
               />
-              )
             </span>
           </li>
           <li>
             <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>
-              (
+            <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={gapInsights.generatedAt}
                 thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                muted
+                parenthesized
               />
-              )
             </span>
           </li>
           <li>
             <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
-            <span style={{ marginLeft: 6, color: '#6b7280' }}>
-              (
+            <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestDigest?.generatedAt ?? null}
                 thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                muted
+                parenthesized
               />
-              )
             </span>
           </li>
         </ul>

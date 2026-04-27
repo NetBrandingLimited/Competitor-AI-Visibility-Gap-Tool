@@ -71,8 +71,13 @@ export default async function OpsPage() {
           {latestJob ? (
             <>
               <code>{latestJob.id}</code> ({latestJob.status})
-              <span style={{ marginLeft: 6, color: '#6b7280' }}>
-                (<FreshnessLine iso={latestJob.completedAt} thresholds={{ freshHours, agingHours }} />)
+              <span style={{ marginLeft: 6 }}>
+                <FreshnessLine
+                  iso={latestJob.completedAt}
+                  thresholds={{ freshHours, agingHours }}
+                  muted
+                  parenthesized
+                />
               </span>
             </>
           ) : (
@@ -84,8 +89,13 @@ export default async function OpsPage() {
           {latestRun ? (
             <>
               <code>{latestRun.id}</code>
-              <span style={{ marginLeft: 6, color: '#6b7280' }}>
-                (<FreshnessLine iso={latestRun.createdAt} thresholds={{ freshHours, agingHours }} />)
+              <span style={{ marginLeft: 6 }}>
+                <FreshnessLine
+                  iso={latestRun.createdAt}
+                  thresholds={{ freshHours, agingHours }}
+                  muted
+                  parenthesized
+                />
               </span>
             </>
           ) : (
@@ -97,8 +107,13 @@ export default async function OpsPage() {
           {latestTrend ? (
             <>
               <code>{latestTrend.date}</code>
-              <span style={{ marginLeft: 6, color: '#6b7280' }}>
-                (<FreshnessLine iso={latestTrend.generatedAt} thresholds={{ freshHours, agingHours }} />)
+              <span style={{ marginLeft: 6 }}>
+                <FreshnessLine
+                  iso={latestTrend.generatedAt}
+                  thresholds={{ freshHours, agingHours }}
+                  muted
+                  parenthesized
+                />
               </span>
             </>
           ) : (

@@ -53,25 +53,35 @@ export function FreshnessPill({ label }: { label: FreshnessLabel }) {
 export function FreshnessLine({
   iso,
   thresholds,
-  missingText = 'no data'
+  missingText = 'no data',
+  muted = false,
+  parenthesized = false
 }: {
   iso: string | null;
   thresholds: { freshHours: number; agingHours: number };
   missingText?: string;
+  muted?: boolean;
+  parenthesized?: boolean;
 }) {
+  const wrapperStyle = muted ? { color: '#6b7280' } : undefined;
+
   if (!iso) {
     return (
-      <>
+      <span style={wrapperStyle}>
+        {parenthesized ? '(' : null}
         {missingText}
         <FreshnessPill label="Missing" />
-      </>
+        {parenthesized ? ')' : null}
+      </span>
     );
   }
   return (
-    <>
+    <span style={wrapperStyle}>
+      {parenthesized ? '(' : null}
       {formatAge(iso)}
       <FreshnessPill label={getFreshnessLabel(iso, thresholds)} />
-    </>
+      {parenthesized ? ')' : null}
+    </span>
   );
 }
 
