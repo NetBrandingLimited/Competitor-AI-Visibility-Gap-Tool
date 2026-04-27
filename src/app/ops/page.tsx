@@ -9,6 +9,18 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 
+function envHours(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) {
+    return fallback;
+  }
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) {
+    return fallback;
+  }
+  return n;
+}
+
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -20,6 +32,8 @@ export default async function OpsPage() {
   const latestRun = await readLatestPipelineRun(active.organizationId);
   const trendSnapshots = await readTrendSnapshots(active.organizationId);
   const latestTrend = trendSnapshots.at(-1) ?? null;
+  const freshHours = envHours('FRESH_HOURS', 24);
+  const agingHours = envHours('AGING_HOURS', 72);
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -79,6 +93,16 @@ export default async function OpsPage() {
           Latest trend snapshot: {latestTrend ? <code>{latestTrend.date}</code> : 'none'}
         </li>
       </ul>
+      <h2>Freshness thresholds</h2>
+      <p style={{ color: '#444' }}>
+        Reports badges currently use:
+        {' '}
+        <code>Fresh &lt;= {freshHours}h</code>,
+        {' '}
+        <code>Aging &lt;= {agingHours}h</code>,
+        {' '}
+        otherwise <code>Stale</code>.
+      </p>
 
       <h2>Recent scheduler jobs</h2>
       {jobs.length === 0 ? (

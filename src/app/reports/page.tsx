@@ -14,6 +14,54 @@ function display(value: string | null | undefined): string {
   return t && t.length > 0 ? t : '—';
 }
 
+function envHours(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) {
+    return fallback;
+  }
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) {
+    return fallback;
+  }
+  return n;
+}
+
+const FRESH_HOURS = envHours('FRESH_HOURS', 24);
+const AGING_HOURS = envHours('AGING_HOURS', 72);
+
+function freshnessFor(iso: string | null): { label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'; color: string } {
+  if (!iso) {
+    return { label: 'Missing', color: '#6b7280' };
+  }
+  const ageMs = Date.now() - new Date(iso).getTime();
+  if (ageMs <= FRESH_HOURS * 60 * 60 * 1000) {
+    return { label: 'Fresh', color: '#166534' };
+  }
+  if (ageMs <= AGING_HOURS * 60 * 60 * 1000) {
+    return { label: 'Aging', color: '#a16207' };
+  }
+  return { label: 'Stale', color: '#b91c1c' };
+}
+
+function freshnessBadge(iso: string | null) {
+  const info = freshnessFor(iso);
+  return (
+    <span
+      style={{
+        marginLeft: 8,
+        padding: '2px 8px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        color: '#fff',
+        background: info.color
+      }}
+    >
+      {info.label}
+    </span>
+  );
+}
+
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -124,20 +172,27 @@ export default async function ReportsPage() {
         }}
       >
         <strong>Data freshness</strong>
+        <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
+          Thresholds: Fresh ≤ {FRESH_HOURS}h, Aging ≤ {AGING_HOURS}h, otherwise Stale.
+        </p>
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>
             <code>Pipeline run</code>:{' '}
             {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
+            {freshnessBadge(latestPipelineRun?.createdAt ?? null)}
           </li>
           <li>
             <code>Trend snapshot</code>:{' '}
             {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
+            {freshnessBadge(latestSnapshot?.generatedAt ?? null)}
           </li>
           <li>
             <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
+            {freshnessBadge(gapInsights.generatedAt)}
           </li>
           <li>
             <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
+            {freshnessBadge(latestDigest?.generatedAt ?? null)}
           </li>
         </ul>
       </div>

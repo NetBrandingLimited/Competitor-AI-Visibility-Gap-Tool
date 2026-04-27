@@ -25,6 +25,9 @@ Quick start
   - `POST /api/debug/scheduler/run?query=seo%20tool&limit=2`
   - `GET /api/debug/scheduler/run` for recent job history
   - `GET /ops` for a simple operations monitor page
+- Reports freshness thresholds (optional):
+  - `FRESH_HOURS` (default `24`)
+  - `AGING_HOURS` (default `72`)
 - Auth:
   - `POST /api/auth/login` with `{ "username": "demo", "password": "demo123" }` (or use email as username)
   - `GET /api/auth/session`
