@@ -8,9 +8,16 @@ type StatusFreshnessItemProps = {
   iso: string | null;
   thresholds: FreshnessThresholdInput;
   children: ReactNode;
+  missingText?: string;
 };
 
-export default function StatusFreshnessItem({ label, iso, thresholds, children }: StatusFreshnessItemProps) {
+export default function StatusFreshnessItem({
+  label,
+  iso,
+  thresholds,
+  children,
+  missingText = 'Not available yet'
+}: StatusFreshnessItemProps) {
   return (
     <li>
       {label}:{' '}
@@ -22,7 +29,7 @@ export default function StatusFreshnessItem({ label, iso, thresholds, children }
           </span>
         </>
       ) : (
-        <FreshnessLine iso={null} thresholds={thresholds} missingText="none" />
+        <FreshnessLine iso={null} thresholds={thresholds} missingText={missingText} />
       )}
     </li>
   );

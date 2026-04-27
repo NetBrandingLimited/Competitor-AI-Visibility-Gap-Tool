@@ -74,18 +74,25 @@ export default async function OpsPage() {
           label="Latest scheduler job"
           iso={latestJob?.completedAt ?? null}
           thresholds={freshnessThresholds}
+          missingText="Not completed yet"
         >
           <>
             <code>{latestJob?.id}</code> ({latestJob?.status})
           </>
         </StatusFreshnessItem>
-        <StatusFreshnessItem label="Latest unified run" iso={latestRun?.createdAt ?? null} thresholds={freshnessThresholds}>
+        <StatusFreshnessItem
+          label="Latest unified run"
+          iso={latestRun?.createdAt ?? null}
+          thresholds={freshnessThresholds}
+          missingText="Not run yet"
+        >
           <code>{latestRun?.id}</code>
         </StatusFreshnessItem>
         <StatusFreshnessItem
           label="Latest trend snapshot"
           iso={latestTrend?.generatedAt ?? null}
           thresholds={freshnessThresholds}
+          missingText="Not generated yet"
         >
           <code>{latestTrend?.date}</code>
         </StatusFreshnessItem>
