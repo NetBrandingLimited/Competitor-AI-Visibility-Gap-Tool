@@ -24,6 +24,7 @@ export default async function OpsPage() {
   const trendSnapshots = await readTrendSnapshots(active.organizationId);
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const { freshHours, agingHours, misconfigured: thresholdsMisconfigured } = getFreshnessThresholds();
+  const freshnessThresholds = { freshHours, agingHours };
   const schedule = await prisma.organization.findUnique({
     where: { id: active.organizationId },
     select: {
@@ -74,14 +75,14 @@ export default async function OpsPage() {
               <span style={{ marginLeft: 6 }}>
                 <FreshnessLine
                   iso={latestJob.completedAt}
-                  thresholds={{ freshHours, agingHours }}
+                  thresholds={freshnessThresholds}
                   muted
                   parenthesized
                 />
               </span>
             </>
           ) : (
-            <FreshnessLine iso={null} thresholds={{ freshHours, agingHours }} missingText="none" />
+            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
           )}
         </li>
         <li>
@@ -92,14 +93,14 @@ export default async function OpsPage() {
               <span style={{ marginLeft: 6 }}>
                 <FreshnessLine
                   iso={latestRun.createdAt}
-                  thresholds={{ freshHours, agingHours }}
+                  thresholds={freshnessThresholds}
                   muted
                   parenthesized
                 />
               </span>
             </>
           ) : (
-            <FreshnessLine iso={null} thresholds={{ freshHours, agingHours }} missingText="none" />
+            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
           )}
         </li>
         <li>
@@ -110,14 +111,14 @@ export default async function OpsPage() {
               <span style={{ marginLeft: 6 }}>
                 <FreshnessLine
                   iso={latestTrend.generatedAt}
-                  thresholds={{ freshHours, agingHours }}
+                  thresholds={freshnessThresholds}
                   muted
                   parenthesized
                 />
               </span>
             </>
           ) : (
-            <FreshnessLine iso={null} thresholds={{ freshHours, agingHours }} missingText="none" />
+            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
           )}
         </li>
       </ul>

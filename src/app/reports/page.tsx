@@ -18,6 +18,7 @@ function display(value: string | null | undefined): string {
 
 const { freshHours: FRESH_HOURS, agingHours: AGING_HOURS, misconfigured: THRESHOLDS_MISCONFIGURED } =
   getFreshnessThresholds();
+const freshnessThresholds = { freshHours: FRESH_HOURS, agingHours: AGING_HOURS };
 
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -138,7 +139,7 @@ export default async function ReportsPage() {
             <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestPipelineRun?.createdAt ?? null}
-                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                thresholds={freshnessThresholds}
                 muted
                 parenthesized
               />
@@ -150,7 +151,7 @@ export default async function ReportsPage() {
             <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestSnapshot?.generatedAt ?? null}
-                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                thresholds={freshnessThresholds}
                 muted
                 parenthesized
               />
@@ -161,7 +162,7 @@ export default async function ReportsPage() {
             <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={gapInsights.generatedAt}
-                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                thresholds={freshnessThresholds}
                 muted
                 parenthesized
               />
@@ -172,7 +173,7 @@ export default async function ReportsPage() {
             <span style={{ marginLeft: 6 }}>
               <FreshnessLine
                 iso={latestDigest?.generatedAt ?? null}
-                thresholds={{ freshHours: FRESH_HOURS, agingHours: AGING_HOURS }}
+                thresholds={freshnessThresholds}
                 muted
                 parenthesized
               />
