@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds } from '@/lib/config/freshness';
+import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -13,7 +13,6 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
-  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
@@ -338,6 +337,8 @@ export default async function ReportsPage() {
     </section>
   );
 }
+
+
 
 
 

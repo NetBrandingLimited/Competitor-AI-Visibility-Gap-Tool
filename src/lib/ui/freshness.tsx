@@ -1,11 +1,8 @@
 import { formatAge } from '@/lib/format/age';
+import type { FreshnessThresholdInput } from '@/lib/config/freshness';
 import type { ReactNode } from 'react';
 
 export type FreshnessLabel = 'Fresh' | 'Aging' | 'Stale' | 'Missing';
-export type FreshnessThresholdInput = {
-  freshHours: number;
-  agingHours: number;
-};
 
 export function getFreshnessLabel(
   iso: string | null,

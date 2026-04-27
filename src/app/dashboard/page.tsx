@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import DebugConfigActions from '@/app/components/DebugConfigActions';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds } from '@/lib/config/freshness';
+import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
@@ -15,7 +15,6 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
-  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
@@ -298,5 +297,7 @@ export default async function DashboardPage() {
     </section>
   );
 }
+
+
 
 

@@ -5,7 +5,7 @@ import DebugConfigActions from '@/app/components/DebugConfigActions';
 import RunSchedulerAction from './RunSchedulerAction';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { getFreshnessThresholds } from '@/lib/config/freshness';
+import { getFreshnessThresholds, type FreshnessThresholdInput } from '@/lib/config/freshness';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -14,7 +14,6 @@ import {
   FreshnessLine,
   FreshnessMisconfiguredNotice,
   FreshnessSectionCard,
-  FreshnessThresholdInput,
   FreshnessThresholdsHint
 } from '@/lib/ui/freshness';
 
@@ -178,6 +177,8 @@ export default async function OpsPage() {
     </section>
   );
 }
+
+
 
 
 

@@ -1,6 +1,11 @@
-export type FreshnessThresholds = {
+export type FreshnessThresholdInput = {
   freshHours: number;
   agingHours: number;
+};
+
+export type FreshnessThresholds = {
+  freshHours: FreshnessThresholdInput['freshHours'];
+  agingHours: FreshnessThresholdInput['agingHours'];
   misconfigured: boolean;
 };
 
