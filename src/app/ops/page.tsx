@@ -104,6 +104,12 @@ export default async function OpsPage() {
         {' '}
         otherwise <code>Stale</code>.
       </p>
+      <p style={{ marginTop: 6 }}>
+        Runtime debug JSON:{' '}
+        <a href="/api/debug/config" target="_blank" rel="noreferrer">
+          /api/debug/config
+        </a>
+      </p>
       {thresholdsMisconfigured ? (
         <p
           style={{
