@@ -7,7 +7,7 @@ type DebugConfigActionsProps = {
 };
 
 export default function DebugConfigActions({ className }: DebugConfigActionsProps) {
-  const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<null | 'copy' | 'download'>(null);
   const [message, setMessage] = useState('');
   const [actionAt, setActionAt] = useState<string | null>(null);
 
@@ -33,7 +33,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
   }
 
   async function copyJson() {
-    setBusy(true);
+    setBusyAction('copy');
     setMessage('');
     try {
       const payload = await fetchDebugConfig();
@@ -44,12 +44,12 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
       setMessage(error instanceof Error ? error.message : 'Copy failed.');
       setActionAt(null);
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
   async function downloadJson() {
-    setBusy(true);
+    setBusyAction('download');
     setMessage('');
     try {
       const payload = await fetchDebugConfig();
@@ -69,7 +69,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
       setMessage(error instanceof Error ? error.message : 'Download failed.');
       setActionAt(null);
     } finally {
-      setBusy(false);
+      setBusyAction(null);
     }
   }
 
@@ -79,14 +79,26 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
       <a href="/api/debug/config" target="_blank" rel="noreferrer">
         /api/debug/config
       </a>
-      <button type="button" onClick={copyJson} disabled={busy} style={{ marginLeft: 10, padding: '4px 10px' }}>
-        {busy ? 'Copying...' : 'Copy JSON'}
+      <button
+        type="button"
+        onClick={copyJson}
+        disabled={Boolean(busyAction)}
+        style={{ marginLeft: 10, padding: '4px 10px' }}
+      >
+        {busyAction === 'copy' ? 'Copying...' : 'Copy JSON'}
       </button>
-      <button type="button" onClick={downloadJson} disabled={busy} style={{ marginLeft: 8, padding: '4px 10px' }}>
-        Download JSON
+      <button
+        type="button"
+        onClick={downloadJson}
+        disabled={Boolean(busyAction)}
+        style={{ marginLeft: 8, padding: '4px 10px' }}
+      >
+        {busyAction === 'download' ? 'Downloading...' : 'Download JSON'}
       </button>
       {message ? (
         <span
+          role="status"
+          aria-live="polite"
           style={{
             marginLeft: 8,
             color: message.startsWith('Copied') || message.startsWith('Downloaded') ? '#166534' : '#b91c1c'
