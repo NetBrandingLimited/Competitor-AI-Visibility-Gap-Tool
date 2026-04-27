@@ -1,0 +1,50 @@
+[
+  {
+    "id": "job-1777079946076",
+    "startedAt": "2026-04-25T01:19:06.076Z",
+    "completedAt": "2026-04-25T01:19:06.108Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777079946077"
+  },
+  {
+    "id": "job-1777049128572",
+    "startedAt": "2026-04-24T16:45:28.572Z",
+    "completedAt": "2026-04-24T16:45:28.629Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777049128572"
+  },
+  {
+    "id": "job-1777047038668",
+    "startedAt": "2026-04-24T16:10:38.668Z",
+    "completedAt": "2026-04-24T16:10:38.696Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777047038668"
+  },
+  {
+    "id": "job-1777032118595",
+    "startedAt": "2026-04-24T12:01:58.595Z",
+    "completedAt": "2026-04-24T12:01:59.688Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777032118595"
+  },
+  {
+    "id": "job-1777032117739",
+    "startedAt": "2026-04-24T12:01:57.739Z",
+    "completedAt": "2026-04-24T12:01:59.600Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777032117739"
+  },
+  {
+    "id": "job-1777031986948",
+    "startedAt": "2026-04-24T11:59:46.948Z",
+    "completedAt": "2026-04-24T11:59:47.919Z",
+    "status": "success",
+    "query": "seo tool",
+    "pipelineRunId": "run-1777031986948"
+  }
+]

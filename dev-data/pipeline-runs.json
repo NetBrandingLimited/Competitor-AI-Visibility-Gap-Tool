@@ -1,0 +1,1325 @@
+[
+  {
+    "id": "run-1777079946077",
+    "createdAt": "2026-04-25T01:19:06.077Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:18:06.077Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:06.077Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:18:06.077Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:06.077Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777079925062",
+    "createdAt": "2026-04-25T01:18:45.062Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:45.063Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:45.063Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:45.063Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:45.063Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777079923541",
+    "createdAt": "2026-04-25T01:18:43.541Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:43.541Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:43.541Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:43.542Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:43.542Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777079917396",
+    "createdAt": "2026-04-25T01:18:37.396Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:37.397Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:37.397Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:17:37.397Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-25T01:16:37.397Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777049133482",
+    "createdAt": "2026-04-24T16:45:33.482Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:44:33.482Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:43:33.482Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:44:33.482Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:43:33.482Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777049128572",
+    "createdAt": "2026-04-24T16:45:28.572Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:44:28.573Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:43:28.573Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:44:28.573Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:43:28.573Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777048342518",
+    "createdAt": "2026-04-24T16:32:22.518Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:31:22.522Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:30:22.523Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:31:22.532Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:30:22.532Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777047038668",
+    "createdAt": "2026-04-24T16:10:38.668Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:09:38.669Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:08:38.669Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:09:38.669Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T16:08:38.669Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  },
+  {
+    "id": "run-1777032118595",
+    "createdAt": "2026-04-24T12:01:58.595Z",
+    "query": "seo tool",
+    "limitPerConnector": 2,
+    "documentCount": 4,
+    "triggerCount": 8,
+    "clusterCount": 5,
+    "ingestionEvents": [
+      "run_started",
+      "connector_started",
+      "connector_completed",
+      "connector_started",
+      "connector_completed",
+      "documents_deduped",
+      "run_completed"
+    ],
+    "documents": [
+      {
+        "id": "reddit-mock-seo-tool-1",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-1",
+        "title": "Reddit thread: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T12:00:58.595Z"
+      },
+      {
+        "id": "reddit-mock-seo-tool-2",
+        "source": "reddit-mock",
+        "url": "https://reddit.com/r/mock/seo-tool-2",
+        "title": "Reddit thread: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T11:59:58.595Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-1",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-dupe",
+        "title": "HN post: seo tool #1",
+        "content": "Mock source text for \"seo tool\" sample 1. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T12:00:58.595Z"
+      },
+      {
+        "id": "hn-mock-seo-tool-2",
+        "source": "hn-mock",
+        "url": "https://news.ycombinator.com/item/seo-tool-2",
+        "title": "HN post: seo tool #2",
+        "content": "Mock source text for \"seo tool\" sample 2. Compare alternatives, pricing, and best features vs competitors.",
+        "publishedAt": "2026-04-24T11:59:58.595Z"
+      }
+    ],
+    "triggers": [
+      {
+        "phrase": "vs",
+        "category": "comparison",
+        "score": 0.9,
+        "evidence": "vs"
+      },
+      {
+        "phrase": "compare",
+        "category": "comparison",
+        "score": 0.88,
+        "evidence": "compare"
+      },
+      {
+        "phrase": "best",
+        "category": "recommendation",
+        "score": 0.85,
+        "evidence": "best"
+      },
+      {
+        "phrase": "alternative",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternative"
+      },
+      {
+        "phrase": "alternatives",
+        "category": "alternatives",
+        "score": 0.84,
+        "evidence": "alternatives"
+      },
+      {
+        "phrase": "pricing",
+        "category": "pricing",
+        "score": 0.82,
+        "evidence": "pricing"
+      },
+      {
+        "phrase": "feature",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "feature"
+      },
+      {
+        "phrase": "features",
+        "category": "feature",
+        "score": 0.72,
+        "evidence": "features"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "cluster-comparison",
+        "label": "Comparison Queries",
+        "keywords": [
+          "vs",
+          "compare"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-recommendation",
+        "label": "Recommendation Queries",
+        "keywords": [
+          "best"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-alternatives",
+        "label": "Alternative Discovery",
+        "keywords": [
+          "alternative",
+          "alternatives"
+        ],
+        "itemCount": 2
+      },
+      {
+        "id": "cluster-pricing",
+        "label": "Pricing Questions",
+        "keywords": [
+          "pricing"
+        ],
+        "itemCount": 1
+      },
+      {
+        "id": "cluster-feature",
+        "label": "Feature Evaluation",
+        "keywords": [
+          "feature",
+          "features"
+        ],
+        "itemCount": 2
+      }
+    ]
+  }
+]

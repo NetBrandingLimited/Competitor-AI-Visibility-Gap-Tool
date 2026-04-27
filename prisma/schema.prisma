@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String?  @unique
+  passwordHash String?
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships OrganizationMember[]
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  brandName   String?
+  category    String?
+  competitorA String?
+  competitorB String?
+  competitorC String?
+  gscSiteUrl  String?
+  ga4PropertyId String?
+  gscServiceAccountJsonEnc String?
+  ga4ServiceAccountJsonEnc String?
+  connectorTestedAt DateTime?
+  connectorTestResultsJson String?
+  connectorSignalsFetchedAt DateTime?
+  connectorSignalsJson String?
+  weeklyDigestScheduleEnabled Boolean @default(false)
+  weeklyDigestScheduleDayUtc Int @default(1)
+  weeklyDigestScheduleHourUtc Int @default(9)
+  weeklyDigestRefreshPipelineFirst Boolean @default(false)
+  weeklyDigestNotifyEmail String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members                 OrganizationMember[]
+  pipelineRuns            PipelineRun[]
+  trendSnapshots          TrendSnapshot[]
+  schedulerJobs           SchedulerJob[]
+  visibilityScoreSnapshots VisibilityScoreSnapshot[]
+  weeklyDigests           WeeklyDigest[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           String       @default("VIEWER")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+model PipelineRun {
+  id                 String       @id
+  organizationId     String
+  createdAt          DateTime
+  query              String
+  limitPerConnector  Int
+  documentCount      Int
+  triggerCount       Int
+  clusterCount       Int
+  ingestionEventsRaw String
+  documentsRaw       String
+  triggersRaw        String
+  clustersRaw        String
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+}
+
+model TrendSnapshot {
+  id                String       @id
+  organizationId    String
+  date              String
+  generatedAt       DateTime
+  totalMentions     Int
+  topBrand          String
+  topBrandMentions  Int
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, date])
+  @@index([organizationId, generatedAt])
+}
+
+model SchedulerJob {
+  id             String       @id
+  organizationId String
+  startedAt      DateTime
+  completedAt    DateTime
+  status         String
+  query          String
+  pipelineRunId  String?
+  weeklyDigestId String?
+  errorMessage   String?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, completedAt])
+}
+
+model VisibilityScoreSnapshot {
+  id             String       @id @default(cuid())
+  organizationId String
+  score          Float
+  reasonsJson    String
+  inputsJson     String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+}
+
+model WeeklyDigest {
+  id             String       @id @default(cuid())
+  organizationId String
+  periodStart    String
+  periodEnd      String
+  generatedAt    DateTime     @default(now())
+  summaryJson    String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, generatedAt])
+}
