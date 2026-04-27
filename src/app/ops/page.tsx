@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunSchedulerAction from './RunSchedulerAction';
+import StatusFreshnessItem from './StatusFreshnessItem';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
@@ -10,10 +11,7 @@ import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import {
-  FreshnessLine,
-  FreshnessSectionCard
-} from '@/lib/ui/freshness';
+import { FreshnessSectionCard } from '@/lib/ui/freshness';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -72,60 +70,25 @@ export default async function OpsPage() {
 
       <h2>Current status</h2>
       <ul>
-        <li>
-          Latest scheduler job:{' '}
-          {latestJob ? (
-            <>
-              <code>{latestJob.id}</code> ({latestJob.status})
-              <span style={{ marginLeft: 6 }}>
-                <FreshnessLine
-                  iso={latestJob.completedAt}
-                  thresholds={freshnessThresholds}
-                  muted
-                  parenthesized
-                />
-              </span>
-            </>
-          ) : (
-            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
-          )}
-        </li>
-        <li>
-          Latest unified run:{' '}
-          {latestRun ? (
-            <>
-              <code>{latestRun.id}</code>
-              <span style={{ marginLeft: 6 }}>
-                <FreshnessLine
-                  iso={latestRun.createdAt}
-                  thresholds={freshnessThresholds}
-                  muted
-                  parenthesized
-                />
-              </span>
-            </>
-          ) : (
-            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
-          )}
-        </li>
-        <li>
-          Latest trend snapshot:{' '}
-          {latestTrend ? (
-            <>
-              <code>{latestTrend.date}</code>
-              <span style={{ marginLeft: 6 }}>
-                <FreshnessLine
-                  iso={latestTrend.generatedAt}
-                  thresholds={freshnessThresholds}
-                  muted
-                  parenthesized
-                />
-              </span>
-            </>
-          ) : (
-            <FreshnessLine iso={null} thresholds={freshnessThresholds} missingText="none" />
-          )}
-        </li>
+        <StatusFreshnessItem
+          label="Latest scheduler job"
+          iso={latestJob?.completedAt ?? null}
+          thresholds={freshnessThresholds}
+        >
+          <>
+            <code>{latestJob?.id}</code> ({latestJob?.status})
+          </>
+        </StatusFreshnessItem>
+        <StatusFreshnessItem label="Latest unified run" iso={latestRun?.createdAt ?? null} thresholds={freshnessThresholds}>
+          <code>{latestRun?.id}</code>
+        </StatusFreshnessItem>
+        <StatusFreshnessItem
+          label="Latest trend snapshot"
+          iso={latestTrend?.generatedAt ?? null}
+          thresholds={freshnessThresholds}
+        >
+          <code>{latestTrend?.date}</code>
+        </StatusFreshnessItem>
       </ul>
       <FreshnessSectionCard title="Freshness thresholds">
         <FreshnessConfigInfo
