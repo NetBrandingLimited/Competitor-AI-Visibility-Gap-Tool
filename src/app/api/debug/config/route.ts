@@ -1,18 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { resolveActiveOrgSessionForRequest } from '@/lib/active-org';
-
-function envHours(name: string, fallback: number): number {
-  const raw = process.env[name];
-  if (!raw) {
-    return fallback;
-  }
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n <= 0) {
-    return fallback;
-  }
-  return n;
-}
+import { getFreshnessThresholds } from '@/lib/config/freshness';
 
 export async function GET(request: NextRequest) {
   const active = await resolveActiveOrgSessionForRequest(request);
@@ -20,8 +9,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  const freshHours = envHours('FRESH_HOURS', 24);
-  const agingHours = envHours('AGING_HOURS', 72);
+  const { freshHours, agingHours, misconfigured } = getFreshnessThresholds();
 
   return NextResponse.json({
     generatedAt: new Date().toISOString(),
@@ -33,7 +21,7 @@ export async function GET(request: NextRequest) {
     freshnessThresholds: {
       freshHours,
       agingHours,
-      misconfigured: agingHours < freshHours
+      misconfigured
     },
     runtime: {
       nodeEnv: process.env.NODE_ENV ?? 'development',

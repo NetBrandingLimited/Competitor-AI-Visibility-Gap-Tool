@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { getFreshnessThresholds } from '@/lib/config/freshness';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -14,21 +15,8 @@ function display(value: string | null | undefined): string {
   return t && t.length > 0 ? t : '—';
 }
 
-function envHours(name: string, fallback: number): number {
-  const raw = process.env[name];
-  if (!raw) {
-    return fallback;
-  }
-  const n = Number(raw);
-  if (!Number.isFinite(n) || n <= 0) {
-    return fallback;
-  }
-  return n;
-}
-
-const FRESH_HOURS = envHours('FRESH_HOURS', 24);
-const AGING_HOURS = envHours('AGING_HOURS', 72);
-const THRESHOLDS_MISCONFIGURED = AGING_HOURS < FRESH_HOURS;
+const { freshHours: FRESH_HOURS, agingHours: AGING_HOURS, misconfigured: THRESHOLDS_MISCONFIGURED } =
+  getFreshnessThresholds();
 
 function freshnessFor(iso: string | null): { label: 'Fresh' | 'Aging' | 'Stale' | 'Missing'; color: string } {
   if (!iso) {
@@ -61,6 +49,29 @@ function freshnessBadge(iso: string | null) {
       {info.label}
     </span>
   );
+}
+
+function formatAge(iso: string | null): string {
+  if (!iso) {
+    return 'no data';
+  }
+  const deltaMs = Date.now() - new Date(iso).getTime();
+  if (!Number.isFinite(deltaMs) || deltaMs < 0) {
+    return 'just now';
+  }
+  const mins = Math.floor(deltaMs / 60000);
+  if (mins < 1) {
+    return 'just now';
+  }
+  if (mins < 60) {
+    return `${mins}m ago`;
+  }
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
 export default async function ReportsPage() {
@@ -197,19 +208,23 @@ export default async function ReportsPage() {
           <li>
             <code>Pipeline run</code>:{' '}
             {latestPipelineRun ? new Date(latestPipelineRun.createdAt).toLocaleString() : 'Not run yet'}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestPipelineRun?.createdAt ?? null)})</span>
             {freshnessBadge(latestPipelineRun?.createdAt ?? null)}
           </li>
           <li>
             <code>Trend snapshot</code>:{' '}
             {latestSnapshot ? new Date(latestSnapshot.generatedAt).toLocaleString() : 'Not generated yet'}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestSnapshot?.generatedAt ?? null)})</span>
             {freshnessBadge(latestSnapshot?.generatedAt ?? null)}
           </li>
           <li>
             <code>Gap insights</code>: {new Date(gapInsights.generatedAt).toLocaleString()}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(gapInsights.generatedAt)})</span>
             {freshnessBadge(gapInsights.generatedAt)}
           </li>
           <li>
             <code>Weekly digest</code>: {latestDigest ? new Date(latestDigest.generatedAt).toLocaleString() : 'Not generated yet'}
+            <span style={{ marginLeft: 6, color: '#6b7280' }}>({formatAge(latestDigest?.generatedAt ?? null)})</span>
             {freshnessBadge(latestDigest?.generatedAt ?? null)}
           </li>
         </ul>
