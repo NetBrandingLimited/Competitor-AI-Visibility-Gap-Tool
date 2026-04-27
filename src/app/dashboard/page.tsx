@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
+import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
@@ -42,11 +43,12 @@ export default async function DashboardPage() {
       }
     : {};
 
-  const [recentRuns, trendSnapshots, visibility, weeklyDigests] = await Promise.all([
+  const [recentRuns, trendSnapshots, visibility, weeklyDigests, gapInsights] = await Promise.all([
     readRecentPipelineRuns(active.organizationId, 2),
     readTrendSnapshots(active.organizationId),
     getLatestVisibilityScore(active.organizationId),
-    listWeeklyDigests(active.organizationId)
+    listWeeklyDigests(active.organizationId),
+    buildGapInsightsForOrg(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
   const previousRun = recentRuns[1] ?? null;
@@ -151,6 +153,51 @@ export default async function DashboardPage() {
       ) : (
         <p>No trend snapshots for this workspace yet. Run a snapshot from Reports.</p>
       )}
+
+      <h2>Gap opportunities</h2>
+      <p style={{ color: '#555' }}>
+        Generated <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code> from latest run, trend, and
+        visibility signals.
+      </p>
+      <ul style={{ marginTop: 8, marginBottom: 20 }}>
+        {gapInsights.opportunities.slice(0, 3).map((op) => (
+          <li key={op.id} style={{ marginBottom: 8 }}>
+            <strong>{op.title}</strong> ({op.priority}) — {op.detail}
+          </li>
+        ))}
+      </ul>
+
+      {gapInsights.topics.length > 0 ? (
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            marginBottom: 24,
+            border: '1px solid #ddd'
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Topic</th>
+              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Gap score</th>
+              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Trigger count</th>
+              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Recommendation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {gapInsights.topics.slice(0, 5).map((topic) => (
+              <tr key={topic.topic}>
+                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.topic}</td>
+                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{topic.gapScore}</td>
+                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
+                  {topic.triggerCount}
+                </td>
+                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.recommendation}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : null}
 
       <h2>Leaderboard</h2>
       <table
