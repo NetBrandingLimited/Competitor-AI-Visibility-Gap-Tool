@@ -8,7 +8,7 @@ import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine, FreshnessMisconfiguredNotice } from '@/lib/ui/freshness';
+import { FreshnessLine, FreshnessMisconfiguredNotice, FreshnessThresholdsHint } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -129,9 +129,7 @@ export default async function ReportsPage() {
         }}
       >
         <strong>Data freshness</strong>
-        <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
-          Thresholds: Fresh ≤ {FRESH_HOURS}h, Aging ≤ {AGING_HOURS}h, otherwise Stale.
-        </p>
+        <FreshnessThresholdsHint freshHours={FRESH_HOURS} agingHours={AGING_HOURS} />
         {THRESHOLDS_MISCONFIGURED ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>

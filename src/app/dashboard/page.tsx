@@ -10,7 +10,7 @@ import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine, FreshnessMisconfiguredNotice } from '@/lib/ui/freshness';
+import { FreshnessLine, FreshnessMisconfiguredNotice, FreshnessThresholdsHint } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -118,6 +118,7 @@ export default async function DashboardPage() {
         }}
       >
         <strong>Data freshness</strong>
+        <FreshnessThresholdsHint freshHours={thresholds.freshHours} agingHours={thresholds.agingHours} />
         {thresholds.misconfigured ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
           <li>

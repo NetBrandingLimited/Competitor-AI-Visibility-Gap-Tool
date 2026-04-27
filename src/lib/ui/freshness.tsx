@@ -94,3 +94,20 @@ export function FreshnessMisconfiguredNotice() {
     </p>
   );
 }
+
+export function FreshnessThresholdsHint({
+  freshHours,
+  agingHours,
+  prefix = 'Thresholds:'
+}: {
+  freshHours: number;
+  agingHours: number;
+  prefix?: string;
+}) {
+  return (
+    <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
+      {prefix} <code>Fresh &lt;= {freshHours}h</code>, <code>Aging &lt;= {agingHours}h</code>, otherwise{' '}
+      <code>Stale</code>.
+    </p>
+  );
+}
