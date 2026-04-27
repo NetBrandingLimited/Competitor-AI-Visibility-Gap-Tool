@@ -1,4 +1,5 @@
 import { formatAge } from '@/lib/format/age';
+import type { ReactNode } from 'react';
 
 export type FreshnessLabel = 'Fresh' | 'Aging' | 'Stale' | 'Missing';
 
@@ -119,5 +120,29 @@ export function FreshnessThresholdsHint({
       {prefix} <code>Fresh &lt;= {freshHours}h</code>, <code>Aging &lt;= {agingHours}h</code>, otherwise{' '}
       <code>Stale</code>.
     </p>
+  );
+}
+
+export function FreshnessSectionCard({
+  title = 'Data freshness',
+  children
+}: {
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        marginBottom: 16,
+        padding: 10,
+        border: '1px solid #e5e7eb',
+        borderRadius: 6,
+        background: '#f8fafc',
+        color: '#374151'
+      }}
+    >
+      <strong>{title}</strong>
+      {children}
+    </div>
   );
 }

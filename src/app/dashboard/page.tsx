@@ -10,7 +10,12 @@ import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine, FreshnessMisconfiguredNotice, FreshnessThresholdsHint } from '@/lib/ui/freshness';
+import {
+  FreshnessLine,
+  FreshnessMisconfiguredNotice,
+  FreshnessSectionCard,
+  FreshnessThresholdsHint
+} from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -107,17 +112,7 @@ export default async function DashboardPage() {
           <Link href="/reports">Generate one from Reports</Link>.
         </p>
       )}
-      <div
-        style={{
-          marginBottom: 16,
-          padding: 10,
-          border: '1px solid #e5e7eb',
-          borderRadius: 6,
-          background: '#f8fafc',
-          color: '#374151'
-        }}
-      >
-        <strong>Data freshness</strong>
+      <FreshnessSectionCard>
         <FreshnessThresholdsHint freshHours={thresholds.freshHours} agingHours={thresholds.agingHours} />
         {thresholds.misconfigured ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
@@ -138,7 +133,7 @@ export default async function DashboardPage() {
             <FreshnessLine iso={latestDigest?.generatedAt ?? null} thresholds={thresholds} />
           </li>
         </ul>
-      </div>
+      </FreshnessSectionCard>
 
       <p>
         Tables below use your organization&apos;s <strong>Brand</strong> and <strong>Competitors</strong> from{' '}

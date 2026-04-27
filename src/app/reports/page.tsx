@@ -8,7 +8,12 @@ import { listWeeklyDigests } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { FreshnessLine, FreshnessMisconfiguredNotice, FreshnessThresholdsHint } from '@/lib/ui/freshness';
+import {
+  FreshnessLine,
+  FreshnessMisconfiguredNotice,
+  FreshnessSectionCard,
+  FreshnessThresholdsHint
+} from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -119,17 +124,7 @@ export default async function ReportsPage() {
           </li>
         </ul>
       </div>
-      <div
-        style={{
-          marginBottom: 16,
-          padding: 10,
-          border: '1px solid #e5e7eb',
-          borderRadius: 6,
-          background: '#f8fafc',
-          color: '#374151'
-        }}
-      >
-        <strong>Data freshness</strong>
+      <FreshnessSectionCard>
         <FreshnessThresholdsHint freshHours={FRESH_HOURS} agingHours={AGING_HOURS} />
         {THRESHOLDS_MISCONFIGURED ? <FreshnessMisconfiguredNotice /> : null}
         <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
@@ -180,7 +175,7 @@ export default async function ReportsPage() {
             </span>
           </li>
         </ul>
-      </div>
+      </FreshnessSectionCard>
       <RunActions />
 
       <h2>Competitor gap insights (v1)</h2>
