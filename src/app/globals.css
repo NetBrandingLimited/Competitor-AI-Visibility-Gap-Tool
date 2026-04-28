@@ -28,6 +28,19 @@ p { color: #333; }
   white-space: nowrap;
   border: 0;
 }
+.app-nav-link {
+  color: #1d4ed8;
+  text-decoration: none;
+  border-radius: 6px;
+  outline: none;
+}
+.app-nav-link-active {
+  font-weight: 600;
+  text-decoration: underline;
+}
+.app-nav-link:focus-visible {
+  box-shadow: 0 0 0 2px #93c5fd;
+}
 
 .login-shell {
   min-height: 70vh;

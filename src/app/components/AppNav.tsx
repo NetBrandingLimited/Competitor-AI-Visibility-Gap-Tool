@@ -3,14 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
-
-const itemStyle: CSSProperties = { color: '#1d4ed8', textDecoration: 'none' };
-const activeItemStyle: CSSProperties = {
-  ...itemStyle,
-  fontWeight: 600,
-  textDecoration: 'underline'
-};
 
 type NavItem = {
   label: string;
@@ -98,7 +90,7 @@ export default function AppNav() {
             <Link
               key={item.href}
               href={item.href}
-              style={active ? activeItemStyle : itemStyle}
+              className={active ? 'app-nav-link app-nav-link-active' : 'app-nav-link'}
               aria-current={active ? 'page' : undefined}
             >
               {item.label}
