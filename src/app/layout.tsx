@@ -2,6 +2,7 @@ import './globals.css';
 import type { ReactNode } from 'react';
 
 import AppNav from '@/app/components/AppNav';
+import BackToTopButton from '@/app/components/BackToTopButton';
 
 export const metadata = {
   title: 'Competitor AI Visibility Gap Tool',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <AppNav />
           {children}
         </main>
+        <BackToTopButton />
       </body>
     </html>
   );
