@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { requireOrgRole } from '@/lib/auth';
-import { buildGapInsightsForOrg } from '@/lib/insights/gap';
+import { buildGapInsightsFromLatestData, readGapLatestDataForOrg } from '@/lib/insights/gap';
 
 export async function GET(request: NextRequest, context: { params: Promise<{ orgId: string }> }) {
   const { orgId } = await context.params;
@@ -10,7 +10,13 @@ export async function GET(request: NextRequest, context: { params: Promise<{ org
     return auth;
   }
 
-  const insights = await buildGapInsightsForOrg(orgId);
+  const latest = await readGapLatestDataForOrg(orgId);
+  const insights = buildGapInsightsFromLatestData(
+    latest.org,
+    latest.latestRun,
+    latest.latestTrend,
+    latest.visibility
+  );
   return NextResponse.json({
     organizationId: orgId,
     insights
