@@ -104,6 +104,12 @@ async function readSignalsForScoring(organizationId: string): Promise<{
         connectorSignalsJson: JSON.stringify(live)
       }
     });
+    return { signals: live, source: 'live' };
+  }
+  // Fall back to the last cached snapshot when a refresh attempt yields no signals.
+  // This avoids transient connector/API issues zeroing out score inputs.
+  if (cached.length > 0) {
+    return { signals: cached, source: 'cache' };
   }
   return { signals: live, source: 'live' };
 }
