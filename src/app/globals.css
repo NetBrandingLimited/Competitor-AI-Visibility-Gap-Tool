@@ -33,6 +33,7 @@ p { color: #333; }
   text-decoration: none;
   border-radius: 6px;
   outline: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 .app-nav-shell {
   position: sticky;
@@ -63,6 +64,13 @@ p { color: #333; }
 }
 .app-nav-link:focus-visible {
   box-shadow: 0 0 0 2px #93c5fd;
+}
+.app-nav-link:hover {
+  color: #1e40af;
+  background: #eff6ff;
+}
+.app-nav-link:active {
+  background: #dbeafe;
 }
 .app-nav-section-chip {
   margin-left: auto;
@@ -103,6 +111,14 @@ p { color: #333; }
   font-weight: 600;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
   cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+}
+.back-to-top-button:hover {
+  background: #f8fafc;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+.back-to-top-button:active {
+  transform: translateY(1px);
 }
 .back-to-top-button:focus-visible {
   outline: none;
