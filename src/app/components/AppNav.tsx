@@ -85,32 +85,10 @@ export default function AppNav() {
         {!compactViewport ? <span aria-hidden="true" className="app-nav-section-chip">{activeSection}</span> : null}
       </nav>
       {showLeftFade ? (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 16,
-            pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(255,255,255,0.98), rgba(255,255,255,0))'
-          }}
-        />
+        <span aria-hidden="true" className="app-nav-fade app-nav-fade-left" />
       ) : null}
       {showRightFade ? (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: 16,
-            pointerEvents: 'none',
-            background: 'linear-gradient(to left, rgba(255,255,255,0.98), rgba(255,255,255,0))'
-          }}
-        />
+        <span aria-hidden="true" className="app-nav-fade app-nav-fade-right" />
       ) : null}
     </div>
   );

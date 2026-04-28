@@ -74,6 +74,21 @@ p { color: #333; }
   border: 1px solid #e2e8f0;
   white-space: nowrap;
 }
+.app-nav-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  pointer-events: none;
+}
+.app-nav-fade-left {
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0));
+}
+.app-nav-fade-right {
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0));
+}
 
 .login-shell {
   min-height: 70vh;
