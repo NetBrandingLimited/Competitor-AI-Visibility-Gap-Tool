@@ -1,4 +1,5 @@
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 
 function escapeCsv(value: string | number): string {
@@ -43,11 +44,6 @@ export async function GET() {
   const csv = `\uFEFF${[header.join(','), ...rows].join('\n')}`;
 
   return new Response(csv, {
-    headers: {
-      'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': 'attachment; filename="pipeline-runs.csv"',
-      'cache-control': 'no-store',
-      'x-content-type-options': 'nosniff'
-    }
+    headers: buildDownloadHeaders('text/csv; charset=utf-8', 'pipeline-runs.csv')
   });
 }

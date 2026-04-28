@@ -1,4 +1,5 @@
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readTrendSnapshots } from '@/lib/trends/store';
 
@@ -109,11 +110,6 @@ export async function GET() {
   const csv = `\uFEFF${[header.join(','), ...trendRows, ...opportunityRows, ...topicRows].join('\n')}`;
 
   return new Response(csv, {
-    headers: {
-      'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': 'attachment; filename="visibility-report.csv"',
-      'cache-control': 'no-store',
-      'x-content-type-options': 'nosniff'
-    }
+    headers: buildDownloadHeaders('text/csv; charset=utf-8', 'visibility-report.csv')
   });
 }

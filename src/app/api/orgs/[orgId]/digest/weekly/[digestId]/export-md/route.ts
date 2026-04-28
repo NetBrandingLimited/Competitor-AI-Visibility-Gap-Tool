@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { requireOrgRole } from '@/lib/auth';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
+import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
@@ -40,11 +41,6 @@ export async function GET(
 
   return new NextResponse(body, {
     status: 200,
-    headers: {
-      'content-type': 'text/markdown; charset=utf-8',
-      'content-disposition': `attachment; filename="${filename}"`,
-      'cache-control': 'no-store',
-      'x-content-type-options': 'nosniff'
-    }
+    headers: buildDownloadHeaders('text/markdown; charset=utf-8', filename)
   });
 }
