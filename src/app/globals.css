@@ -24,7 +24,8 @@ p { color: #333; }
   text-decoration: none;
   font-size: 14px;
 }
-.skip-link:focus {
+.skip-link:focus,
+.skip-link:focus-visible {
   top: 12px;
 }
 .app-layout {
@@ -658,3 +659,4 @@ p { color: #333; }
   background: #e2e8f0;
   color: #334155;
 }
+

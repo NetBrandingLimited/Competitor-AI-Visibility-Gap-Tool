@@ -29,10 +29,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <header>
             <AppNav />
           </header>
-          <main id="main-content">{children}</main>
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
         </div>
         <BackToTopButton />
       </body>
     </html>
   );
 }
+
