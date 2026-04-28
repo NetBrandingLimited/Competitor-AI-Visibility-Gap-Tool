@@ -19,6 +19,10 @@ const navItems: NavItem[] = [
   { label: 'Brand', href: '/settings/brand', sectionLabel: 'Brand settings' },
   { label: 'Connectors', href: '/settings/connectors', sectionLabel: 'Connectors' }
 ];
+const navGroups = [
+  { id: 'workspace', items: navItems.slice(0, 4) },
+  { id: 'settings', items: navItems.slice(4) }
+];
 
 function isActivePath(pathname: string, item: NavItem): boolean {
   if (item.exact) {
@@ -73,20 +77,52 @@ export default function AppNav() {
         <span id={currentSectionId} className="sr-only">
           Current section: {activeSection}
         </span>
-        {navItems.map((item) => {
-          const active = isActivePath(pathname, item);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={active ? 'app-nav-link app-nav-link-active' : 'app-nav-link'}
-              aria-current={active ? 'page' : undefined}
-            >
-              {item.label}
+        <div className="app-nav-workspace-zone" aria-hidden="true">
+          <span className="app-nav-workspace-icon">◈</span>
+          <span className="app-nav-workspace-copy">
+            <span className="app-nav-workspace-label">Workspace</span>
+            <span className="app-nav-workspace-value">{activeSection}</span>
+          </span>
+        </div>
+        <span aria-hidden="true" className="app-nav-group-separator" />
+        {navGroups.map((group, groupIdx) => (
+          <div key={group.id} className="app-nav-group" role="group" aria-label={`${group.id} navigation`}>
+            {group.items.map((item) => {
+              const active = isActivePath(pathname, item);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={active ? 'app-nav-link app-nav-link-active' : 'app-nav-link'}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+            {groupIdx < navGroups.length - 1 ? <span aria-hidden="true" className="app-nav-group-separator" /> : null}
+          </div>
+        ))}
+        {!compactViewport ? (
+          <div className="app-nav-utilities" aria-label="Quick utilities">
+            <label className="app-nav-search-wrap">
+              <span className="sr-only">Quick search</span>
+              <input
+                type="search"
+                className="app-nav-search-input"
+                placeholder="Search (soon)"
+                readOnly
+                aria-label="Quick search (coming soon)"
+              />
+            </label>
+            <Link href="/settings/brand" className="app-nav-utility-link">
+              Profile
             </Link>
-          );
-        })}
-        {!compactViewport ? <span aria-hidden="true" className="app-nav-section-chip">{activeSection}</span> : null}
+            <Link href="/reports" className="app-nav-utility-link app-nav-utility-link-primary">
+              Actions
+            </Link>
+          </div>
+        ) : null}
       </nav>
       {showLeftFade ? (
         <span aria-hidden="true" className="app-nav-fade app-nav-fade-left" />
