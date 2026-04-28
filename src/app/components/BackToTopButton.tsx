@@ -1,11 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [compactViewport, setCompactViewport] = useState(false);
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  }, [reduceMotion]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -31,13 +35,35 @@ export default function BackToTopButton() {
     };
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.altKey && event.shiftKey && event.key.toLowerCase() === 't')) {
+        return;
+      }
+      const activeEl = document.activeElement;
+      if (
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        activeEl instanceof HTMLSelectElement ||
+        (activeEl instanceof HTMLElement && activeEl.isContentEditable)
+      ) {
+        return;
+      }
+      event.preventDefault();
+      scrollToTop();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [scrollToTop]);
+
   if (!visible || compactViewport) return null;
 
   return (
     <button
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })}
+      onClick={scrollToTop}
       aria-label="Back to top"
+      title="Back to top (Alt+Shift+T)"
       style={{
         position: 'fixed',
         right: 16,
