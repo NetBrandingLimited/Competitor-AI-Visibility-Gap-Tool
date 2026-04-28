@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { readPipelineRunById } from '@/lib/pipeline/store';
+import { tableBase, tableWithMarginBottom, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 
 export default async function PipelineRunDetailPage({
   params
@@ -52,26 +53,48 @@ export default async function PipelineRunDetailPage({
       {run.triggers.length === 0 ? (
         <p>No triggers found for this run.</p>
       ) : (
-        <ul>
-          {run.triggers.map((trigger) => (
-            <li key={`${trigger.phrase}-${trigger.category}`}>
-              {trigger.phrase} ({trigger.category}, score {trigger.score})
-            </li>
-          ))}
-        </ul>
+        <table style={tableWithMarginBottom(16)}>
+          <thead>
+            <tr>
+              <th style={thLeft}>Phrase</th>
+              <th style={thLeft}>Category</th>
+              <th style={thRight}>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {run.triggers.map((trigger) => (
+              <tr key={`${trigger.phrase}-${trigger.category}`}>
+                <td style={tdCell}>{trigger.phrase}</td>
+                <td style={tdCell}>{trigger.category}</td>
+                <td style={tdCellRight}>{trigger.score}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
 
       <h2>Theme clusters</h2>
       {run.clusters.length === 0 ? (
         <p>No clusters generated for this run.</p>
       ) : (
-        <ul>
-          {run.clusters.map((cluster) => (
-            <li key={cluster.id}>
-              {cluster.label}: {cluster.keywords.join(', ')} ({cluster.itemCount} items)
-            </li>
-          ))}
-        </ul>
+        <table style={tableBase}>
+          <thead>
+            <tr>
+              <th style={thLeft}>Label</th>
+              <th style={thLeft}>Keywords</th>
+              <th style={thRight}>Items</th>
+            </tr>
+          </thead>
+          <tbody>
+            {run.clusters.map((cluster) => (
+              <tr key={cluster.id}>
+                <td style={tdCell}>{cluster.label}</td>
+                <td style={tdCell}>{cluster.keywords.join(', ')}</td>
+                <td style={tdCellRight}>{cluster.itemCount}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </section>
   );
