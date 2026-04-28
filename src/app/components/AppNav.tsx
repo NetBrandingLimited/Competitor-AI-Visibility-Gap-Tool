@@ -40,22 +40,28 @@ export default function AppNav() {
   const navRef = useRef<HTMLElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
+  const [compactViewport, setCompactViewport] = useState(false);
 
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
+    const mediaCompact = window.matchMedia('(max-width: 820px)');
 
     const updateFades = () => {
       const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
       setShowLeftFade(nav.scrollLeft > 0);
       setShowRightFade(maxScrollLeft > 0 && nav.scrollLeft < maxScrollLeft - 1);
     };
+    const onMediaChange = () => setCompactViewport(mediaCompact.matches);
 
     updateFades();
+    onMediaChange();
     nav.addEventListener('scroll', updateFades, { passive: true });
+    mediaCompact.addEventListener('change', onMediaChange);
     window.addEventListener('resize', updateFades);
     return () => {
       nav.removeEventListener('scroll', updateFades);
+      mediaCompact.removeEventListener('change', onMediaChange);
       window.removeEventListener('resize', updateFades);
     };
   }, []);
@@ -85,6 +91,7 @@ export default function AppNav() {
           fontSize: 14
         }}
       >
+        <span style={{ position: 'absolute', left: -10000 }}>Current section: {activeSection}</span>
         {navItems.map((item) => {
           const active = isActivePath(pathname, item);
           return (
@@ -98,21 +105,23 @@ export default function AppNav() {
             </Link>
           );
         })}
-        <span
-          aria-hidden="true"
-          style={{
-            marginLeft: 'auto',
-            padding: '4px 8px',
-            borderRadius: 999,
-            fontSize: 12,
-            color: '#334155',
-            background: '#f1f5f9',
-            border: '1px solid #e2e8f0',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {activeSection}
-        </span>
+        {!compactViewport ? (
+          <span
+            aria-hidden="true"
+            style={{
+              marginLeft: 'auto',
+              padding: '4px 8px',
+              borderRadius: 999,
+              fontSize: 12,
+              color: '#334155',
+              background: '#f1f5f9',
+              border: '1px solid #e2e8f0',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {activeSection}
+          </span>
+        ) : null}
       </nav>
       {showLeftFade ? (
         <span
