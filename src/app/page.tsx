@@ -18,19 +18,19 @@ export default function HomePage() {
           Phase 3 debug: <code>/api/debug/extract-cluster?text=best%20seo%20tool%20vs%20alternatives</code>
         </li>
         <li>
-          Phase 4 dashboard: <code>/dashboard</code>
+          Phase 4 dashboard: <Link href="/dashboard">/dashboard</Link>
         </li>
         <li>
-          Phase 5 reports: <code>/reports</code> and <code>POST /api/debug/trends/run</code>
+          Phase 5 reports: <Link href="/reports">/reports</Link> and <code>POST /api/debug/trends/run</code>
         </li>
         <li>
           Unified run: <code>POST /api/debug/pipeline/run?query=seo%20tool&amp;limit=2</code>
         </li>
         <li>
-          Ops monitor: <code>/ops</code> and <code>POST /api/debug/scheduler/run</code>
+          Ops monitor: <Link href="/ops">/ops</Link> and <code>POST /api/debug/scheduler/run</code>
         </li>
         <li>
-          Sign in: <code>/login</code> · Brand form: <code>/settings/brand</code>
+          Sign in: <Link href="/login">/login</Link> · Brand form: <Link href="/settings/brand">/settings/brand</Link>
         </li>
       </ul>
     </section>
