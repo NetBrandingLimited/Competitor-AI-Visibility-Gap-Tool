@@ -1,6 +1,11 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import BrandSettingsForm from './BrandSettingsForm';
+
+export const metadata: Metadata = {
+  title: 'Brand settings'
+};
 
 export default function BrandSettingsPage() {
   return (

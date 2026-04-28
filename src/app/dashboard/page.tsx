@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
@@ -16,6 +17,10 @@ import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
+
+export const metadata: Metadata = {
+  title: 'Dashboard'
+};
 
 function formatPercent(value: number): string {
   return `${(value * 100).toFixed(1)}%`;

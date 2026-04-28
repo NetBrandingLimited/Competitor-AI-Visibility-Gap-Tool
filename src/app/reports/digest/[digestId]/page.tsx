@@ -1,10 +1,15 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
+
+export const metadata: Metadata = {
+  title: 'Weekly digest'
+};
 
 export default async function WeeklyDigestDetailPage({
   params

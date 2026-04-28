@@ -6,7 +6,10 @@ import AppNav from '@/app/components/AppNav';
 import BackToTopButton from '@/app/components/BackToTopButton';
 
 export const metadata: Metadata = {
-  title: 'Competitor AI Visibility Gap Tool',
+  title: {
+    default: 'Competitor AI Visibility Gap Tool',
+    template: '%s | Competitor AI Visibility Gap Tool'
+  },
   description: 'Track brand mentions across AI answers and find visibility gaps.'
 };
 

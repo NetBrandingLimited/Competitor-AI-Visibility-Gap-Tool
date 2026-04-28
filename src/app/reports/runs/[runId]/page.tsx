@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { readPipelineRunById } from '@/lib/pipeline/store';
+
+export const metadata: Metadata = {
+  title: 'Pipeline run'
+};
 
 export default async function PipelineRunDetailPage({
   params

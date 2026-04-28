@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
@@ -12,6 +13,10 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+
+export const metadata: Metadata = {
+  title: 'Ops'
+};
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();

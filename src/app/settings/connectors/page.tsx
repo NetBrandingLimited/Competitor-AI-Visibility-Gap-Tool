@@ -1,6 +1,11 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
 import ConnectorsStatusPanel from './ConnectorsStatusPanel';
+
+export const metadata: Metadata = {
+  title: 'Connectors'
+};
 
 export default function ConnectorsSettingsPage() {
   return (

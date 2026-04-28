@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
@@ -12,6 +13,10 @@ import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { prisma } from '@/lib/prisma';
+
+export const metadata: Metadata = {
+  title: 'Reports'
+};
 
 function display(value: string | null | undefined): string {
   const t = value?.trim();
