@@ -14,11 +14,19 @@ type Props = {
  */
 export default function RecalculateVisibilityForm({ organizationId }: Props) {
   const [pending, setPending] = useState(false);
+  const [feedback, setFeedback] = useState<null | { ok: boolean; text: string }>(null);
 
   async function submit(formData: FormData) {
+    setFeedback(null);
     setPending(true);
     try {
       await refreshVisibilityScoreAction(formData);
+      setFeedback({ ok: true, text: 'Visibility score recalculated.' });
+    } catch (err) {
+      setFeedback({
+        ok: false,
+        text: err instanceof Error ? err.message : 'Recalculation failed.'
+      });
     } finally {
       setPending(false);
     }
@@ -30,6 +38,15 @@ export default function RecalculateVisibilityForm({ organizationId }: Props) {
       <button type="submit" className="primary" disabled={pending} aria-busy={pending}>
         {pending ? 'Recalculating…' : 'Recalculate score'}
       </button>
+      {feedback ? (
+        <p
+          className={`mt-8 ${feedback.ok ? 'text-debug-success' : 'text-debug-error'}`}
+          role="status"
+          aria-live="polite"
+        >
+          {feedback.text}
+        </p>
+      ) : null}
     </form>
   );
 }
