@@ -105,7 +105,12 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
   return (
     <p className={paragraphClass}>
       Runtime debug JSON:{' '}
-      <a href="/api/debug/config" target="_blank" rel="noreferrer" aria-label="Open debug config JSON in a new tab">
+      <a
+        href="/api/debug/config"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open debug config JSON in a new tab"
+      >
         /api/debug/config
       </a>
       <button
@@ -139,3 +144,4 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
     </p>
   );
 }
+

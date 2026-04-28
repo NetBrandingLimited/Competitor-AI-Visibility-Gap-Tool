@@ -44,7 +44,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
         <Link
           href={`/api/orgs/${organizationId}/visibility`}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label="Open visibility JSON API in a new tab"
         >
           JSON API
@@ -53,7 +53,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
         <Link
           href={`/api/orgs/${organizationId}/connectors`}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label="Open connector health API in a new tab"
         >
           Connector health
@@ -104,4 +104,5 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
     </div>
   );
 }
+
 
