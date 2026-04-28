@@ -18,6 +18,27 @@ export const metadata: Metadata = {
   title: 'Ops'
 };
 
+function describeSchedulerJob(job: {
+  status: 'success' | 'failed';
+  query: string;
+  pipelineRunId?: string;
+  weeklyDigestId?: string;
+  errorMessage?: string;
+}): string {
+  if (job.status === 'failed') {
+    return job.errorMessage?.trim() || 'Job failed before producing output.';
+  }
+  const parts: string[] = [];
+  parts.push(job.pipelineRunId ? `pipeline run ${job.pipelineRunId}` : 'no pipeline run');
+  parts.push(job.weeklyDigestId ? `digest ${job.weeklyDigestId}` : 'no digest');
+  if (job.query.includes('not due')) {
+    parts.push('digest was skipped because schedule was not due');
+  } else if (job.query.includes('digest-only')) {
+    parts.push('digest-only mode');
+  }
+  return parts.join(' · ');
+}
+
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -117,13 +138,14 @@ export default async function OpsPage() {
       ) : (
         <table className="data-table">
           <caption className="sr-only">
-            Recent scheduler jobs for this workspace: job id, status, query, linked pipeline run and digest, and
-            completion time.
+            Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
+            and digest, and completion time.
           </caption>
           <thead>
             <tr>
               <th scope="col" className="data-table-th-left">Job id</th>
               <th scope="col" className="data-table-th-left">Status</th>
+              <th scope="col" className="data-table-th-left">Details</th>
               <th scope="col" className="data-table-th-left">Query</th>
               <th scope="col" className="data-table-th-left">Pipeline run</th>
               <th scope="col" className="data-table-th-left">Weekly digest</th>
@@ -135,6 +157,7 @@ export default async function OpsPage() {
               <tr key={job.id}>
                 <td className="data-table-td">{job.id}</td>
                 <td className="data-table-td">{job.status}</td>
+                <td className="data-table-td">{describeSchedulerJob(job)}</td>
                 <td className="data-table-td">{job.query}</td>
                 <td className="data-table-td">{job.pipelineRunId ?? '-'}</td>
                 <td className="data-table-td">{job.weeklyDigestId ?? '-'}</td>
