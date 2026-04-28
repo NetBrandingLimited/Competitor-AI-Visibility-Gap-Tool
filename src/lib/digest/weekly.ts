@@ -1,9 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import type { GapOpportunity, TopicGap } from '@/lib/insights/gap';
-import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
-import { readLatestPipelineRun } from '@/lib/pipeline/store';
-import { readLatestTrendSnapshot } from '@/lib/trends/store';
-import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { buildGapInsightsFromLatestData, readGapLatestDataForOrg } from '@/lib/insights/gap';
 import { sendWeeklyDigestEmail } from '@/lib/email/weeklyDigestEmail';
 
 export type WeeklyDigestSummary = {
@@ -124,16 +121,17 @@ export async function generateWeeklyDigest(organizationId: string): Promise<Week
   start.setUTCDate(start.getUTCDate() - 6);
   const periodStart = isoDate(start);
 
-  const [latestRun, latestTrend, latestVisibility] = await Promise.all([
-    readLatestPipelineRun(organizationId),
-    readLatestTrendSnapshot(organizationId),
-    getLatestVisibilityScore(organizationId)
-  ]);
-  const insights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, latestVisibility);
+  const gapLatest = await readGapLatestDataForOrg(organizationId);
+  const insights = buildGapInsightsFromLatestData(
+    org,
+    gapLatest.latestRun,
+    gapLatest.latestTrend,
+    gapLatest.visibility
+  );
 
   const summary: WeeklyDigestSummary = {
-    score: latestVisibility ? Math.round(latestVisibility.score) : null,
-    signalSource: latestVisibility?.inputs.connectorSignalSource ?? null,
+    score: gapLatest.visibility ? Math.round(gapLatest.visibility.score) : null,
+    signalSource: gapLatest.visibility?.inputs?.connectorSignalSource ?? null,
     topOpportunities: insights.opportunities.slice(0, 3).map((o) => o.title),
     opportunities: insights.opportunities,
     topics: insights.topics,

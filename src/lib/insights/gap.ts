@@ -37,10 +37,43 @@ type GapOrgFields = {
 type GapVisibilityInput = {
   score: number;
   createdAt: string;
+  inputs?: {
+    connectorSignalSource: 'cache' | 'live';
+  };
 } | null;
+
+export type GapLatestData = {
+  org: GapOrgFields | null;
+  latestRun: UnifiedPipelineRun | null;
+  latestTrend: TrendSnapshot | null;
+  visibility: GapVisibilityInput;
+};
 
 function norm(value: string | null | undefined): string {
   return (value ?? '').trim().toLowerCase();
+}
+
+export async function readGapLatestDataForOrg(organizationId: string): Promise<GapLatestData> {
+  const [org, latestRun, latestTrend, visibility] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: {
+        brandName: true,
+        competitorA: true,
+        competitorB: true,
+        competitorC: true
+      }
+    }),
+    readLatestPipelineRun(organizationId),
+    readLatestTrendSnapshot(organizationId),
+    getLatestVisibilityScore(organizationId)
+  ]);
+  return {
+    org,
+    latestRun,
+    latestTrend,
+    visibility
+  };
 }
 
 export function buildGapInsightsFromLatestData(
@@ -147,19 +180,6 @@ export function buildGapInsightsFromLatestData(
 }
 
 export async function buildGapInsightsForOrg(organizationId: string): Promise<GapInsights> {
-  const [org, latestRun, latestTrend, visibility] = await Promise.all([
-    prisma.organization.findUnique({
-      where: { id: organizationId },
-      select: {
-        brandName: true,
-        competitorA: true,
-        competitorB: true,
-        competitorC: true
-      }
-    }),
-    readLatestPipelineRun(organizationId),
-    readLatestTrendSnapshot(organizationId),
-    getLatestVisibilityScore(organizationId)
-  ]);
+  const { org, latestRun, latestTrend, visibility } = await readGapLatestDataForOrg(organizationId);
   return buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 }

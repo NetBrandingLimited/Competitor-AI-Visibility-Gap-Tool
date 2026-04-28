@@ -1,10 +1,7 @@
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
-import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
-import { readLatestPipelineRun } from '@/lib/pipeline/store';
-import { prisma } from '@/lib/prisma';
+import { buildGapInsightsFromLatestData, readGapLatestDataForOrg } from '@/lib/insights/gap';
 import { readTrendSnapshots } from '@/lib/trends/store';
-import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 function escapeCsv(value: string | number): string {
   const raw = String(value);
@@ -22,22 +19,16 @@ export async function GET() {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const [snapshots, org, latestRun, latestVisibility] = await Promise.all([
+  const [snapshots, gapLatest] = await Promise.all([
     readTrendSnapshots(active.organizationId),
-    prisma.organization.findUnique({
-      where: { id: active.organizationId },
-      select: {
-        brandName: true,
-        competitorA: true,
-        competitorB: true,
-        competitorC: true
-      }
-    }),
-    readLatestPipelineRun(active.organizationId),
-    getLatestVisibilityScore(active.organizationId)
+    readGapLatestDataForOrg(active.organizationId)
   ]);
-  const latestTrend = snapshots.at(-1) ?? null;
-  const gapInsights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, latestVisibility);
+  const gapInsights = buildGapInsightsFromLatestData(
+    gapLatest.org,
+    gapLatest.latestRun,
+    snapshots.at(-1) ?? gapLatest.latestTrend,
+    gapLatest.visibility
+  );
 
   const header = [
     'section',
