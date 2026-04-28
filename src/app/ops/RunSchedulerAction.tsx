@@ -8,19 +8,43 @@ export default function RunSchedulerAction() {
   const [running, setRunning] = useState(false);
   const [message, setMessage] = useState('');
   const [forceDigest, setForceDigest] = useState(false);
+  const [digestOnly, setDigestOnly] = useState(false);
 
   async function runNow() {
     setRunning(true);
     setMessage('');
     try {
-      const response = await fetch(`/api/debug/scheduler/run?limit=2${forceDigest ? '&forceDigest=1' : ''}`, {
+      const params = new URLSearchParams({ limit: '2' });
+      if (forceDigest) {
+        params.set('forceDigest', '1');
+      }
+      if (digestOnly) {
+        params.set('digestOnly', '1');
+      }
+      const response = await fetch(`/api/debug/scheduler/run?${params.toString()}`, {
         method: 'POST',
         credentials: 'include'
       });
       if (!response.ok) {
         throw new Error(`Scheduler run failed (${response.status})`);
       }
-      setMessage('Scheduler job completed successfully.');
+      const data = (await response.json()) as {
+        mode?: 'full' | 'digest-only';
+        digestGenerated?: boolean;
+        pipelineRefreshedForDigest?: boolean;
+        pipelineRun?: { id: string } | null;
+        digest?: { id: string } | null;
+      };
+      const parts = [
+        `Scheduler job completed (${data.mode ?? (digestOnly ? 'digest-only' : 'full')}).`,
+        data.digestGenerated ? `Digest: ${data.digest?.id ?? 'generated'}.` : 'Digest: skipped (not due).',
+        data.pipelineRun?.id
+          ? `Pipeline run: ${data.pipelineRun.id}.`
+          : data.pipelineRefreshedForDigest
+            ? 'Pipeline refreshed for digest.'
+            : 'Pipeline: not executed.'
+      ];
+      setMessage(parts.join(' '));
       router.refresh();
     } catch (error) {
       const text = error instanceof Error ? error.message : 'Scheduler run failed.';
@@ -42,6 +66,17 @@ export default function RunSchedulerAction() {
           className="mr-8"
         />
         Force weekly digest generation in this run
+      </label>
+      <label className="block mb-8">
+        <input
+          type="checkbox"
+          name="digestOnly"
+          checked={digestOnly}
+          onChange={(e) => setDigestOnly(e.target.checked)}
+          disabled={running}
+          className="mr-8"
+        />
+        Run digest-only mode (skip full pipeline/trends unless digest refresh requires it)
       </label>
       <button type="button" onClick={runNow} disabled={running} aria-busy={running}>
         {running ? 'Running scheduled job?' : 'Run scheduled job now'}

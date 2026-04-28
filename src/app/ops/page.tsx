@@ -82,7 +82,7 @@ export default async function OpsPage() {
           missingText="Not completed yet"
         >
           <>
-            <code>{latestJob?.id}</code> ({latestJob?.status})
+            <code>{latestJob?.id}</code> ({latestJob?.status}) · <code>{latestJob?.query}</code>
           </>
         </StatusFreshnessItem>
         <StatusFreshnessItem
