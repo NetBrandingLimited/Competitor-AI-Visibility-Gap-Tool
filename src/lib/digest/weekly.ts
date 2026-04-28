@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import type { GapOpportunity, TopicGap } from '@/lib/insights/gap';
-import { buildGapInsightsForOrg } from '@/lib/insights/gap';
+import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
+import { readLatestPipelineRun } from '@/lib/pipeline/store';
+import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 import { sendWeeklyDigestEmail } from '@/lib/email/weeklyDigestEmail';
 
@@ -106,7 +108,14 @@ function isoDate(d: Date): string {
 export async function generateWeeklyDigest(organizationId: string): Promise<WeeklyDigest> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
-    select: { name: true, weeklyDigestNotifyEmail: true }
+    select: {
+      name: true,
+      weeklyDigestNotifyEmail: true,
+      brandName: true,
+      competitorA: true,
+      competitorB: true,
+      competitorC: true
+    }
   });
 
   const now = new Date();
@@ -115,10 +124,12 @@ export async function generateWeeklyDigest(organizationId: string): Promise<Week
   start.setUTCDate(start.getUTCDate() - 6);
   const periodStart = isoDate(start);
 
-  const [insights, latestVisibility] = await Promise.all([
-    buildGapInsightsForOrg(organizationId),
+  const [latestRun, latestTrend, latestVisibility] = await Promise.all([
+    readLatestPipelineRun(organizationId),
+    readLatestTrendSnapshot(organizationId),
     getLatestVisibilityScore(organizationId)
   ]);
+  const insights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, latestVisibility);
 
   const summary: WeeklyDigestSummary = {
     score: latestVisibility ? Math.round(latestVisibility.score) : null,

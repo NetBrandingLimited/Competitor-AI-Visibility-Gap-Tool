@@ -2,7 +2,7 @@ import { collectAllConnectorSignals } from '@/lib/connectors';
 import type { VisibilitySignal } from '@/lib/connectors/types';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
-import { readTrendSnapshots } from '@/lib/trends/store';
+import { readLatestTrendSnapshot } from '@/lib/trends/store';
 
 export type VisibilityReasonV1 = {
   code: string;
@@ -267,14 +267,15 @@ export function buildWhyChanged(
 }
 
 export async function buildInputsForOrg(organizationId: string): Promise<VisibilityInputsV1> {
-  const org = await prisma.organization.findUnique({
-    where: { id: organizationId },
-    select: { brandName: true }
-  });
-  const latestRun = await readLatestPipelineRun(organizationId);
-  const trends = await readTrendSnapshots(organizationId);
-  const latestTrend = trends.at(-1) ?? null;
-  const signalState = await readSignalsForScoring(organizationId);
+  const [org, latestRun, latestTrend, signalState] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { brandName: true }
+    }),
+    readLatestPipelineRun(organizationId),
+    readLatestTrendSnapshot(organizationId),
+    readSignalsForScoring(organizationId)
+  ]);
   const signals = signalState.signals;
 
   return {
