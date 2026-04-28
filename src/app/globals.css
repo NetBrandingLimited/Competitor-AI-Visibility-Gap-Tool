@@ -262,6 +262,43 @@ p { color: #333; }
   color: #374151;
 }
 
+/* Bordered data tables (dashboard, reports, digest detail, run detail, ops) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+.data-table-mb-16 {
+  margin-bottom: 16px;
+}
+.data-table-mb-24 {
+  margin-bottom: 24px;
+}
+.data-table-th-left {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.data-table-th-right {
+  text-align: right;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+.data-table-td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+.data-table-td-right {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  text-align: right;
+}
+.data-table-td-nowrap {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
 .field-hint-small {
   display: block;
   margin-top: 6px;

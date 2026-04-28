@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { readPipelineRunById } from '@/lib/pipeline/store';
-import { tableBase, tableWithMarginBottom, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 
 export default async function PipelineRunDetailPage({
   params
@@ -53,20 +52,20 @@ export default async function PipelineRunDetailPage({
       {run.triggers.length === 0 ? (
         <p>No triggers found for this run.</p>
       ) : (
-        <table style={tableWithMarginBottom(16)}>
+        <table className="data-table data-table-mb-16">
           <thead>
             <tr>
-              <th style={thLeft}>Phrase</th>
-              <th style={thLeft}>Category</th>
-              <th style={thRight}>Score</th>
+              <th className="data-table-th-left">Phrase</th>
+              <th className="data-table-th-left">Category</th>
+              <th className="data-table-th-right">Score</th>
             </tr>
           </thead>
           <tbody>
             {run.triggers.map((trigger) => (
               <tr key={`${trigger.phrase}-${trigger.category}`}>
-                <td style={tdCell}>{trigger.phrase}</td>
-                <td style={tdCell}>{trigger.category}</td>
-                <td style={tdCellRight}>{trigger.score}</td>
+                <td className="data-table-td">{trigger.phrase}</td>
+                <td className="data-table-td">{trigger.category}</td>
+                <td className="data-table-td-right">{trigger.score}</td>
               </tr>
             ))}
           </tbody>
@@ -77,20 +76,20 @@ export default async function PipelineRunDetailPage({
       {run.clusters.length === 0 ? (
         <p>No clusters generated for this run.</p>
       ) : (
-        <table style={tableBase}>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={thLeft}>Label</th>
-              <th style={thLeft}>Keywords</th>
-              <th style={thRight}>Items</th>
+              <th className="data-table-th-left">Label</th>
+              <th className="data-table-th-left">Keywords</th>
+              <th className="data-table-th-right">Items</th>
             </tr>
           </thead>
           <tbody>
             {run.clusters.map((cluster) => (
               <tr key={cluster.id}>
-                <td style={tdCell}>{cluster.label}</td>
-                <td style={tdCell}>{cluster.keywords.join(', ')}</td>
-                <td style={tdCellRight}>{cluster.itemCount}</td>
+                <td className="data-table-td">{cluster.label}</td>
+                <td className="data-table-td">{cluster.keywords.join(', ')}</td>
+                <td className="data-table-td-right">{cluster.itemCount}</td>
               </tr>
             ))}
           </tbody>

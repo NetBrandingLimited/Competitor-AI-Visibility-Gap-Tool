@@ -11,7 +11,6 @@ import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
-import { tableBase, tableWithMarginBottom, tdCell, tdCellNowrap, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -155,24 +154,24 @@ export default async function ReportsPage() {
       {gapInsights.topics.length === 0 ? (
         <p>No topic breakdown available yet. Run the unified pipeline first.</p>
       ) : (
-        <table style={tableWithMarginBottom(16)}>
+        <table className="data-table data-table-mb-16">
           <thead>
             <tr>
-              <th style={thLeft}>Topic</th>
-              <th style={thRight}>Gap score</th>
-              <th style={thRight}>Trigger hits</th>
-              <th style={thRight}>Cluster weight</th>
-              <th style={thLeft}>Recommendation</th>
+              <th className="data-table-th-left">Topic</th>
+              <th className="data-table-th-right">Gap score</th>
+              <th className="data-table-th-right">Trigger hits</th>
+              <th className="data-table-th-right">Cluster weight</th>
+              <th className="data-table-th-left">Recommendation</th>
             </tr>
           </thead>
           <tbody>
             {gapInsights.topics.map((topic) => (
               <tr key={topic.topic}>
-                <td style={tdCell}>{topic.topic}</td>
-                <td style={tdCellRight}>{topic.gapScore}</td>
-                <td style={tdCellRight}>{topic.triggerCount}</td>
-                <td style={tdCellRight}>{topic.clusterWeight}</td>
-                <td style={tdCell}>{topic.recommendation}</td>
+                <td className="data-table-td">{topic.topic}</td>
+                <td className="data-table-td-right">{topic.gapScore}</td>
+                <td className="data-table-td-right">{topic.triggerCount}</td>
+                <td className="data-table-td-right">{topic.clusterWeight}</td>
+                <td className="data-table-td">{topic.recommendation}</td>
               </tr>
             ))}
           </tbody>
@@ -183,30 +182,30 @@ export default async function ReportsPage() {
       {weeklyDigests.length === 0 ? (
         <p>No digest yet. Click &quot;Generate weekly digest&quot; above.</p>
       ) : (
-        <table style={tableWithMarginBottom(16)}>
+        <table className="data-table data-table-mb-16">
           <thead>
             <tr>
-              <th style={thLeft}>Digest</th>
-              <th style={thLeft}>Generated</th>
-              <th style={thLeft}>Period</th>
-              <th style={thRight}>Score</th>
-              <th style={thLeft}>Signal source</th>
-              <th style={thLeft}>Top opportunities</th>
+              <th className="data-table-th-left">Digest</th>
+              <th className="data-table-th-left">Generated</th>
+              <th className="data-table-th-left">Period</th>
+              <th className="data-table-th-right">Score</th>
+              <th className="data-table-th-left">Signal source</th>
+              <th className="data-table-th-left">Top opportunities</th>
             </tr>
           </thead>
           <tbody>
             {weeklyDigests.map((d) => (
               <tr key={d.id}>
-                <td style={tdCell}>
+                <td className="data-table-td">
                   <Link href={`/reports/digest/${d.id}`}>View</Link>
                 </td>
-                <td style={tdCell}>{new Date(d.generatedAt).toLocaleString()}</td>
-                <td style={tdCell}>
+                <td className="data-table-td">{new Date(d.generatedAt).toLocaleString()}</td>
+                <td className="data-table-td">
                   {d.periodStart} → {d.periodEnd}
                 </td>
-                <td style={tdCellRight}>{d.summary.score ?? '—'}</td>
-                <td style={tdCell}>{d.summary.signalSource ?? '—'}</td>
-                <td style={tdCell}>{d.summary.topOpportunities.join(', ') || '—'}</td>
+                <td className="data-table-td-right">{d.summary.score ?? '—'}</td>
+                <td className="data-table-td">{d.summary.signalSource ?? '—'}</td>
+                <td className="data-table-td">{d.summary.topOpportunities.join(', ') || '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -217,22 +216,22 @@ export default async function ReportsPage() {
       {snapshots.length === 0 ? (
         <p>No snapshots yet for this workspace. Run the trend snapshot job below.</p>
       ) : (
-        <table style={tableBase}>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={thLeft}>Date</th>
-              <th style={thRight}>Mentions</th>
-              <th style={thLeft}>Top brand</th>
-              <th style={thRight}>Top brand mentions</th>
+              <th className="data-table-th-left">Date</th>
+              <th className="data-table-th-right">Mentions</th>
+              <th className="data-table-th-left">Top brand</th>
+              <th className="data-table-th-right">Top brand mentions</th>
             </tr>
           </thead>
           <tbody>
             {snapshots.map((row) => (
               <tr key={row.date}>
-                <td style={tdCell}>{row.date}</td>
-                <td style={tdCellRight}>{row.totalMentions}</td>
-                <td style={tdCell}>{row.topBrand}</td>
-                <td style={tdCellRight}>{row.topBrandMentions}</td>
+                <td className="data-table-td">{row.date}</td>
+                <td className="data-table-td-right">{row.totalMentions}</td>
+                <td className="data-table-td">{row.topBrand}</td>
+                <td className="data-table-td-right">{row.topBrandMentions}</td>
               </tr>
             ))}
           </tbody>
@@ -249,28 +248,28 @@ export default async function ReportsPage() {
       {pipelineRuns.length === 0 ? (
         <p>No runs yet for this workspace. Run the unified pipeline below.</p>
       ) : (
-        <table style={tableBase}>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={thLeft}>Run id</th>
-              <th style={thLeft}>Created</th>
-              <th style={thLeft}>Query</th>
-              <th style={thRight}>Docs</th>
-              <th style={thRight}>Triggers</th>
-              <th style={thRight}>Clusters</th>
+              <th className="data-table-th-left">Run id</th>
+              <th className="data-table-th-left">Created</th>
+              <th className="data-table-th-left">Query</th>
+              <th className="data-table-th-right">Docs</th>
+              <th className="data-table-th-right">Triggers</th>
+              <th className="data-table-th-right">Clusters</th>
             </tr>
           </thead>
           <tbody>
             {pipelineRuns.map((run) => (
               <tr key={run.id}>
-                <td style={tdCell}>
+                <td className="data-table-td">
                   <Link href={`/reports/runs/${run.id}`}>{run.id}</Link>
                 </td>
-                <td style={tdCellNowrap}>{new Date(run.createdAt).toLocaleString()}</td>
-                <td style={tdCell}>{run.query}</td>
-                <td style={tdCellRight}>{run.documentCount}</td>
-                <td style={tdCellRight}>{run.triggerCount}</td>
-                <td style={tdCellRight}>{run.clusterCount}</td>
+                <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
+                <td className="data-table-td">{run.query}</td>
+                <td className="data-table-td-right">{run.documentCount}</td>
+                <td className="data-table-td-right">{run.triggerCount}</td>
+                <td className="data-table-td-right">{run.clusterCount}</td>
               </tr>
             ))}
           </tbody>

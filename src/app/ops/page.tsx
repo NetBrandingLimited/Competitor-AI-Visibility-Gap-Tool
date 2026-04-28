@@ -12,7 +12,6 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
-import { tableBase, tdCell, thLeft } from '@/lib/ui/tableStyles';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -111,26 +110,26 @@ export default async function OpsPage() {
       {jobs.length === 0 ? (
         <p>No scheduler jobs yet for this workspace.</p>
       ) : (
-        <table style={tableBase}>
+        <table className="data-table">
           <thead>
             <tr>
-              <th style={thLeft}>Job id</th>
-              <th style={thLeft}>Status</th>
-              <th style={thLeft}>Query</th>
-              <th style={thLeft}>Pipeline run</th>
-              <th style={thLeft}>Weekly digest</th>
-              <th style={thLeft}>Completed</th>
+              <th className="data-table-th-left">Job id</th>
+              <th className="data-table-th-left">Status</th>
+              <th className="data-table-th-left">Query</th>
+              <th className="data-table-th-left">Pipeline run</th>
+              <th className="data-table-th-left">Weekly digest</th>
+              <th className="data-table-th-left">Completed</th>
             </tr>
           </thead>
           <tbody>
             {jobs.map((job) => (
               <tr key={job.id}>
-                <td style={tdCell}>{job.id}</td>
-                <td style={tdCell}>{job.status}</td>
-                <td style={tdCell}>{job.query}</td>
-                <td style={tdCell}>{job.pipelineRunId ?? '-'}</td>
-                <td style={tdCell}>{job.weeklyDigestId ?? '-'}</td>
-                <td style={tdCell}>{new Date(job.completedAt).toLocaleString()}</td>
+                <td className="data-table-td">{job.id}</td>
+                <td className="data-table-td">{job.status}</td>
+                <td className="data-table-td">{job.query}</td>
+                <td className="data-table-td">{job.pipelineRunId ?? '-'}</td>
+                <td className="data-table-td">{job.weeklyDigestId ?? '-'}</td>
+                <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

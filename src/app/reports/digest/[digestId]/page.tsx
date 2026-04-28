@@ -5,7 +5,6 @@ import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
-import { tableBase, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 
 export default async function WeeklyDigestDetailPage({
   params
@@ -86,22 +85,22 @@ export default async function WeeklyDigestDetailPage({
       {digest.summary.topics && digest.summary.topics.length > 0 ? (
         <>
           <h2>Topic gaps (frozen at generation)</h2>
-          <table style={tableBase}>
+          <table className="data-table">
             <thead>
               <tr>
-                <th style={thLeft}>Topic</th>
-                <th style={thRight}>Gap</th>
-                <th style={thRight}>Triggers</th>
-                <th style={thLeft}>Recommendation</th>
+                <th className="data-table-th-left">Topic</th>
+                <th className="data-table-th-right">Gap</th>
+                <th className="data-table-th-right">Triggers</th>
+                <th className="data-table-th-left">Recommendation</th>
               </tr>
             </thead>
             <tbody>
               {digest.summary.topics.map((t) => (
                 <tr key={t.topic}>
-                  <td style={tdCell}>{t.topic}</td>
-                  <td style={tdCellRight}>{t.gapScore}</td>
-                  <td style={tdCellRight}>{t.triggerCount}</td>
-                  <td style={tdCell}>{t.recommendation}</td>
+                  <td className="data-table-td">{t.topic}</td>
+                  <td className="data-table-td-right">{t.gapScore}</td>
+                  <td className="data-table-td-right">{t.triggerCount}</td>
+                  <td className="data-table-td">{t.recommendation}</td>
                 </tr>
               ))}
             </tbody>

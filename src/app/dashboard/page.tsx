@@ -13,7 +13,6 @@ import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
-import { tableBase, tableWithMarginBottom, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -211,22 +210,22 @@ export default async function DashboardPage() {
       </ul>
 
       {gapInsights.topics.length > 0 ? (
-        <table style={tableWithMarginBottom(24)}>
+        <table className="data-table data-table-mb-24">
           <thead>
             <tr>
-              <th style={thLeft}>Topic</th>
-              <th style={thRight}>Gap score</th>
-              <th style={thRight}>Trigger count</th>
-              <th style={thLeft}>Recommendation</th>
+              <th className="data-table-th-left">Topic</th>
+              <th className="data-table-th-right">Gap score</th>
+              <th className="data-table-th-right">Trigger count</th>
+              <th className="data-table-th-left">Recommendation</th>
             </tr>
           </thead>
           <tbody>
             {gapInsights.topics.slice(0, 5).map((topic) => (
               <tr key={topic.topic}>
-                <td style={tdCell}>{topic.topic}</td>
-                <td style={tdCellRight}>{topic.gapScore}</td>
-                <td style={tdCellRight}>{topic.triggerCount}</td>
-                <td style={tdCell}>{topic.recommendation}</td>
+                <td className="data-table-td">{topic.topic}</td>
+                <td className="data-table-td-right">{topic.gapScore}</td>
+                <td className="data-table-td-right">{topic.triggerCount}</td>
+                <td className="data-table-td">{topic.recommendation}</td>
               </tr>
             ))}
           </tbody>
@@ -234,13 +233,13 @@ export default async function DashboardPage() {
       ) : null}
 
       <h2>Leaderboard</h2>
-      <table style={tableWithMarginBottom(24)}>
+      <table className="data-table data-table-mb-24">
         <thead>
           <tr>
-            <th style={thLeft}>Brand</th>
-            <th style={thRight}>Mentions</th>
-            <th style={thRight}>Share of voice</th>
-            <th style={thRight}>
+            <th className="data-table-th-left">Brand</th>
+            <th className="data-table-th-right">Mentions</th>
+            <th className="data-table-th-right">Share of voice</th>
+            <th className="data-table-th-right">
               {leaderboardSource === 'pipeline' ? 'Δ vs prior run' : '7d delta'}
             </th>
           </tr>
@@ -248,10 +247,10 @@ export default async function DashboardPage() {
         <tbody>
           {snapshot.leaderboard.map((row) => (
             <tr key={row.brand}>
-              <td style={tdCell}>{row.brand}</td>
-              <td style={tdCellRight}>{row.mentions}</td>
-              <td style={tdCellRight}>{formatPercent(row.shareOfVoice)}</td>
-              <td style={tdCellRight}>
+              <td className="data-table-td">{row.brand}</td>
+              <td className="data-table-td-right">{row.mentions}</td>
+              <td className="data-table-td-right">{formatPercent(row.shareOfVoice)}</td>
+              <td className="data-table-td-right">
                 {row.delta7d >= 0 ? '+' : ''}
                 {formatPercent(row.delta7d)}
               </td>
@@ -261,22 +260,22 @@ export default async function DashboardPage() {
       </table>
 
       <h2>Recent</h2>
-      <table style={tableBase}>
+      <table className="data-table">
         <thead>
           <tr>
-            <th style={thLeft}>Source</th>
-            <th style={thLeft}>Query</th>
-            <th style={thLeft}>Top brand</th>
-            <th style={thLeft}>Published</th>
+            <th className="data-table-th-left">Source</th>
+            <th className="data-table-th-left">Query</th>
+            <th className="data-table-th-left">Top brand</th>
+            <th className="data-table-th-left">Published</th>
           </tr>
         </thead>
         <tbody>
           {snapshot.recent.map((row) => (
             <tr key={`${row.source}-${row.query}`}>
-              <td style={tdCell}>{row.source}</td>
-              <td style={tdCell}>{row.query}</td>
-              <td style={tdCell}>{row.topBrand}</td>
-              <td style={tdCell}>{new Date(row.publishedAt).toLocaleString()}</td>
+              <td className="data-table-td">{row.source}</td>
+              <td className="data-table-td">{row.query}</td>
+              <td className="data-table-td">{row.topBrand}</td>
+              <td className="data-table-td">{new Date(row.publishedAt).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
