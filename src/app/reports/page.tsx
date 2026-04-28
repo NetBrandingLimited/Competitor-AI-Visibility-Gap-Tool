@@ -158,7 +158,7 @@ export default async function ReportsPage() {
       <RunActions />
 
       <h2>Competitor gap insights (v1)</h2>
-      <p style={{ color: '#444', fontSize: 14 }}>
+      <p className="text-muted-note">
         Auto-generated opportunities from latest pipeline triggers/clusters, trend leader, and visibility score.
       </p>
       <ul>
@@ -257,7 +257,7 @@ export default async function ReportsPage() {
       )}
 
       <h2 style={{ marginTop: 24 }}>Unified pipeline runs</h2>
-      <p style={{ fontSize: 14, color: '#444', maxWidth: 720 }}>
+      <p className="text-muted-note-wide">
         Each row is <strong>this workspace only</strong> (not mixed with other accounts). The <strong>Query</strong> is
         built from your saved brand fields when you don&apos;t pass a custom query. <strong>Docs / Triggers / Clusters</strong>{' '}
         are counts from mock ingestion plus on-device heuristics (not live Google or AI answers). New runs rotate mock

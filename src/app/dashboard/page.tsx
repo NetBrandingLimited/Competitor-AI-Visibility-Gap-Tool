@@ -198,7 +198,7 @@ export default async function DashboardPage() {
       )}
 
       <h2>Gap opportunities</h2>
-      <p style={{ color: '#555' }}>
+      <p className="text-muted-subtle">
         Generated <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code> from latest run, trend, and
         visibility signals.
       </p>

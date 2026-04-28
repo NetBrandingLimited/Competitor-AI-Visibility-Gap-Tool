@@ -22,6 +22,18 @@ p { color: #333; }
   margin: 40px auto;
   padding: 0 16px;
 }
+.text-muted-note {
+  font-size: 14px;
+  color: #444;
+}
+.text-muted-note-wide {
+  font-size: 14px;
+  color: #444;
+  max-width: 720px;
+}
+.text-muted-subtle {
+  color: #555;
+}
 .sr-only {
   position: absolute;
   width: 1px;
