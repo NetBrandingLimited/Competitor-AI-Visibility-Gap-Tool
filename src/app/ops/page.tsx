@@ -8,6 +8,7 @@ import StatusFreshnessItem from './StatusFreshnessItem';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
+import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -47,8 +48,11 @@ export default async function OpsPage() {
 
   const jobs = await readSchedulerJobs(active.organizationId);
   const latestJob = jobs[0] ?? null;
-  const latestRun = await readLatestPipelineRun(active.organizationId);
-  const trendSnapshots = await readTrendSnapshots(active.organizationId);
+  const [latestRun, latestDigest, trendSnapshots] = await Promise.all([
+    readLatestPipelineRun(active.organizationId),
+    readLatestWeeklyDigest(active.organizationId),
+    readTrendSnapshots(active.organizationId)
+  ]);
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const {
     thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
@@ -121,6 +125,14 @@ export default async function OpsPage() {
           missingText="Not generated yet"
         >
           <code>{latestTrend?.date}</code>
+        </StatusFreshnessItem>
+        <StatusFreshnessItem
+          label="Latest weekly digest"
+          iso={latestDigest?.generatedAt ?? null}
+          thresholds={freshnessThresholds}
+          missingText="Not generated yet"
+        >
+          <code>{latestDigest?.id}</code>
         </StatusFreshnessItem>
       </ul>
       <FreshnessSectionCard title="Freshness thresholds">
