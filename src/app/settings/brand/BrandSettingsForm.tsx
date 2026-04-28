@@ -113,7 +113,11 @@ export default function BrandSettingsForm() {
   }
 
   if (loading) {
-    return <p>Loading…</p>;
+    return (
+      <p role="status" aria-live="polite">
+        Loading…
+      </p>
+    );
   }
 
   if (orgs.length === 0) {
@@ -130,6 +134,7 @@ export default function BrandSettingsForm() {
         <label className="field">
           <span>Organization</span>
           <select
+            name="organizationId"
             value={orgId}
             onChange={async (e) => {
               const nextId = e.target.value;
@@ -161,29 +166,42 @@ export default function BrandSettingsForm() {
 
       <label className="field">
         <span>Brand name</span>
-        <input value={brandName} onChange={(e) => setBrandName(e.target.value)} placeholder="Your brand" />
+        <input
+          name="brandName"
+          autoComplete="off"
+          value={brandName}
+          onChange={(e) => setBrandName(e.target.value)}
+          placeholder="Your brand"
+        />
       </label>
       <label className="field">
         <span>Category</span>
-        <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. SaaS, SEO" />
+        <input
+          name="category"
+          autoComplete="off"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="e.g. SaaS, SEO"
+        />
       </label>
       <label className="field">
         <span>Competitor A</span>
-        <input value={competitorA} onChange={(e) => setCompetitorA(e.target.value)} />
+        <input name="competitorA" autoComplete="off" value={competitorA} onChange={(e) => setCompetitorA(e.target.value)} />
       </label>
       <label className="field">
         <span>Competitor B</span>
-        <input value={competitorB} onChange={(e) => setCompetitorB(e.target.value)} />
+        <input name="competitorB" autoComplete="off" value={competitorB} onChange={(e) => setCompetitorB(e.target.value)} />
       </label>
       <label className="field">
         <span>Competitor C</span>
-        <input value={competitorC} onChange={(e) => setCompetitorC(e.target.value)} />
+        <input name="competitorC" autoComplete="off" value={competitorC} onChange={(e) => setCompetitorC(e.target.value)} />
       </label>
 
       <label className="field">
         <span>Weekly digest email (optional)</span>
         <input
           type="email"
+          name="weeklyDigestNotifyEmail"
           autoComplete="email"
           value={weeklyDigestNotifyEmail}
           onChange={(e) => setWeeklyDigestNotifyEmail(e.target.value)}
