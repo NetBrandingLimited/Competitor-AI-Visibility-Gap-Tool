@@ -62,26 +62,11 @@ export default function AppNav() {
   const activeSection = activeItem?.sectionLabel ?? 'Workspace';
 
   return (
-    <div style={{ position: 'sticky', top: 0, zIndex: 20, marginTop: -8, marginBottom: 8 }}>
+    <div className="app-nav-shell">
       <nav
         ref={navRef}
         aria-label="Primary"
-        style={{
-          position: 'relative',
-          display: 'flex',
-          flexWrap: 'nowrap',
-          gap: '10px 18px',
-          alignItems: 'center',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          paddingTop: 8,
-          paddingBottom: 14,
-          background: 'rgba(255, 255, 255, 0.94)',
-          backdropFilter: 'blur(2px)',
-          borderBottom: '1px solid #e5e7eb',
-          fontSize: 14
-        }}
+        className="app-nav-track"
       >
         <span className="sr-only">Current section: {activeSection}</span>
         {navItems.map((item) => {
@@ -97,23 +82,7 @@ export default function AppNav() {
             </Link>
           );
         })}
-        {!compactViewport ? (
-          <span
-            aria-hidden="true"
-            style={{
-              marginLeft: 'auto',
-              padding: '4px 8px',
-              borderRadius: 999,
-              fontSize: 12,
-              color: '#334155',
-              background: '#f1f5f9',
-              border: '1px solid #e2e8f0',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            {activeSection}
-          </span>
-        ) : null}
+        {!compactViewport ? <span aria-hidden="true" className="app-nav-section-chip">{activeSection}</span> : null}
       </nav>
       {showLeftFade ? (
         <span
