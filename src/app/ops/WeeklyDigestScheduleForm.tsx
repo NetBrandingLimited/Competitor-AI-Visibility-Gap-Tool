@@ -59,6 +59,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
       <label className="label-block-tight">
         <input
           type="checkbox"
+          name="enabled"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
           disabled={!canEdit || saving}
@@ -69,6 +70,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
       <label className="label-block-body">
         <input
           type="checkbox"
+          name="refreshPipelineFirst"
           checked={refreshPipelineFirst}
           onChange={(e) => setRefreshPipelineFirst(e.target.checked)}
           disabled={!canEdit || saving}
@@ -79,7 +81,12 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
       <div className="flex-row-wrap-gap">
         <label>
           Day:{' '}
-          <select value={dayUtc} onChange={(e) => setDayUtc(Number(e.target.value))} disabled={!canEdit || saving}>
+          <select
+            name="dayUtc"
+            value={dayUtc}
+            onChange={(e) => setDayUtc(Number(e.target.value))}
+            disabled={!canEdit || saving}
+          >
             {DAYS.map((d, idx) => (
               <option key={d} value={idx}>
                 {d}
@@ -91,6 +98,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
           Hour (UTC):{' '}
           <input
             type="number"
+            name="hourUtc"
             min={0}
             max={23}
             value={hourUtc}
