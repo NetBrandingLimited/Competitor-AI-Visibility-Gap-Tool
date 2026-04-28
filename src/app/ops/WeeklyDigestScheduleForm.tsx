@@ -104,7 +104,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
         </button>
       </div>
       {message ? <p style={{ marginTop: 10 }}>{message}</p> : null}
-      {!canEdit ? <p style={{ marginTop: 8, color: '#666', fontSize: 13 }}>Viewer role: schedule is read-only.</p> : null}
+      {!canEdit ? <p className="text-muted-small" style={{ marginTop: 8 }}>Viewer role: schedule is read-only.</p> : null}
     </div>
   );
 }

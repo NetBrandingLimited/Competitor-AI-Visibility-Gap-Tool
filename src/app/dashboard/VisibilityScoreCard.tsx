@@ -57,7 +57,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
       ) : (
         <>
           <p style={{ fontSize: 34, fontWeight: 700, margin: '8px 0' }}>{Math.round(latest.score)}</p>
-          <p style={{ color: '#555', fontSize: 13, marginTop: 0 }}>
+          <p className="text-muted-small-subtle mt-0">
             Last updated: {new Date(latest.createdAt).toLocaleString()}
             {latest.signalSource ? ` · signals: ${latest.signalSource}` : ''}
             {typeof latest.signalCount === 'number' ? ` · count: ${latest.signalCount}` : ''}
@@ -82,12 +82,12 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
       {canRecalculate ? (
         <RecalculateVisibilityForm organizationId={organizationId} />
       ) : (
-        <p style={{ marginTop: 12, fontSize: 13, color: '#666' }}>
+        <p className="text-muted-small" style={{ marginTop: 12 }}>
           Ask an editor or admin to recalculate if needed (viewer role).
         </p>
       )}
 
-      <p style={{ marginTop: 12, fontSize: 12, color: '#666' }}>
+      <p className="text-muted-xs" style={{ marginTop: 12 }}>
         GSC: <code>GSC_SITE_URL</code> + credentials. GA4: <code>GA4_PROPERTY_ID</code> + credentials (same inline JSON
         vars as connectors page).
       </p>
