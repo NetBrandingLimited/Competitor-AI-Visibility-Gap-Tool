@@ -1,12 +1,18 @@
 import './globals.css';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import AppNav from '@/app/components/AppNav';
 import BackToTopButton from '@/app/components/BackToTopButton';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Competitor AI Visibility Gap Tool',
   description: 'Track brand mentions across AI answers and find visibility gaps.'
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

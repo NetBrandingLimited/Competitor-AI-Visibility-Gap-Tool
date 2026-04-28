@@ -103,7 +103,11 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
           {saving ? 'Saving...' : 'Save schedule'}
         </button>
       </div>
-      {message ? <p className="mt-10">{message}</p> : null}
+      {message ? (
+        <p className="mt-10" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
       {!canEdit ? <p className="text-muted-small mt-8">Viewer role: schedule is read-only.</p> : null}
     </div>
   );

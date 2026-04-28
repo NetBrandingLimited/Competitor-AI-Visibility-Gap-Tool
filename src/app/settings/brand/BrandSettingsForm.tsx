@@ -202,7 +202,15 @@ export default function BrandSettingsForm() {
           Sign out
         </button>
       </div>
-      {message ? <p className={message === 'Saved.' ? 'success' : 'error'}>{message}</p> : null}
+      {message ? (
+        <p
+          className={message === 'Saved.' ? 'success' : 'error'}
+          role="status"
+          aria-live="polite"
+        >
+          {message}
+        </p>
+      ) : null}
     </form>
   );
 }

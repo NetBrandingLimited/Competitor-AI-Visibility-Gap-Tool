@@ -75,6 +75,7 @@ export default function RegisterForm() {
         <input
           type="text"
           name="organizationName"
+          autoComplete="organization"
           value={organizationName}
           onChange={(e) => setOrganizationName(e.target.value)}
           placeholder="e.g. Acme Inc (optional)"
