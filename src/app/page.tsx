@@ -1,10 +1,12 @@
+import Link from 'next/link';
+
 export default function HomePage() {
   return (
     <section>
       <h1>Competitor AI Visibility Gap Tool</h1>
       <p>
-        Each client gets a separate account and workspace: <a href="/register">register</a> or{' '}
-        <a href="/login">sign in</a>, then set brand and competitors at <code>/settings/brand</code>. Pipeline runs,
+        Each client gets a separate account and workspace: <Link href="/register">register</Link> or{' '}
+        <Link href="/login">sign in</Link>, then set brand and competitors at <code>/settings/brand</code>. Pipeline runs,
         trends, scheduler jobs, and CSV exports are stored per workspace. Copy <code>.env.example</code> to{' '}
         <code>.env</code>, run migrations and seed for a demo user.
       </p>
