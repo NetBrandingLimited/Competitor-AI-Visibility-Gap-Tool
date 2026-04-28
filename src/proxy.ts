@@ -4,7 +4,7 @@ import { SESSION_USER_ID_COOKIE } from '@/lib/session';
 
 const PROTECTED = ['/dashboard', '/reports', '/settings', '/ops'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const needsAuth = PROTECTED.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
