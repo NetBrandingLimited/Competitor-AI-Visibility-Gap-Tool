@@ -154,8 +154,8 @@ export default async function DashboardPage() {
 
       <p>
         Tables below use your organization&apos;s <strong>Brand</strong> and <strong>Competitors</strong> from{' '}
-        <a href="/settings/brand">Brand settings</a>. Optional analytics wiring:{' '}
-        <a href="/settings/connectors">Data connectors</a>.
+        <Link href="/settings/brand">Brand settings</Link>. Optional analytics wiring:{' '}
+        <Link href="/settings/connectors">Data connectors</Link>.
       </p>
       <p className={leaderboardSource === 'pipeline' ? 'text-leader-live' : 'text-leader-preview'}>
         {leaderboardSource === 'pipeline' ? (

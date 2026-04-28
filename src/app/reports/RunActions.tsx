@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -72,7 +73,7 @@ export default function RunActions() {
     <div className="stack-y-actions">
       <p className="text-muted-note mb-8">
         Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query and mock
-        document text. Set them under <a href="/settings/brand">Brand settings</a> first.
+        document text. Set them under <Link href="/settings/brand">Brand settings</Link> first.
       </p>
       <button
         type="button"
