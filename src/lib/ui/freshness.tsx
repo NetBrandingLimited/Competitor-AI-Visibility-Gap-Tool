@@ -35,21 +35,8 @@ export function freshnessColor(label: FreshnessLabel): string {
 }
 
 export function FreshnessPill({ label }: { label: FreshnessLabel }) {
-  return (
-    <span
-      style={{
-        marginLeft: 8,
-        padding: '2px 8px',
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 600,
-        color: '#fff',
-        background: freshnessColor(label)
-      }}
-    >
-      {label}
-    </span>
-  );
+  const variant = label.toLowerCase() as 'fresh' | 'aging' | 'stale' | 'missing';
+  return <span className={`freshness-pill freshness-pill--${variant}`}>{label}</span>;
 }
 
 export function FreshnessLine({
@@ -65,11 +52,11 @@ export function FreshnessLine({
   muted?: boolean;
   parenthesized?: boolean;
 }) {
-  const wrapperStyle = muted ? { color: '#6b7280' } : undefined;
+  const mutedClass = muted ? 'freshness-line-muted' : undefined;
 
   if (!iso) {
     return (
-      <span style={wrapperStyle}>
+      <span className={mutedClass}>
         {parenthesized ? '(' : null}
         {missingText}
         <FreshnessPill label="Missing" />
@@ -78,7 +65,7 @@ export function FreshnessLine({
     );
   }
   return (
-    <span style={wrapperStyle}>
+    <span className={mutedClass}>
       {parenthesized ? '(' : null}
       {formatAge(iso)}
       <FreshnessPill label={getFreshnessLabel(iso, thresholds)} />
@@ -89,18 +76,7 @@ export function FreshnessLine({
 
 export function FreshnessMisconfiguredNotice() {
   return (
-    <p
-      style={{
-        marginTop: 8,
-        marginBottom: 8,
-        color: '#b91c1c',
-        background: '#fef2f2',
-        border: '1px solid #fecaca',
-        borderRadius: 6,
-        padding: '8px 10px',
-        maxWidth: 760
-      }}
-    >
+    <p className="freshness-warning-box">
       Warning: <code>AGING_HOURS</code> is lower than <code>FRESH_HOURS</code>. Set
       <code> AGING_HOURS &gt;= FRESH_HOURS</code> to keep freshness labels consistent.
     </p>
@@ -117,7 +93,7 @@ export function FreshnessThresholdsHint({
   prefix?: string;
 }) {
   return (
-    <p style={{ marginTop: 8, marginBottom: 8, fontSize: 12, color: '#6b7280' }}>
+    <p className="freshness-thresholds-hint">
       {prefix} <code>Fresh &lt;= {freshHours}h</code>, <code>Aging &lt;= {agingHours}h</code>, otherwise{' '}
       <code>Stale</code>.
     </p>
@@ -132,16 +108,7 @@ export function FreshnessSectionCard({
   children: ReactNode;
 }) {
   return (
-    <div
-      style={{
-        marginBottom: 16,
-        padding: 10,
-        border: '1px solid #e5e7eb',
-        borderRadius: 6,
-        background: '#f8fafc',
-        color: '#374151'
-      }}
-    >
+    <div className="freshness-section-card">
       <strong>{title}</strong>
       {children}
     </div>

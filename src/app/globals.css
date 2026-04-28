@@ -212,6 +212,56 @@ p { color: #333; }
 .li-tight {
   margin-bottom: 6px;
 }
+
+/* Freshness UI (src/lib/ui/freshness.tsx) */
+.freshness-pill {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+.freshness-pill--fresh {
+  background: #166534;
+}
+.freshness-pill--aging {
+  background: #a16207;
+}
+.freshness-pill--stale {
+  background: #b91c1c;
+}
+.freshness-pill--missing {
+  background: #6b7280;
+}
+.freshness-line-muted {
+  color: #6b7280;
+}
+.freshness-warning-box {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 10px;
+  max-width: 760px;
+}
+.freshness-thresholds-hint {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.freshness-section-card {
+  margin-bottom: 16px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #374151;
+}
+
 .field-hint-small {
   display: block;
   margin-top: 6px;
