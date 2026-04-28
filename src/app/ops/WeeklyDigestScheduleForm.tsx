@@ -108,7 +108,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
           />
         </label>
         <button type="button" onClick={save} disabled={!canEdit || saving} aria-busy={saving}>
-          {saving ? 'Saving...' : 'Save schedule'}
+          {saving ? 'Saving?' : 'Save schedule'}
         </button>
       </div>
       {message ? (
@@ -120,4 +120,3 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
     </div>
   );
 }
-

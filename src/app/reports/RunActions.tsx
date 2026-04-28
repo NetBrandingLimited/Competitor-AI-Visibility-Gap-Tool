@@ -82,10 +82,10 @@ export default function RunActions() {
         aria-busy={pipeline.running}
         className="mr-8"
       >
-        {pipeline.running ? 'Running pipeline...' : 'Run unified pipeline'}
+        {pipeline.running ? 'Running pipeline?' : 'Run unified pipeline'}
       </button>
       <button type="button" onClick={runTrends} disabled={trends.running} aria-busy={trends.running}>
-        {trends.running ? 'Running snapshot job...' : 'Run trend snapshot'}
+        {trends.running ? 'Running snapshot job?' : 'Run trend snapshot'}
       </button>
       <button
         type="button"
@@ -94,7 +94,7 @@ export default function RunActions() {
         aria-busy={digest.running}
         className="ml-8"
       >
-        {digest.running ? 'Generating digest...' : 'Generate weekly digest'}
+        {digest.running ? 'Generating digest?' : 'Generate weekly digest'}
       </button>
       {pipeline.message ? (
         <p className="mt-8" role="status" aria-live="polite">
@@ -114,4 +114,3 @@ export default function RunActions() {
     </div>
   );
 }
-

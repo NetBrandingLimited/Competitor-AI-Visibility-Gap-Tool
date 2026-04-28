@@ -120,7 +120,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         aria-busy={busyAction === 'copy'}
         className="btn-compact-inline ml-10"
       >
-        {busyAction === 'copy' ? 'Copying...' : 'Copy JSON'}
+        {busyAction === 'copy' ? 'Copying?' : 'Copy JSON'}
       </button>
       <button
         type="button"
@@ -129,7 +129,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         aria-busy={busyAction === 'download'}
         className="btn-compact-inline ml-8"
       >
-        {busyAction === 'download' ? 'Downloading...' : 'Download JSON'}
+        {busyAction === 'download' ? 'Downloading?' : 'Download JSON'}
       </button>
       {message ? (
         <span
@@ -144,4 +144,3 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
     </p>
   );
 }
-
