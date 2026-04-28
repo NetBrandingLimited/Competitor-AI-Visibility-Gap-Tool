@@ -189,7 +189,7 @@ export default function BrandSettingsForm() {
           onChange={(e) => setWeeklyDigestNotifyEmail(e.target.value)}
           placeholder="you@company.com"
         />
-        <small style={{ display: 'block', marginTop: 6, opacity: 0.85, fontSize: '0.9em' }}>
+        <small className="field-hint-small">
           When set, each new weekly digest is emailed here if the server has Resend or SMTP env vars (see .env.example).
         </small>
       </label>

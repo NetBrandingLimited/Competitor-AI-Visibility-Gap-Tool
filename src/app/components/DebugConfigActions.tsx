@@ -99,8 +99,11 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
     }
   }
 
+  const statusOk = message.startsWith('Copied') || message.startsWith('Downloaded');
+  const paragraphClass = [className, 'mt-6'].filter(Boolean).join(' ');
+
   return (
-    <p style={{ marginTop: 6 }} className={className}>
+    <p className={paragraphClass}>
       Runtime debug JSON:{' '}
       <a href="/api/debug/config" target="_blank" rel="noreferrer">
         /api/debug/config
@@ -109,7 +112,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         type="button"
         onClick={copyJson}
         disabled={Boolean(busyAction)}
-        style={{ marginLeft: 10, padding: '4px 10px' }}
+        className="btn-compact-inline ml-10"
       >
         {busyAction === 'copy' ? 'Copying...' : 'Copy JSON'}
       </button>
@@ -117,7 +120,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         type="button"
         onClick={downloadJson}
         disabled={Boolean(busyAction)}
-        style={{ marginLeft: 8, padding: '4px 10px' }}
+        className="btn-compact-inline ml-8"
       >
         {busyAction === 'download' ? 'Downloading...' : 'Download JSON'}
       </button>
@@ -125,13 +128,10 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         <span
           role="status"
           aria-live="polite"
-          style={{
-            marginLeft: 8,
-            color: message.startsWith('Copied') || message.startsWith('Downloaded') ? '#166534' : '#b91c1c'
-          }}
+          className={`debug-config-status ${statusOk ? 'text-debug-success' : 'text-debug-error'}`}
         >
           {message}
-          {actionAt ? <span style={{ marginLeft: 6, color: '#6b7280' }}>at {actionAt}</span> : null}
+          {actionAt ? <span className="text-timestamp-muted ml-6">at {actionAt}</span> : null}
         </span>
       ) : null}
     </p>

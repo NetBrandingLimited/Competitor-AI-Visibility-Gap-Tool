@@ -84,6 +84,12 @@ p { color: #333; }
 .mt-4 {
   margin-top: 4px;
 }
+.mt-6 {
+  margin-top: 6px;
+}
+.ml-10 {
+  margin-left: 10px;
+}
 .mt-10 {
   margin-top: 10px;
 }
@@ -205,6 +211,27 @@ p { color: #333; }
 }
 .li-tight {
   margin-bottom: 6px;
+}
+.field-hint-small {
+  display: block;
+  margin-top: 6px;
+  opacity: 0.85;
+  font-size: 0.9em;
+}
+.btn-compact-inline {
+  padding: 4px 10px;
+}
+.debug-config-status {
+  margin-left: 8px;
+}
+.text-debug-success {
+  color: #166534;
+}
+.text-debug-error {
+  color: #b91c1c;
+}
+.text-timestamp-muted {
+  color: #6b7280;
 }
 .panel-box {
   padding: 12px;
