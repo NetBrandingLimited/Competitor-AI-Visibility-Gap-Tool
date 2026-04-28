@@ -16,15 +16,16 @@ type NavItem = {
   label: string;
   href: string;
   exact?: boolean;
+  sectionLabel?: string;
 };
 
 const navItems: NavItem[] = [
-  { label: 'Home', href: '/', exact: true },
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Reports', href: '/reports' },
-  { label: 'Ops', href: '/ops' },
-  { label: 'Brand', href: '/settings/brand' },
-  { label: 'Connectors', href: '/settings/connectors' }
+  { label: 'Home', href: '/', exact: true, sectionLabel: 'Home' },
+  { label: 'Dashboard', href: '/dashboard', sectionLabel: 'Dashboard' },
+  { label: 'Reports', href: '/reports', sectionLabel: 'Reports' },
+  { label: 'Ops', href: '/ops', sectionLabel: 'Operations' },
+  { label: 'Brand', href: '/settings/brand', sectionLabel: 'Brand settings' },
+  { label: 'Connectors', href: '/settings/connectors', sectionLabel: 'Connectors' }
 ];
 
 function isActivePath(pathname: string, item: NavItem): boolean {
@@ -58,6 +59,9 @@ export default function AppNav() {
       window.removeEventListener('resize', updateFades);
     };
   }, []);
+
+  const activeItem = navItems.find((item) => isActivePath(pathname, item));
+  const activeSection = activeItem?.sectionLabel ?? 'Workspace';
 
   return (
     <div style={{ position: 'sticky', top: 0, zIndex: 20, marginTop: -8, marginBottom: 8 }}>
@@ -94,6 +98,21 @@ export default function AppNav() {
             </Link>
           );
         })}
+        <span
+          aria-hidden="true"
+          style={{
+            marginLeft: 'auto',
+            padding: '4px 8px',
+            borderRadius: 999,
+            fontSize: 12,
+            color: '#334155',
+            background: '#f1f5f9',
+            border: '1px solid #e2e8f0',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {activeSection}
+        </span>
       </nav>
       {showLeftFade ? (
         <span
