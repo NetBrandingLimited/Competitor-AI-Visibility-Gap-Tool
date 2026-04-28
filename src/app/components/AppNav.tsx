@@ -40,12 +40,19 @@ export default function AppNav() {
     <nav
       aria-label="Primary"
       style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 20,
         display: 'flex',
         flexWrap: 'wrap',
         gap: '10px 18px',
         alignItems: 'center',
+        marginTop: -8,
+        paddingTop: 8,
         paddingBottom: 14,
         marginBottom: 8,
+        background: 'rgba(255, 255, 255, 0.94)',
+        backdropFilter: 'blur(2px)',
         borderBottom: '1px solid #e5e7eb',
         fontSize: 14
       }}
