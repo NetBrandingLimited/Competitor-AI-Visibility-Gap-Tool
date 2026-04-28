@@ -300,7 +300,11 @@ export default function ConnectorsStatusPanel() {
   }
 
   if (loading) {
-    return <p>Loading…</p>;
+    return (
+      <p role="status" aria-live="polite">
+        Loading…
+      </p>
+    );
   }
 
   if (orgs.length === 0) {
@@ -316,7 +320,7 @@ export default function ConnectorsStatusPanel() {
       {orgs.length > 1 ? (
         <label className="field">
           <span>Organization</span>
-          <select value={orgId} onChange={(e) => void onOrgChange(e.target.value)}>
+          <select name="organizationId" value={orgId} onChange={(e) => void onOrgChange(e.target.value)}>
             {orgs.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name} ({o.role})
@@ -334,6 +338,8 @@ export default function ConnectorsStatusPanel() {
       <label className="field mt-16">
         <span>GSC site URL (org-specific override)</span>
         <input
+          name="gscSiteUrl"
+          autoComplete="off"
           value={gscSiteUrl}
           onChange={(e) => setGscSiteUrl(e.target.value)}
           placeholder="sc-domain:example.com or https://www.example.com/"
@@ -341,11 +347,19 @@ export default function ConnectorsStatusPanel() {
       </label>
       <label className="field">
         <span>GA4 property ID (org-specific override)</span>
-        <input value={ga4PropertyId} onChange={(e) => setGa4PropertyId(e.target.value)} placeholder="123456789" />
+        <input
+          name="ga4PropertyId"
+          autoComplete="off"
+          value={ga4PropertyId}
+          onChange={(e) => setGa4PropertyId(e.target.value)}
+          placeholder="123456789"
+        />
       </label>
       <label className="field">
         <span>GSC service-account JSON (encrypted at rest; leave blank to keep current)</span>
         <textarea
+          name="gscServiceAccountJson"
+          autoComplete="off"
           value={gscServiceAccountJson}
           onChange={(e) => setGscServiceAccountJson(e.target.value)}
           rows={4}
@@ -359,6 +373,7 @@ export default function ConnectorsStatusPanel() {
         <span>
           <input
             type="checkbox"
+            name="clearGscCredential"
             checked={clearGscCredential}
             onChange={(e) => setClearGscCredential(e.target.checked)}
             className="mr-8"
@@ -369,6 +384,8 @@ export default function ConnectorsStatusPanel() {
       <label className="field">
         <span>GA4 service-account JSON (encrypted at rest; leave blank to keep current)</span>
         <textarea
+          name="ga4ServiceAccountJson"
+          autoComplete="off"
           value={ga4ServiceAccountJson}
           onChange={(e) => setGa4ServiceAccountJson(e.target.value)}
           rows={4}
@@ -382,6 +399,7 @@ export default function ConnectorsStatusPanel() {
         <span>
           <input
             type="checkbox"
+            name="clearGa4Credential"
             checked={clearGa4Credential}
             onChange={(e) => setClearGa4Credential(e.target.checked)}
             className="mr-8"
