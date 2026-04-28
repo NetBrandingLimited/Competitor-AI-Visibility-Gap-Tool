@@ -208,7 +208,12 @@ export default async function ReportsPage() {
             {weeklyDigests.map((d) => (
               <tr key={d.id}>
                 <td className="data-table-td">
-                  <Link href={`/reports/digest/${d.id}`}>View</Link>
+                  <Link
+                    href={`/reports/digest/${d.id}`}
+                    aria-label={`View weekly digest generated ${new Date(d.generatedAt).toLocaleString()} for period ${d.periodStart} to ${d.periodEnd}`}
+                  >
+                    View
+                  </Link>
                 </td>
                 <td className="data-table-td">{new Date(d.generatedAt).toLocaleString()}</td>
                 <td className="data-table-td">
@@ -280,7 +285,12 @@ export default async function ReportsPage() {
             {pipelineRuns.map((run) => (
               <tr key={run.id}>
                 <td className="data-table-td">
-                  <Link href={`/reports/runs/${run.id}`}>{run.id}</Link>
+                  <Link
+                    href={`/reports/runs/${run.id}`}
+                    aria-label={`Open pipeline run ${run.id} created ${new Date(run.createdAt).toLocaleString()}`}
+                  >
+                    {run.id}
+                  </Link>
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
                 <td className="data-table-td">{run.query}</td>
