@@ -35,6 +35,7 @@ export default function RunSchedulerAction() {
       <label className="block mb-8">
         <input
           type="checkbox"
+          name="forceDigest"
           checked={forceDigest}
           onChange={(e) => setForceDigest(e.target.checked)}
           disabled={running}

@@ -467,7 +467,7 @@ export default function ConnectorsStatusPanel() {
         </p>
       ) : null}
       {lastTestedAt ? (
-        <p className="connector-hint-meta">
+        <p className="connector-hint-meta" role="status" aria-live="polite">
           Last credentials test: {new Date(lastTestedAt).toLocaleString()}
           {freshnessLabel(lastTestedAt) ? ` · ${freshnessLabel(lastTestedAt)}` : ''}
         </p>
@@ -482,7 +482,7 @@ export default function ConnectorsStatusPanel() {
         </div>
       ) : null}
       {signalsFetchedAt ? (
-        <p className="connector-hint-signals">
+        <p className="connector-hint-signals" role="status" aria-live="polite">
           Live signals fetched: {new Date(signalsFetchedAt).toLocaleString()} ({liveSignals.length} metrics)
         </p>
       ) : null}
