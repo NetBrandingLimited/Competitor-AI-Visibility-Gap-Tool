@@ -91,7 +91,7 @@ export default function AppNav() {
           fontSize: 14
         }}
       >
-        <span style={{ position: 'absolute', left: -10000 }}>Current section: {activeSection}</span>
+        <span className="sr-only">Current section: {activeSection}</span>
         {navItems.map((item) => {
           const active = isActivePath(pathname, item);
           return (
