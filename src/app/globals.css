@@ -34,6 +34,12 @@ p { color: #333; }
 .text-muted-subtle {
   color: #555;
 }
+.mt-0 {
+  margin-top: 0;
+}
+.mb-8 {
+  margin-bottom: 8px;
+}
 .sr-only {
   position: absolute;
   width: 1px;

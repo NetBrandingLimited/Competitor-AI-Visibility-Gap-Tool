@@ -70,7 +70,7 @@ export default function RunActions() {
 
   return (
     <div style={{ margin: '12px 0 20px' }}>
-      <p className="text-muted-note" style={{ marginBottom: 8 }}>
+      <p className="text-muted-note mb-8">
         Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query and mock
         document text. Set them under <a href="/settings/brand">Brand settings</a> first.
       </p>
@@ -89,3 +89,4 @@ export default function RunActions() {
     </div>
   );
 }
+
