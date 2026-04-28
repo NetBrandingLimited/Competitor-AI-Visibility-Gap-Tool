@@ -340,6 +340,7 @@ export default function ConnectorsStatusPanel() {
         <input
           name="gscSiteUrl"
           autoComplete="off"
+          spellCheck={false}
           value={gscSiteUrl}
           onChange={(e) => setGscSiteUrl(e.target.value)}
           placeholder="sc-domain:example.com or https://www.example.com/"
@@ -350,6 +351,9 @@ export default function ConnectorsStatusPanel() {
         <input
           name="ga4PropertyId"
           autoComplete="off"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          spellCheck={false}
           value={ga4PropertyId}
           onChange={(e) => setGa4PropertyId(e.target.value)}
           placeholder="123456789"
@@ -360,6 +364,7 @@ export default function ConnectorsStatusPanel() {
         <textarea
           name="gscServiceAccountJson"
           autoComplete="off"
+          spellCheck={false}
           value={gscServiceAccountJson}
           onChange={(e) => setGscServiceAccountJson(e.target.value)}
           rows={4}
@@ -386,6 +391,7 @@ export default function ConnectorsStatusPanel() {
         <textarea
           name="ga4ServiceAccountJson"
           autoComplete="off"
+          spellCheck={false}
           value={ga4ServiceAccountJson}
           onChange={(e) => setGa4ServiceAccountJson(e.target.value)}
           rows={4}
