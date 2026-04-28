@@ -84,7 +84,11 @@ export default function RegisterForm() {
       <button type="submit" className="primary" disabled={loading} aria-busy={loading}>
         {loading ? 'Creating account…' : 'Create account'}
       </button>
-      {message ? <p className="error">{message}</p> : null}
+      {message ? (
+        <p className="error" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
       <p className="hint">
         Already have an account? <Link href="/login">Sign in</Link>
       </p>

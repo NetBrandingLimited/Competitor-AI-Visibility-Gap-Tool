@@ -45,7 +45,11 @@ export default function RunSchedulerAction() {
       <button type="button" onClick={runNow} disabled={running} aria-busy={running}>
         {running ? 'Running scheduled job...' : 'Run scheduled job now'}
       </button>
-      {message ? <p className="mt-8">{message}</p> : null}
+      {message ? (
+        <p className="mt-8" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
     </div>
   );
 }

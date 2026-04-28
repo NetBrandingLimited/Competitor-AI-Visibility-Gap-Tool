@@ -438,8 +438,16 @@ export default function ConnectorsStatusPanel() {
         </button>
       </div>
 
-      {error ? <p className="error">{error}</p> : null}
-      {saveMessage ? <p className="success">{saveMessage}</p> : null}
+      {error ? (
+        <p className="error" role="status" aria-live="polite">
+          {error}
+        </p>
+      ) : null}
+      {saveMessage ? (
+        <p className="success" role="status" aria-live="polite">
+          {saveMessage}
+        </p>
+      ) : null}
       {lastTestedAt ? (
         <p className="connector-hint-meta">
           Last credentials test: {new Date(lastTestedAt).toLocaleString()}

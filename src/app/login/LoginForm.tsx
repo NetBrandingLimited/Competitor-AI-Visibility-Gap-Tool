@@ -73,7 +73,11 @@ export default function LoginForm({ nextPath }: Props) {
       <button type="submit" className="primary" disabled={loading} aria-busy={loading}>
         {loading ? 'Signing in…' : 'Sign in'}
       </button>
-      {message ? <p className="error">{message}</p> : null}
+      {message ? (
+        <p className="error" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
       <p className="hint">
         After seed: username <code>demo</code>, password <code>demo123</code>. New workspace?{' '}
         <Link href="/register">Register</Link>

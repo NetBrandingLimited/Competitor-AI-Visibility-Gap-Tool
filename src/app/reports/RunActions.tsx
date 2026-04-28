@@ -95,9 +95,21 @@ export default function RunActions() {
       >
         {digest.running ? 'Generating digest...' : 'Generate weekly digest'}
       </button>
-      {pipeline.message ? <p className="mt-8">{pipeline.message}</p> : null}
-      {trends.message ? <p className="mt-4">{trends.message}</p> : null}
-      {digest.message ? <p className="mt-4">{digest.message}</p> : null}
+      {pipeline.message ? (
+        <p className="mt-8" role="status" aria-live="polite">
+          {pipeline.message}
+        </p>
+      ) : null}
+      {trends.message ? (
+        <p className="mt-4" role="status" aria-live="polite">
+          {trends.message}
+        </p>
+      ) : null}
+      {digest.message ? (
+        <p className="mt-4" role="status" aria-live="polite">
+          {digest.message}
+        </p>
+      ) : null}
     </div>
   );
 }
