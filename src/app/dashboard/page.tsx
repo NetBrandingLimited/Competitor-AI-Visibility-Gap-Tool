@@ -202,9 +202,9 @@ export default async function DashboardPage() {
         Generated <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code> from latest run, trend, and
         visibility signals.
       </p>
-      <ul style={{ marginTop: 8, marginBottom: 20 }}>
+      <ul className="mt-8 mb-20">
         {gapInsights.opportunities.slice(0, 3).map((op) => (
-          <li key={op.id} style={{ marginBottom: 8 }}>
+          <li key={op.id} className="mb-8">
             <strong>{op.title}</strong> ({op.priority}) — {op.detail}
           </li>
         ))}

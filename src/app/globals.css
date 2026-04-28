@@ -52,6 +52,23 @@ p { color: #333; }
 .mb-8 {
   margin-bottom: 8px;
 }
+.mt-8 {
+  margin-top: 8px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+.text-metric-line {
+  margin: 4px 0;
+  color: #334155;
+  font-size: 13px;
+}
+.text-hint-empty {
+  margin-top: 4px;
+  margin-bottom: 10px;
+  color: #64748b;
+  font-size: 12px;
+}
 .panel-box {
   padding: 12px;
   border: 1px solid #ddd;

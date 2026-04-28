@@ -446,14 +446,14 @@ export default function ConnectorsStatusPanel() {
         </p>
       ) : null}
       {signalsFetchedAt && liveSignals.length === 0 ? (
-        <p style={{ marginTop: 4, marginBottom: 10, color: '#64748b', fontSize: 12 }}>
+        <p className="text-hint-empty">
           No live metrics returned. Check property IDs, credentials, and API permissions.
         </p>
       ) : null}
       {liveSignals.length > 0 ? (
         <div style={{ marginTop: 10 }}>
           {liveSignals.map((s) => (
-            <p key={`${s.source}-${s.metric}-${s.asOf}`} style={{ margin: '4px 0', color: '#334155', fontSize: 13 }}>
+            <p key={`${s.source}-${s.metric}-${s.asOf}`} className="text-metric-line">
               <strong>{s.source}</strong> · <code>{s.metric}</code> = {s.value}
               {s.unit ? ` ${s.unit}` : ''} · asOf {s.asOf}
             </p>
