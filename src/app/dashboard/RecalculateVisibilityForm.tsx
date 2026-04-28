@@ -12,7 +12,7 @@ type Props = {
  */
 export default function RecalculateVisibilityForm({ organizationId }: Props) {
   return (
-    <form action={refreshVisibilityScoreAction} style={{ marginTop: 14 }}>
+    <form action={refreshVisibilityScoreAction} className="mt-14">
       <input type="hidden" name="organizationId" value={organizationId} />
       <button type="submit" className="primary">
         Recalculate score

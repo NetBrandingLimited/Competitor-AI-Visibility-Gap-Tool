@@ -20,7 +20,7 @@ export default function CopyDigestSummary({ markdown }: Props) {
   }
 
   return (
-    <p style={{ marginTop: 12 }}>
+    <p className="mt-12">
       <button type="button" onClick={copy}>
         {done ? 'Copied' : 'Copy summary as Markdown'}
       </button>

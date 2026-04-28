@@ -51,32 +51,32 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
   }
 
   return (
-    <div className="panel-box" style={{ marginBottom: 20 }}>
-      <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>Weekly digest schedule (UTC)</h2>
+    <div className="panel-box mb-20">
+      <h2 className="heading-panel">Weekly digest schedule (UTC)</h2>
       <p className="text-muted-note mt-0">
         Stored per workspace. Scheduler runs can use this as the standard digest cadence.
       </p>
-      <label style={{ display: 'block', marginBottom: 10 }}>
+      <label className="label-block-tight">
         <input
           type="checkbox"
           checked={enabled}
           onChange={(e) => setEnabled(e.target.checked)}
           disabled={!canEdit || saving}
-          style={{ marginRight: 8 }}
+          className="mr-8"
         />
         Enable weekly digest schedule
       </label>
-      <label style={{ display: 'block', marginBottom: 10, fontSize: 14, color: '#333' }}>
+      <label className="label-block-body">
         <input
           type="checkbox"
           checked={refreshPipelineFirst}
           onChange={(e) => setRefreshPipelineFirst(e.target.checked)}
           disabled={!canEdit || saving}
-          style={{ marginRight: 8 }}
+          className="mr-8"
         />
         Refresh pipeline + trends before digest if data is older than 7 days (digest-only / cron)
       </label>
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+      <div className="flex-row-wrap-gap">
         <label>
           Day:{' '}
           <select value={dayUtc} onChange={(e) => setDayUtc(Number(e.target.value))} disabled={!canEdit || saving}>
@@ -96,15 +96,15 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
             value={hourUtc}
             onChange={(e) => setHourUtc(Number(e.target.value))}
             disabled={!canEdit || saving}
-            style={{ width: 80 }}
+            className="input-narrow-num"
           />
         </label>
         <button type="button" onClick={save} disabled={!canEdit || saving}>
           {saving ? 'Saving...' : 'Save schedule'}
         </button>
       </div>
-      {message ? <p style={{ marginTop: 10 }}>{message}</p> : null}
-      {!canEdit ? <p className="text-muted-small" style={{ marginTop: 8 }}>Viewer role: schedule is read-only.</p> : null}
+      {message ? <p className="mt-10">{message}</p> : null}
+      {!canEdit ? <p className="text-muted-small mt-8">Viewer role: schedule is read-only.</p> : null}
     </div>
   );
 }

@@ -20,7 +20,7 @@ export default function FreshnessTimestampListItem({
     <li>
       <code>{label}</code>
       {showTimestamp ? <>: {iso ? new Date(iso).toLocaleString() : fallbackText}</> : ': '}
-      <span style={{ marginLeft: 6 }}>
+      <span className="ml-6">
         <FreshnessLine iso={iso} thresholds={thresholds} muted parenthesized />
       </span>
     </li>

@@ -62,9 +62,9 @@ export default async function ReportsPage() {
         numbers and queries.
       </p>
 
-      <div className="panel-box" style={{ marginBottom: 20 }}>
-        <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>Tracking profile (saved on organization)</h2>
-        <ul style={{ margin: 0, paddingLeft: 20 }}>
+      <div className="panel-box mb-20">
+        <h2 className="heading-panel">Tracking profile (saved on organization)</h2>
+        <ul className="list-indent">
           <li>
             <strong>Brand name:</strong> {display(org?.brandName)}
           </li>
@@ -91,18 +91,9 @@ export default async function ReportsPage() {
         {' | '}
         <Link href="/api/reports/pipeline-runs.csv">Download pipeline runs CSV</Link>
       </p>
-      <div
-        style={{
-          marginBottom: 16,
-          padding: 10,
-          border: '1px solid #e5e7eb',
-          borderRadius: 6,
-          background: '#fcfcfd',
-          color: '#374151'
-        }}
-      >
+      <div className="callout-csv-help">
         <strong>Which CSV should I use?</strong>
-        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+        <ul className="list-indent-mt8">
           <li>
             <code>full report CSV</code>: trends + gap opportunities + topic recommendations in one file.
           </li>
@@ -120,7 +111,7 @@ export default async function ReportsPage() {
           agingHours={agingHours}
           misconfigured={thresholdsMisconfigured}
         />
-        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+        <ul className="list-indent-mt8">
           <FreshnessTimestampListItem
             label="Pipeline run"
             iso={latestPipelineRun?.createdAt ?? null}
@@ -248,7 +239,7 @@ export default async function ReportsPage() {
         </table>
       )}
 
-      <h2 style={{ marginTop: 24 }}>Unified pipeline runs</h2>
+      <h2 className="mt-24">Unified pipeline runs</h2>
       <p className="text-muted-note-wide">
         Each row is <strong>this workspace only</strong> (not mixed with other accounts). The <strong>Query</strong> is
         built from your saved brand fields when you don&apos;t pass a custom query. <strong>Docs / Triggers / Clusters</strong>{' '}

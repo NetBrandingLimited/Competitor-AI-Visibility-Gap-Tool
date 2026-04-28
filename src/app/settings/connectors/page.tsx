@@ -17,7 +17,7 @@ export default function ConnectorsSettingsPage() {
         <code>APP_SECRETS_KEY</code> on the server).
       </p>
       <ConnectorsStatusPanel />
-      <p style={{ marginTop: 24 }}>
+      <p className="mt-24">
         <Link href="/settings/brand">Brand settings</Link>
         {' · '}
         <Link href="/dashboard">Dashboard</Link>

@@ -326,12 +326,12 @@ export default function ConnectorsStatusPanel() {
         </label>
       ) : null}
 
-      <p style={{ marginTop: 8, marginBottom: 0 }}>
+      <p className="mt-8-mb-0">
         Connector credentials are read from server environment variables (see <code>.env.example</code>). This page
         only shows whether each adapter is configured, not secrets.
       </p>
 
-      <label className="field" style={{ marginTop: 16 }}>
+      <label className="field mt-16">
         <span>GSC site URL (org-specific override)</span>
         <input
           value={gscSiteUrl}
@@ -352,16 +352,16 @@ export default function ConnectorsStatusPanel() {
           placeholder='{"type":"service_account", ...}'
         />
       </label>
-      <p style={{ marginTop: -8, marginBottom: 8, color: '#64748b', fontSize: 12 }}>
+      <p className="connector-hint-pull">
         Current stored GSC credential: {hasGscServiceAccountJson ? 'present' : 'none'}
       </p>
-      <label className="field" style={{ marginTop: 0 }}>
+      <label className="field mt-0">
         <span>
           <input
             type="checkbox"
             checked={clearGscCredential}
             onChange={(e) => setClearGscCredential(e.target.checked)}
-            style={{ marginRight: 8 }}
+            className="mr-8"
           />
           Clear stored GSC credential on save
         </span>
@@ -375,22 +375,22 @@ export default function ConnectorsStatusPanel() {
           placeholder='{"type":"service_account", ...}'
         />
       </label>
-      <p style={{ marginTop: -8, marginBottom: 8, color: '#64748b', fontSize: 12 }}>
+      <p className="connector-hint-pull">
         Current stored GA4 credential: {hasGa4ServiceAccountJson ? 'present' : 'none'}
       </p>
-      <label className="field" style={{ marginTop: 0 }}>
+      <label className="field mt-0">
         <span>
           <input
             type="checkbox"
             checked={clearGa4Credential}
             onChange={(e) => setClearGa4Credential(e.target.checked)}
-            style={{ marginRight: 8 }}
+            className="mr-8"
           />
           Clear stored GA4 credential on save
         </span>
       </label>
 
-      <div className="connector-actions" style={{ marginTop: 16 }}>
+      <div className="connector-actions mt-16">
         <button type="button" className="primary" disabled={saving || !orgId} onClick={() => void saveSettings()}>
           {saving ? 'Saving…' : 'Save connector settings'}
         </button>
@@ -426,22 +426,22 @@ export default function ConnectorsStatusPanel() {
       {error ? <p className="error">{error}</p> : null}
       {saveMessage ? <p className="success">{saveMessage}</p> : null}
       {lastTestedAt ? (
-        <p style={{ marginTop: 8, marginBottom: 6, color: '#64748b', fontSize: 12 }}>
+        <p className="connector-hint-meta">
           Last credentials test: {new Date(lastTestedAt).toLocaleString()}
           {freshnessLabel(lastTestedAt) ? ` · ${freshnessLabel(lastTestedAt)}` : ''}
         </p>
       ) : null}
       {testResults.length > 0 ? (
-        <div style={{ marginTop: 12 }}>
+        <div className="mt-12">
           {testResults.map((t) => (
-            <p key={t.id} className={t.ok ? 'success' : 'error'} style={{ margin: '6px 0' }}>
+            <p key={t.id} className={`${t.ok ? 'success' : 'error'} my-6-0`}>
               {t.ok ? 'PASS' : 'FAIL'} {t.id}: {t.detail}
             </p>
           ))}
         </div>
       ) : null}
       {signalsFetchedAt ? (
-        <p style={{ marginTop: 10, marginBottom: 6, color: '#64748b', fontSize: 12 }}>
+        <p className="connector-hint-signals">
           Live signals fetched: {new Date(signalsFetchedAt).toLocaleString()} ({liveSignals.length} metrics)
         </p>
       ) : null}
@@ -451,7 +451,7 @@ export default function ConnectorsStatusPanel() {
         </p>
       ) : null}
       {liveSignals.length > 0 ? (
-        <div style={{ marginTop: 10 }}>
+        <div className="mt-10">
           {liveSignals.map((s) => (
             <p key={`${s.source}-${s.metric}-${s.asOf}`} className="text-metric-line">
               <strong>{s.source}</strong> · <code>{s.metric}</code> = {s.value}

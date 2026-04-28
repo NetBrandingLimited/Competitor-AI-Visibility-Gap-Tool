@@ -97,7 +97,7 @@ export default async function DashboardPage() {
           <Link href={`/reports/digest/${latestDigest.id}`}>
             {latestDigest.periodStart} → {latestDigest.periodEnd}
           </Link>{' '}
-          <span style={{ color: '#666' }}>
+          <span className="text-priority-muted">
             ({new Date(latestDigest.generatedAt).toLocaleString()}) ·{' '}
             <a href={`/api/orgs/${active.organizationId}/digest/weekly/${latestDigest.id}/export-md`}>
               Download .md
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
           agingHours={thresholds.agingHours}
           misconfigured={thresholds.misconfigured}
         />
-        <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 20 }}>
+        <ul className="list-indent-mt8">
           <FreshnessTimestampListItem
             label="Pipeline run"
             iso={latestRun?.createdAt ?? null}
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
         <a href="/settings/brand">Brand settings</a>. Optional analytics wiring:{' '}
         <a href="/settings/connectors">Data connectors</a>.
       </p>
-      <p style={{ color: leaderboardSource === 'pipeline' ? '#0f5132' : '#664d03' }}>
+      <p className={leaderboardSource === 'pipeline' ? 'text-leader-live' : 'text-leader-preview'}>
         {leaderboardSource === 'pipeline' ? (
           <>
             <strong>Live data</strong> from your latest pipeline run (mention counts in ingested text).{' '}

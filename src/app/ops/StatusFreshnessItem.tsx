@@ -24,7 +24,7 @@ export default function StatusFreshnessItem({
       {iso ? (
         <>
           {children}
-          <span style={{ marginLeft: 6 }}>
+          <span className="ml-6">
             <FreshnessLine iso={iso} thresholds={thresholds} muted parenthesized />
           </span>
         </>

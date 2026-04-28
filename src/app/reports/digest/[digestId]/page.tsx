@@ -42,7 +42,7 @@ export default async function WeeklyDigestDetailPage({
       <p>
         Workspace: <strong>{active.organizationName}</strong>
       </p>
-      <ul style={{ lineHeight: 1.6 }}>
+      <ul className="list-line-relaxed">
         <li>
           <strong>Period:</strong> {digest.periodStart} → {digest.periodEnd}
         </li>
@@ -74,10 +74,10 @@ export default async function WeeklyDigestDetailPage({
       {digest.summary.opportunities && digest.summary.opportunities.length > 0 ? (
         <>
           <h2>All opportunities (frozen at generation)</h2>
-          <ul style={{ lineHeight: 1.5 }}>
+          <ul className="list-line-compact">
             {digest.summary.opportunities.map((o) => (
               <li key={o.id}>
-                <strong>{o.title}</strong> <span style={{ color: '#666' }}>[{o.priority}]</span> — {o.detail}
+                <strong>{o.title}</strong> <span className="text-priority-muted">[{o.priority}]</span> — {o.detail}
               </li>
             ))}
           </ul>
@@ -108,7 +108,7 @@ export default async function WeeklyDigestDetailPage({
           </table>
         </>
       ) : null}
-      <p style={{ marginTop: 8 }}>
+      <p className="mt-8">
         <a href={exportMdHref}>Download Markdown file</a>
       </p>
       <CopyDigestSummary markdown={md} />

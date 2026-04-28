@@ -69,23 +69,23 @@ export default function RunActions() {
   }
 
   return (
-    <div style={{ margin: '12px 0 20px' }}>
+    <div className="stack-y-actions">
       <p className="text-muted-note mb-8">
         Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query and mock
         document text. Set them under <a href="/settings/brand">Brand settings</a> first.
       </p>
-      <button onClick={runPipeline} disabled={pipeline.running} style={{ marginRight: 8 }}>
+      <button onClick={runPipeline} disabled={pipeline.running} className="mr-8">
         {pipeline.running ? 'Running pipeline...' : 'Run unified pipeline'}
       </button>
       <button onClick={runTrends} disabled={trends.running}>
         {trends.running ? 'Running snapshot job...' : 'Run trend snapshot'}
       </button>
-      <button onClick={generateDigest} disabled={digest.running} style={{ marginLeft: 8 }}>
+      <button onClick={generateDigest} disabled={digest.running} className="ml-8">
         {digest.running ? 'Generating digest...' : 'Generate weekly digest'}
       </button>
-      {pipeline.message ? <p style={{ marginTop: 8 }}>{pipeline.message}</p> : null}
-      {trends.message ? <p style={{ marginTop: 4 }}>{trends.message}</p> : null}
-      {digest.message ? <p style={{ marginTop: 4 }}>{digest.message}</p> : null}
+      {pipeline.message ? <p className="mt-8">{pipeline.message}</p> : null}
+      {trends.message ? <p className="mt-4">{trends.message}</p> : null}
+      {digest.message ? <p className="mt-4">{digest.message}</p> : null}
     </div>
   );
 }

@@ -37,8 +37,8 @@ function signalFreshness(iso: string | null | undefined): { label: string; tone:
 export default function VisibilityScoreCard({ organizationId, canRecalculate, latest }: Props) {
   const freshness = latest ? signalFreshness(latest.signalsAsOf) : null;
   return (
-    <div className="panel-box-info" style={{ marginBottom: 28 }}>
-      <h2 style={{ marginTop: 0 }}>Visibility score (v1)</h2>
+    <div className="panel-box-info mb-28">
+      <h2 className="mt-0">Visibility score (v1)</h2>
       <p className="text-muted-note mt-0">
         Heuristic score from your latest mock pipeline + trend snapshot + connector signals (when configured).{' '}
         <Link href={`/api/orgs/${organizationId}/visibility`} target="_blank" rel="noreferrer">
@@ -51,12 +51,12 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
       </p>
 
       {!latest ? (
-        <p style={{ marginBottom: 12 }}>
+        <p className="mb-12">
           No score recorded yet. Run a <Link href="/reports">pipeline or trend job</Link>, or recalculate below.
         </p>
       ) : (
         <>
-          <p style={{ fontSize: 34, fontWeight: 700, margin: '8px 0' }}>{Math.round(latest.score)}</p>
+          <p className="score-display-lg">{Math.round(latest.score)}</p>
           <p className="text-muted-small-subtle mt-0">
             Last updated: {new Date(latest.createdAt).toLocaleString()}
             {latest.signalSource ? ` · signals: ${latest.signalSource}` : ''}
@@ -64,14 +64,14 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
             {latest.signalsAsOf ? ` · asOf: ${latest.signalsAsOf}` : ''}
           </p>
           {freshness ? (
-            <p style={{ marginTop: -2, marginBottom: 10 }}>
+            <p className="status-chip-row">
               <span className={`status-chip status-chip-${freshness.tone}`}>signal recency: {freshness.label}</span>
             </p>
           ) : null}
-          <h3 style={{ fontSize: 15, marginBottom: 8 }}>Why it changed (last run)</h3>
-          <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <h3 className="subheading-sm">Why it changed (last run)</h3>
+          <ul className="list-indent">
             {latest.reasons.map((r) => (
-              <li key={`${r.code}-${r.message.slice(0, 24)}`} style={{ marginBottom: 6 }}>
+              <li key={`${r.code}-${r.message.slice(0, 24)}`} className="li-tight">
                 {r.message}
               </li>
             ))}
@@ -82,12 +82,12 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
       {canRecalculate ? (
         <RecalculateVisibilityForm organizationId={organizationId} />
       ) : (
-        <p className="text-muted-small" style={{ marginTop: 12 }}>
+        <p className="text-muted-small mt-12">
           Ask an editor or admin to recalculate if needed (viewer role).
         </p>
       )}
 
-      <p className="text-muted-xs" style={{ marginTop: 12 }}>
+      <p className="text-muted-xs mt-12">
         GSC: <code>GSC_SITE_URL</code> + credentials. GA4: <code>GA4_PROPERTY_ID</code> + credentials (same inline JSON
         vars as connectors page).
       </p>

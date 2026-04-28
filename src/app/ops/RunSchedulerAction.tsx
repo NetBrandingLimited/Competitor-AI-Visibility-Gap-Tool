@@ -31,21 +31,21 @@ export default function RunSchedulerAction() {
   }
 
   return (
-    <div style={{ margin: '12px 0 20px' }}>
-      <label style={{ display: 'block', marginBottom: 8 }}>
+    <div className="stack-y-actions">
+      <label className="block mb-8">
         <input
           type="checkbox"
           checked={forceDigest}
           onChange={(e) => setForceDigest(e.target.checked)}
           disabled={running}
-          style={{ marginRight: 8 }}
+          className="mr-8"
         />
         Force weekly digest generation in this run
       </label>
       <button onClick={runNow} disabled={running}>
         {running ? 'Running scheduled job...' : 'Run scheduled job now'}
       </button>
-      {message ? <p style={{ marginTop: 8 }}>{message}</p> : null}
+      {message ? <p className="mt-8">{message}</p> : null}
     </div>
   );
 }
