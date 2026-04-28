@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
+import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
@@ -148,10 +149,11 @@ export default async function ReportsPage() {
       <p className="text-muted-note">
         Auto-generated opportunities from latest pipeline triggers/clusters, trend leader, and visibility score.
       </p>
-      <p className="text-muted-subtle">
-        Computed at <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code>; source data as of{' '}
-        <code>{gapInsights.upstreamAsOf ? new Date(gapInsights.upstreamAsOf).toLocaleString() : 'n/a'}</code>.
-      </p>
+      <ComputedSourceAsOfNote
+        computedAtIso={gapInsights.generatedAt}
+        sourceAsOfIso={gapInsights.upstreamAsOf}
+        className="text-muted-subtle"
+      />
       <ul>
         {gapInsights.opportunities.map((item) => (
           <li key={item.id}>

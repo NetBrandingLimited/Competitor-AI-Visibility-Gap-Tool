@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
+import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
@@ -207,10 +208,11 @@ export default async function DashboardPage() {
       )}
 
       <h2>Gap opportunities</h2>
-      <p className="text-muted-subtle">
-        Computed <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code>; source data as of{' '}
-        <code>{gapInsights.upstreamAsOf ? new Date(gapInsights.upstreamAsOf).toLocaleString() : 'n/a'}</code>.
-      </p>
+      <ComputedSourceAsOfNote
+        computedAtIso={gapInsights.generatedAt}
+        sourceAsOfIso={gapInsights.upstreamAsOf}
+        className="text-muted-subtle"
+      />
       <ul className="mt-8 mb-20">
         {gapInsights.opportunities.slice(0, 3).map((op) => (
           <li key={op.id} className="mb-8">
