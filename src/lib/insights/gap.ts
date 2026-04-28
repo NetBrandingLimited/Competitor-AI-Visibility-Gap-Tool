@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
+import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
+import type { TrendSnapshot } from '@/lib/trends/store';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 export type GapOpportunity = {
@@ -25,26 +27,28 @@ export type GapInsights = {
   topics: TopicGap[];
 };
 
+type GapOrgFields = {
+  brandName: string | null;
+  competitorA: string | null;
+  competitorB: string | null;
+  competitorC: string | null;
+};
+
+type GapVisibilityInput = {
+  score: number;
+  createdAt: string;
+} | null;
+
 function norm(value: string | null | undefined): string {
   return (value ?? '').trim().toLowerCase();
 }
 
-export async function buildGapInsightsForOrg(organizationId: string): Promise<GapInsights> {
-  const [org, latestRun, latestTrend, visibility] = await Promise.all([
-    prisma.organization.findUnique({
-      where: { id: organizationId },
-      select: {
-        brandName: true,
-        competitorA: true,
-        competitorB: true,
-        competitorC: true
-      }
-    }),
-    readLatestPipelineRun(organizationId),
-    readLatestTrendSnapshot(organizationId),
-    getLatestVisibilityScore(organizationId)
-  ]);
-
+export function buildGapInsightsFromLatestData(
+  org: GapOrgFields | null,
+  latestRun: UnifiedPipelineRun | null,
+  latestTrend: TrendSnapshot | null,
+  visibility: GapVisibilityInput
+): GapInsights {
   const opportunities: GapOpportunity[] = [];
   const brandName = org?.brandName?.trim() || 'your brand';
   const competitors = [org?.competitorA, org?.competitorB, org?.competitorC]
@@ -140,4 +144,22 @@ export async function buildGapInsightsForOrg(organizationId: string): Promise<Ga
     opportunities,
     topics: topics.slice(0, 8)
   };
+}
+
+export async function buildGapInsightsForOrg(organizationId: string): Promise<GapInsights> {
+  const [org, latestRun, latestTrend, visibility] = await Promise.all([
+    prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: {
+        brandName: true,
+        competitorA: true,
+        competitorB: true,
+        competitorC: true
+      }
+    }),
+    readLatestPipelineRun(organizationId),
+    readLatestTrendSnapshot(organizationId),
+    getLatestVisibilityScore(organizationId)
+  ]);
+  return buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 }

@@ -9,7 +9,7 @@ import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/l
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
-import { buildGapInsightsForOrg } from '@/lib/insights/gap';
+import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
@@ -53,15 +53,15 @@ export default async function DashboardPage() {
       }
     : {};
 
-  const [recentRuns, latestTrend, visibility, latestDigest, gapInsights] = await Promise.all([
+  const [recentRuns, latestTrend, visibility, latestDigest] = await Promise.all([
     readRecentPipelineRuns(active.organizationId, 2),
     readLatestTrendSnapshot(active.organizationId),
     getLatestVisibilityScore(active.organizationId),
-    readLatestWeeklyDigest(active.organizationId),
-    buildGapInsightsForOrg(active.organizationId)
+    readLatestWeeklyDigest(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
   const previousRun = recentRuns[1] ?? null;
+  const gapInsights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 
   const pipelineSnapshot =
     latestRun ? buildPipelineDashboardSnapshot(orgFields, latestRun, previousRun) : null;

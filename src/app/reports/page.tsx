@@ -9,10 +9,11 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests } from '@/lib/digest/weekly';
-import { buildGapInsightsForOrg } from '@/lib/insights/gap';
+import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 import { prisma } from '@/lib/prisma';
 
 export const metadata: Metadata = {
@@ -41,11 +42,11 @@ export default async function ReportsPage() {
     }
   });
 
-  const snapshots = await readTrendSnapshots(active.organizationId);
-  const pipelineRuns = await readPipelineRuns(active.organizationId);
-  const [gapInsights, weeklyDigests] = await Promise.all([
-    buildGapInsightsForOrg(active.organizationId),
-    listWeeklyDigests(active.organizationId)
+  const [snapshots, pipelineRuns, weeklyDigests, visibility] = await Promise.all([
+    readTrendSnapshots(active.organizationId),
+    readPipelineRuns(active.organizationId),
+    listWeeklyDigests(active.organizationId),
+    getLatestVisibilityScore(active.organizationId)
   ]);
   const {
     thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
@@ -54,6 +55,7 @@ export default async function ReportsPage() {
   const latestSnapshot = snapshots.at(-1) ?? null;
   const latestPipelineRun = pipelineRuns[0] ?? null;
   const latestDigest = weeklyDigests[0] ?? null;
+  const gapInsights = buildGapInsightsFromLatestData(org, latestPipelineRun, latestSnapshot, visibility);
 
   return (
     <section>
@@ -134,6 +136,12 @@ export default async function ReportsPage() {
             iso={gapInsights.upstreamAsOf}
             thresholds={freshnessThresholds}
             fallbackText="No source data yet"
+          />
+          <FreshnessTimestampListItem
+            label="Visibility score"
+            iso={visibility?.createdAt ?? null}
+            thresholds={freshnessThresholds}
+            fallbackText="Not generated yet"
           />
           <FreshnessTimestampListItem
             label="Weekly digest"
