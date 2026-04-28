@@ -37,28 +37,22 @@ export default function AppNav() {
   const navRef = useRef<HTMLElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
-  const [compactViewport, setCompactViewport] = useState(false);
 
   useEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
-    const mediaCompact = window.matchMedia('(max-width: 820px)');
 
     const updateFades = () => {
       const maxScrollLeft = nav.scrollWidth - nav.clientWidth;
       setShowLeftFade(nav.scrollLeft > 0);
       setShowRightFade(maxScrollLeft > 0 && nav.scrollLeft < maxScrollLeft - 1);
     };
-    const onMediaChange = () => setCompactViewport(mediaCompact.matches);
 
     updateFades();
-    onMediaChange();
     nav.addEventListener('scroll', updateFades, { passive: true });
-    mediaCompact.addEventListener('change', onMediaChange);
     window.addEventListener('resize', updateFades);
     return () => {
       nav.removeEventListener('scroll', updateFades);
-      mediaCompact.removeEventListener('change', onMediaChange);
       window.removeEventListener('resize', updateFades);
     };
   }, []);
@@ -103,26 +97,6 @@ export default function AppNav() {
             {groupIdx < navGroups.length - 1 ? <span aria-hidden="true" className="app-nav-group-separator" /> : null}
           </div>
         ))}
-        {!compactViewport ? (
-          <div className="app-nav-utilities" aria-label="Quick utilities">
-            <label className="app-nav-search-wrap">
-              <span className="sr-only">Quick search</span>
-              <input
-                type="search"
-                className="app-nav-search-input"
-                placeholder="Search (soon)"
-                readOnly
-                aria-label="Quick search (coming soon)"
-              />
-            </label>
-            <Link href="/settings/brand" className="app-nav-utility-link">
-              Profile
-            </Link>
-            <Link href="/reports" className="app-nav-utility-link app-nav-utility-link-primary">
-              Actions
-            </Link>
-          </div>
-        ) : null}
       </nav>
       {showLeftFade ? (
         <span aria-hidden="true" className="app-nav-fade app-nav-fade-left" />
