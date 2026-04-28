@@ -112,6 +112,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         type="button"
         onClick={copyJson}
         disabled={Boolean(busyAction)}
+        aria-busy={busyAction === 'copy'}
         className="btn-compact-inline ml-10"
       >
         {busyAction === 'copy' ? 'Copying...' : 'Copy JSON'}
@@ -120,6 +121,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
         type="button"
         onClick={downloadJson}
         disabled={Boolean(busyAction)}
+        aria-busy={busyAction === 'download'}
         className="btn-compact-inline ml-8"
       >
         {busyAction === 'download' ? 'Downloading...' : 'Download JSON'}

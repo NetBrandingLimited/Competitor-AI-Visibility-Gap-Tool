@@ -27,7 +27,7 @@ p { color: #333; }
 .skip-link:focus {
   top: 12px;
 }
-.app-main {
+.app-layout {
   max-width: 960px;
   margin: 40px auto;
   padding: 0 16px;

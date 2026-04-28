@@ -16,10 +16,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <main id="main-content" className="app-main">
-          <AppNav />
-          {children}
-        </main>
+        <div className="app-layout">
+          <header>
+            <AppNav />
+          </header>
+          <main id="main-content">{children}</main>
+        </div>
         <BackToTopButton />
       </body>
     </html>
