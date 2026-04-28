@@ -130,9 +130,9 @@ export default async function ReportsPage() {
           />
           <FreshnessTimestampListItem
             label="Gap insights"
-            iso={gapInsights.generatedAt}
+            iso={gapInsights.upstreamAsOf}
             thresholds={freshnessThresholds}
-            fallbackText="Not generated yet"
+            fallbackText="No source data yet"
           />
           <FreshnessTimestampListItem
             label="Weekly digest"
@@ -147,6 +147,10 @@ export default async function ReportsPage() {
       <h2>Competitor gap insights (v1)</h2>
       <p className="text-muted-note">
         Auto-generated opportunities from latest pipeline triggers/clusters, trend leader, and visibility score.
+      </p>
+      <p className="text-muted-subtle">
+        Computed at <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code>; source data as of{' '}
+        <code>{gapInsights.upstreamAsOf ? new Date(gapInsights.upstreamAsOf).toLocaleString() : 'n/a'}</code>.
       </p>
       <ul>
         {gapInsights.opportunities.map((item) => (

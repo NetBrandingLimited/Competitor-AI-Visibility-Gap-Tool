@@ -20,6 +20,7 @@ export type TopicGap = {
 
 export type GapInsights = {
   generatedAt: string;
+  upstreamAsOf: string | null;
   opportunities: GapOpportunity[];
   topics: TopicGap[];
 };
@@ -51,6 +52,13 @@ export async function buildGapInsightsForOrg(organizationId: string): Promise<Ga
     .filter((x): x is string => Boolean(x));
 
   const latestTrend = trends.at(-1) ?? null;
+  const upstreamTimes = [latestRun?.createdAt, latestTrend?.generatedAt, visibility?.createdAt].filter(
+    (iso): iso is string => Boolean(iso)
+  );
+  const upstreamAsOf =
+    upstreamTimes.length > 0
+      ? new Date(Math.max(...upstreamTimes.map((iso) => new Date(iso).getTime()))).toISOString()
+      : null;
   if (latestTrend) {
     const top = norm(latestTrend.topBrand);
     const brand = norm(brandName);
@@ -129,6 +137,7 @@ export async function buildGapInsightsForOrg(organizationId: string): Promise<Ga
 
   return {
     generatedAt: new Date().toISOString(),
+    upstreamAsOf,
     opportunities,
     topics: topics.slice(0, 8)
   };
