@@ -11,6 +11,7 @@ import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+import { tableBase, tableWithMarginBottom, tdCell, tdCellNowrap, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 import { prisma } from '@/lib/prisma';
 
 function display(value: string | null | undefined): string {
@@ -171,24 +172,24 @@ export default async function ReportsPage() {
       {gapInsights.topics.length === 0 ? (
         <p>No topic breakdown available yet. Run the unified pipeline first.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd', marginBottom: 16 }}>
+        <table style={tableWithMarginBottom(16)}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Topic</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Gap score</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Trigger hits</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Cluster weight</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Recommendation</th>
+              <th style={thLeft}>Topic</th>
+              <th style={thRight}>Gap score</th>
+              <th style={thRight}>Trigger hits</th>
+              <th style={thRight}>Cluster weight</th>
+              <th style={thLeft}>Recommendation</th>
             </tr>
           </thead>
           <tbody>
             {gapInsights.topics.map((topic) => (
               <tr key={topic.topic}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.topic}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{topic.gapScore}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{topic.triggerCount}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{topic.clusterWeight}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.recommendation}</td>
+                <td style={tdCell}>{topic.topic}</td>
+                <td style={tdCellRight}>{topic.gapScore}</td>
+                <td style={tdCellRight}>{topic.triggerCount}</td>
+                <td style={tdCellRight}>{topic.clusterWeight}</td>
+                <td style={tdCell}>{topic.recommendation}</td>
               </tr>
             ))}
           </tbody>
@@ -199,36 +200,30 @@ export default async function ReportsPage() {
       {weeklyDigests.length === 0 ? (
         <p>No digest yet. Click &quot;Generate weekly digest&quot; above.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd', marginBottom: 16 }}>
+        <table style={tableWithMarginBottom(16)}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Digest</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Generated</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Period</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Score</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Signal source</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Top opportunities</th>
+              <th style={thLeft}>Digest</th>
+              <th style={thLeft}>Generated</th>
+              <th style={thLeft}>Period</th>
+              <th style={thRight}>Score</th>
+              <th style={thLeft}>Signal source</th>
+              <th style={thLeft}>Top opportunities</th>
             </tr>
           </thead>
           <tbody>
             {weeklyDigests.map((d) => (
               <tr key={d.id}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
+                <td style={tdCell}>
                   <Link href={`/reports/digest/${d.id}`}>View</Link>
                 </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                  {new Date(d.generatedAt).toLocaleString()}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
+                <td style={tdCell}>{new Date(d.generatedAt).toLocaleString()}</td>
+                <td style={tdCell}>
                   {d.periodStart} → {d.periodEnd}
                 </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {d.summary.score ?? '—'}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{d.summary.signalSource ?? '—'}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                  {d.summary.topOpportunities.join(', ') || '—'}
-                </td>
+                <td style={tdCellRight}>{d.summary.score ?? '—'}</td>
+                <td style={tdCell}>{d.summary.signalSource ?? '—'}</td>
+                <td style={tdCell}>{d.summary.topOpportunities.join(', ') || '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -239,28 +234,22 @@ export default async function ReportsPage() {
       {snapshots.length === 0 ? (
         <p>No snapshots yet for this workspace. Run the trend snapshot job below.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+        <table style={tableBase}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Date</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Mentions</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Top brand</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>
-                Top brand mentions
-              </th>
+              <th style={thLeft}>Date</th>
+              <th style={thRight}>Mentions</th>
+              <th style={thLeft}>Top brand</th>
+              <th style={thRight}>Top brand mentions</th>
             </tr>
           </thead>
           <tbody>
             {snapshots.map((row) => (
               <tr key={row.date}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.date}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {row.totalMentions}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.topBrand}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {row.topBrandMentions}
-                </td>
+                <td style={tdCell}>{row.date}</td>
+                <td style={tdCellRight}>{row.totalMentions}</td>
+                <td style={tdCell}>{row.topBrand}</td>
+                <td style={tdCellRight}>{row.topBrandMentions}</td>
               </tr>
             ))}
           </tbody>
@@ -277,36 +266,28 @@ export default async function ReportsPage() {
       {pipelineRuns.length === 0 ? (
         <p>No runs yet for this workspace. Run the unified pipeline below.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+        <table style={tableBase}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Run id</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Created</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Query</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Docs</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Triggers</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Clusters</th>
+              <th style={thLeft}>Run id</th>
+              <th style={thLeft}>Created</th>
+              <th style={thLeft}>Query</th>
+              <th style={thRight}>Docs</th>
+              <th style={thRight}>Triggers</th>
+              <th style={thRight}>Clusters</th>
             </tr>
           </thead>
           <tbody>
             {pipelineRuns.map((run) => (
               <tr key={run.id}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
+                <td style={tdCell}>
                   <Link href={`/reports/runs/${run.id}`}>{run.id}</Link>
                 </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', whiteSpace: 'nowrap' }}>
-                  {new Date(run.createdAt).toLocaleString()}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{run.query}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {run.documentCount}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {run.triggerCount}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {run.clusterCount}
-                </td>
+                <td style={tdCellNowrap}>{new Date(run.createdAt).toLocaleString()}</td>
+                <td style={tdCell}>{run.query}</td>
+                <td style={tdCellRight}>{run.documentCount}</td>
+                <td style={tdCellRight}>{run.triggerCount}</td>
+                <td style={tdCellRight}>{run.clusterCount}</td>
               </tr>
             ))}
           </tbody>

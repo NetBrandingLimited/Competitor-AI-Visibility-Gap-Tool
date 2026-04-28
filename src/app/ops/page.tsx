@@ -12,6 +12,7 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+import { tableBase, tdCell, thLeft } from '@/lib/ui/tableStyles';
 
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
@@ -110,38 +111,26 @@ export default async function OpsPage() {
       {jobs.length === 0 ? (
         <p>No scheduler jobs yet for this workspace.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+        <table style={tableBase}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Job id</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Status</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Query</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>
-                Pipeline run
-              </th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>
-                Weekly digest
-              </th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>
-                Completed
-              </th>
+              <th style={thLeft}>Job id</th>
+              <th style={thLeft}>Status</th>
+              <th style={thLeft}>Query</th>
+              <th style={thLeft}>Pipeline run</th>
+              <th style={thLeft}>Weekly digest</th>
+              <th style={thLeft}>Completed</th>
             </tr>
           </thead>
           <tbody>
             {jobs.map((job) => (
               <tr key={job.id}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{job.id}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{job.status}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{job.query}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                  {job.pipelineRunId ?? '-'}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                  {job.weeklyDigestId ?? '-'}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                  {new Date(job.completedAt).toLocaleString()}
-                </td>
+                <td style={tdCell}>{job.id}</td>
+                <td style={tdCell}>{job.status}</td>
+                <td style={tdCell}>{job.query}</td>
+                <td style={tdCell}>{job.pipelineRunId ?? '-'}</td>
+                <td style={tdCell}>{job.weeklyDigestId ?? '-'}</td>
+                <td style={tdCell}>{new Date(job.completedAt).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>

@@ -5,6 +5,7 @@ import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
+import { tableBase, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 
 export default async function WeeklyDigestDetailPage({
   params
@@ -85,24 +86,22 @@ export default async function WeeklyDigestDetailPage({
       {digest.summary.topics && digest.summary.topics.length > 0 ? (
         <>
           <h2>Topic gaps (frozen at generation)</h2>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+          <table style={tableBase}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Topic</th>
-                <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Gap</th>
-                <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Triggers</th>
-                <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Recommendation</th>
+                <th style={thLeft}>Topic</th>
+                <th style={thRight}>Gap</th>
+                <th style={thRight}>Triggers</th>
+                <th style={thLeft}>Recommendation</th>
               </tr>
             </thead>
             <tbody>
               {digest.summary.topics.map((t) => (
                 <tr key={t.topic}>
-                  <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{t.topic}</td>
-                  <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{t.gapScore}</td>
-                  <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                    {t.triggerCount}
-                  </td>
-                  <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{t.recommendation}</td>
+                  <td style={tdCell}>{t.topic}</td>
+                  <td style={tdCellRight}>{t.gapScore}</td>
+                  <td style={tdCellRight}>{t.triggerCount}</td>
+                  <td style={tdCell}>{t.recommendation}</td>
                 </tr>
               ))}
             </tbody>

@@ -13,6 +13,7 @@ import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+import { tableBase, tableWithMarginBottom, tdCell, tdCellRight, thLeft, thRight } from '@/lib/ui/tableStyles';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -210,31 +211,22 @@ export default async function DashboardPage() {
       </ul>
 
       {gapInsights.topics.length > 0 ? (
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            marginBottom: 24,
-            border: '1px solid #ddd'
-          }}
-        >
+        <table style={tableWithMarginBottom(24)}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Topic</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Gap score</th>
-              <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Trigger count</th>
-              <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Recommendation</th>
+              <th style={thLeft}>Topic</th>
+              <th style={thRight}>Gap score</th>
+              <th style={thRight}>Trigger count</th>
+              <th style={thLeft}>Recommendation</th>
             </tr>
           </thead>
           <tbody>
             {gapInsights.topics.slice(0, 5).map((topic) => (
               <tr key={topic.topic}>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.topic}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{topic.gapScore}</td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                  {topic.triggerCount}
-                </td>
-                <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{topic.recommendation}</td>
+                <td style={tdCell}>{topic.topic}</td>
+                <td style={tdCellRight}>{topic.gapScore}</td>
+                <td style={tdCellRight}>{topic.triggerCount}</td>
+                <td style={tdCell}>{topic.recommendation}</td>
               </tr>
             ))}
           </tbody>
@@ -242,20 +234,13 @@ export default async function DashboardPage() {
       ) : null}
 
       <h2>Leaderboard</h2>
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginBottom: 24,
-          border: '1px solid #ddd'
-        }}
-      >
+      <table style={tableWithMarginBottom(24)}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Brand</th>
-            <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Mentions</th>
-            <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>Share of voice</th>
-            <th style={{ textAlign: 'right', padding: 8, borderBottom: '1px solid #ddd' }}>
+            <th style={thLeft}>Brand</th>
+            <th style={thRight}>Mentions</th>
+            <th style={thRight}>Share of voice</th>
+            <th style={thRight}>
               {leaderboardSource === 'pipeline' ? 'Δ vs prior run' : '7d delta'}
             </th>
           </tr>
@@ -263,12 +248,10 @@ export default async function DashboardPage() {
         <tbody>
           {snapshot.leaderboard.map((row) => (
             <tr key={row.brand}>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.brand}</td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>{row.mentions}</td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
-                {formatPercent(row.shareOfVoice)}
-              </td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee', textAlign: 'right' }}>
+              <td style={tdCell}>{row.brand}</td>
+              <td style={tdCellRight}>{row.mentions}</td>
+              <td style={tdCellRight}>{formatPercent(row.shareOfVoice)}</td>
+              <td style={tdCellRight}>
                 {row.delta7d >= 0 ? '+' : ''}
                 {formatPercent(row.delta7d)}
               </td>
@@ -278,24 +261,22 @@ export default async function DashboardPage() {
       </table>
 
       <h2>Recent</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
+      <table style={tableBase}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Source</th>
-            <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Query</th>
-            <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Top brand</th>
-            <th style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #ddd' }}>Published</th>
+            <th style={thLeft}>Source</th>
+            <th style={thLeft}>Query</th>
+            <th style={thLeft}>Top brand</th>
+            <th style={thLeft}>Published</th>
           </tr>
         </thead>
         <tbody>
           {snapshot.recent.map((row) => (
             <tr key={`${row.source}-${row.query}`}>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.source}</td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.query}</td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{row.topBrand}</td>
-              <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>
-                {new Date(row.publishedAt).toLocaleString()}
-              </td>
+              <td style={tdCell}>{row.source}</td>
+              <td style={tdCell}>{row.query}</td>
+              <td style={tdCell}>{row.topBrand}</td>
+              <td style={tdCell}>{new Date(row.publishedAt).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
