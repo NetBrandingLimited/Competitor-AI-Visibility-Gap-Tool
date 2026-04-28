@@ -89,6 +89,37 @@ p { color: #333; }
   right: 0;
   background: linear-gradient(to left, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0));
 }
+.back-to-top-button {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #1f2937;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+}
+.back-to-top-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #93c5fd, 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+.back-to-top-toast {
+  position: fixed;
+  right: 16px;
+  bottom: 58px;
+  z-index: 41;
+  background: #111827;
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+}
 
 .login-shell {
   min-height: 70vh;
