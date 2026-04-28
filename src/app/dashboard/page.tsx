@@ -141,6 +141,13 @@ export default async function DashboardPage() {
             showTimestamp={false}
           />
           <FreshnessTimestampListItem
+            label="Gap insights"
+            iso={gapInsights.upstreamAsOf}
+            thresholds={freshnessThresholds}
+            fallbackText="No source data yet"
+            showTimestamp={false}
+          />
+          <FreshnessTimestampListItem
             label="Weekly digest"
             iso={latestDigest?.generatedAt ?? null}
             thresholds={freshnessThresholds}
@@ -201,8 +208,8 @@ export default async function DashboardPage() {
 
       <h2>Gap opportunities</h2>
       <p className="text-muted-subtle">
-        Generated <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code> from latest run, trend, and
-        visibility signals.
+        Computed <code>{new Date(gapInsights.generatedAt).toLocaleString()}</code>; source data as of{' '}
+        <code>{gapInsights.upstreamAsOf ? new Date(gapInsights.upstreamAsOf).toLocaleString() : 'n/a'}</code>.
       </p>
       <ul className="mt-8 mb-20">
         {gapInsights.opportunities.slice(0, 3).map((op) => (

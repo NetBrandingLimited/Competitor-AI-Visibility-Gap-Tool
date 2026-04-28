@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
-import { readTrendSnapshots } from '@/lib/trends/store';
+import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 export type GapOpportunity = {
@@ -30,7 +30,7 @@ function norm(value: string | null | undefined): string {
 }
 
 export async function buildGapInsightsForOrg(organizationId: string): Promise<GapInsights> {
-  const [org, latestRun, trends, visibility] = await Promise.all([
+  const [org, latestRun, latestTrend, visibility] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: organizationId },
       select: {
@@ -41,7 +41,7 @@ export async function buildGapInsightsForOrg(organizationId: string): Promise<Ga
       }
     }),
     readLatestPipelineRun(organizationId),
-    readTrendSnapshots(organizationId),
+    readLatestTrendSnapshot(organizationId),
     getLatestVisibilityScore(organizationId)
   ]);
 
@@ -51,7 +51,6 @@ export async function buildGapInsightsForOrg(organizationId: string): Promise<Ga
     .map((x) => x?.trim())
     .filter((x): x is string => Boolean(x));
 
-  const latestTrend = trends.at(-1) ?? null;
   const upstreamTimes = [latestRun?.createdAt, latestTrend?.generatedAt, visibility?.createdAt].filter(
     (iso): iso is string => Boolean(iso)
   );
