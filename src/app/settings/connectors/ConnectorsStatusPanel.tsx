@@ -391,16 +391,29 @@ export default function ConnectorsStatusPanel() {
       </label>
 
       <div className="connector-actions mt-16">
-        <button type="button" className="primary" disabled={saving || !orgId} onClick={() => void saveSettings()}>
+        <button
+          type="button"
+          className="primary"
+          disabled={saving || !orgId}
+          aria-busy={saving}
+          onClick={() => void saveSettings()}
+        >
           {saving ? 'Saving…' : 'Save connector settings'}
         </button>
-        <button type="button" className="secondary" disabled={refreshing || !orgId} onClick={() => loadConnectors(orgId)}>
+        <button
+          type="button"
+          className="secondary"
+          disabled={refreshing || !orgId}
+          aria-busy={refreshing}
+          onClick={() => loadConnectors(orgId)}
+        >
           {refreshing ? 'Refreshing…' : 'Refresh status'}
         </button>
         <button
           type="button"
           className="secondary"
           disabled={testing || !orgId}
+          aria-busy={testing}
           onClick={() => void testCredentials()}
         >
           {testing ? 'Testing…' : 'Test credentials'}
@@ -409,6 +422,7 @@ export default function ConnectorsStatusPanel() {
           type="button"
           className="secondary"
           disabled={fetchingSignals || !orgId}
+          aria-busy={fetchingSignals}
           onClick={() => void fetchLiveSignals()}
         >
           {fetchingSignals ? 'Fetching signals…' : 'Fetch live signals'}
@@ -417,6 +431,7 @@ export default function ConnectorsStatusPanel() {
           type="button"
           className="secondary"
           disabled={clearingSignals || !orgId}
+          aria-busy={clearingSignals}
           onClick={() => void clearSignalCache()}
         >
           {clearingSignals ? 'Clearing cache…' : 'Clear signal cache'}

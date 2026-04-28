@@ -70,7 +70,7 @@ export default function LoginForm({ nextPath }: Props) {
           required
         />
       </label>
-      <button type="submit" className="primary" disabled={loading}>
+      <button type="submit" className="primary" disabled={loading} aria-busy={loading}>
         {loading ? 'Signing in…' : 'Sign in'}
       </button>
       {message ? <p className="error">{message}</p> : null}

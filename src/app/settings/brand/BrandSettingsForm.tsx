@@ -195,7 +195,7 @@ export default function BrandSettingsForm() {
       </label>
 
       <div className="actions">
-        <button type="submit" className="primary" disabled={saving}>
+        <button type="submit" className="primary" disabled={saving} aria-busy={saving}>
           {saving ? 'Saving…' : 'Save'}
         </button>
         <button type="button" className="secondary" onClick={logout}>

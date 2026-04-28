@@ -80,7 +80,7 @@ export default function RegisterForm() {
           placeholder="e.g. Acme Inc (optional)"
         />
       </label>
-      <button type="submit" className="primary" disabled={loading}>
+      <button type="submit" className="primary" disabled={loading} aria-busy={loading}>
         {loading ? 'Creating account…' : 'Create account'}
       </button>
       {message ? <p className="error">{message}</p> : null}
