@@ -217,3 +217,20 @@ export async function listWeeklyDigests(organizationId: string): Promise<WeeklyD
     summary: parseWeeklyDigestSummaryJson(row.summaryJson)
   }));
 }
+
+export async function readLatestWeeklyDigest(organizationId: string): Promise<WeeklyDigest | null> {
+  const row = await prisma.weeklyDigest.findFirst({
+    where: { organizationId },
+    orderBy: { generatedAt: 'desc' }
+  });
+  if (!row) {
+    return null;
+  }
+  return {
+    id: row.id,
+    periodStart: row.periodStart,
+    periodEnd: row.periodEnd,
+    generatedAt: row.generatedAt.toISOString(),
+    summary: parseWeeklyDigestSummaryJson(row.summaryJson)
+  };
+}

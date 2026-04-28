@@ -7,12 +7,12 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
-import { listWeeklyDigests } from '@/lib/digest/weekly';
+import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
-import { readTrendSnapshots } from '@/lib/trends/store';
+import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
@@ -52,11 +52,11 @@ export default async function DashboardPage() {
       }
     : {};
 
-  const [recentRuns, trendSnapshots, visibility, weeklyDigests, gapInsights] = await Promise.all([
+  const [recentRuns, latestTrend, visibility, latestDigest, gapInsights] = await Promise.all([
     readRecentPipelineRuns(active.organizationId, 2),
-    readTrendSnapshots(active.organizationId),
+    readLatestTrendSnapshot(active.organizationId),
     getLatestVisibilityScore(active.organizationId),
-    listWeeklyDigests(active.organizationId),
+    readLatestWeeklyDigest(active.organizationId),
     buildGapInsightsForOrg(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
@@ -67,8 +67,6 @@ export default async function DashboardPage() {
   const mockSnapshot = getDashboardSnapshotForOrganization(orgFields);
   const snapshot = pipelineSnapshot ?? mockSnapshot;
   const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
-  const latestTrend = trendSnapshots.at(-1) ?? null;
-  const latestDigest = weeklyDigests[0] ?? null;
   const { thresholds, input: freshnessThresholds } = getFreshnessConfig();
 
   return (
@@ -274,7 +272,8 @@ export default async function DashboardPage() {
       <h2>Recent</h2>
       <table className="data-table">
         <caption className="sr-only">
-          Recent mock search rows: source, query, top brand, and published time.
+          Recent {leaderboardSource === 'pipeline' ? 'pipeline-derived' : 'preview'} rows: source, query, top brand,
+          and published time.
         </caption>
         <thead>
           <tr>

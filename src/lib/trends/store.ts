@@ -22,6 +22,23 @@ export async function readTrendSnapshots(organizationId: string): Promise<TrendS
   }));
 }
 
+export async function readLatestTrendSnapshot(organizationId: string): Promise<TrendSnapshot | null> {
+  const row = await prisma.trendSnapshot.findFirst({
+    where: { organizationId },
+    orderBy: { date: 'desc' }
+  });
+  if (!row) {
+    return null;
+  }
+  return {
+    date: row.date,
+    generatedAt: row.generatedAt.toISOString(),
+    totalMentions: row.totalMentions,
+    topBrand: row.topBrand,
+    topBrandMentions: row.topBrandMentions
+  };
+}
+
 export async function writeTrendSnapshots(
   organizationId: string,
   snapshots: TrendSnapshot[]
