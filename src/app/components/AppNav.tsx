@@ -29,6 +29,7 @@ function isActivePath(pathname: string, item: NavItem): boolean {
 
 export default function AppNav() {
   const pathname = usePathname();
+  const currentSectionId = 'app-nav-current-section';
   const navRef = useRef<HTMLElement | null>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
   const [showRightFade, setShowRightFade] = useState(false);
@@ -66,9 +67,12 @@ export default function AppNav() {
       <nav
         ref={navRef}
         aria-label="Primary"
+        aria-describedby={currentSectionId}
         className="app-nav-track"
       >
-        <span className="sr-only">Current section: {activeSection}</span>
+        <span id={currentSectionId} className="sr-only">
+          Current section: {activeSection}
+        </span>
         {navItems.map((item) => {
           const active = isActivePath(pathname, item);
           return (
