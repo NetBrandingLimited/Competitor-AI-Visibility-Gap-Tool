@@ -53,7 +53,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
   return (
     <div style={{ marginBottom: 20, padding: 12, border: '1px solid #ddd', borderRadius: 6, background: '#fafafa' }}>
       <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>Weekly digest schedule (UTC)</h2>
-      <p style={{ marginTop: 0, fontSize: 14, color: '#444' }}>
+      <p className="text-muted-note" style={{ marginTop: 0 }}>
         Stored per workspace. Scheduler runs can use this as the standard digest cadence.
       </p>
       <label style={{ display: 'block', marginBottom: 10 }}>

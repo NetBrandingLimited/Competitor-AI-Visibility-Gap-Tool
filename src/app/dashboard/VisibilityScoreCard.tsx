@@ -47,7 +47,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
       }}
     >
       <h2 style={{ marginTop: 0 }}>Visibility score (v1)</h2>
-      <p style={{ marginTop: 0, color: '#444', fontSize: 14 }}>
+      <p className="text-muted-note" style={{ marginTop: 0 }}>
         Heuristic score from your latest mock pipeline + trend snapshot + connector signals (when configured).{' '}
         <Link href={`/api/orgs/${organizationId}/visibility`} target="_blank" rel="noreferrer">
           JSON API
