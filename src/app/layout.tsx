@@ -13,7 +13,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <main style={{ maxWidth: 960, margin: '40px auto', padding: '0 16px' }}>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <main id="main-content" style={{ maxWidth: 960, margin: '40px auto', padding: '0 16px' }}>
           <AppNav />
           {children}
         </main>

@@ -2,6 +2,21 @@ html, body { padding: 0; margin: 0; font-family: ui-sans-serif, system-ui, -appl
 * { box-sizing: border-box; }
 h1 { font-size: 2rem; margin: 1rem 0; }
 p { color: #333; }
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -40px;
+  z-index: 100;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+}
+.skip-link:focus {
+  top: 12px;
+}
 
 .login-shell {
   min-height: 70vh;
