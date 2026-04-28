@@ -7,9 +7,20 @@ import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
 
-export const metadata: Metadata = {
-  title: 'Weekly digest'
-};
+function digestTitleSegment(digestId: string): string {
+  const id = digestId.trim();
+  if (!id) return 'Weekly digest';
+  return id.length > 12 ? `Digest ${id.slice(0, 12)}…` : `Digest ${id}`;
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ digestId: string }>;
+}): Promise<Metadata> {
+  const { digestId } = await params;
+  return { title: digestTitleSegment(digestId) };
+}
 
 export default async function WeeklyDigestDetailPage({
   params

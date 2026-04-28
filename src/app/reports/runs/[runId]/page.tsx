@@ -5,9 +5,20 @@ import { redirect } from 'next/navigation';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
-export const metadata: Metadata = {
-  title: 'Pipeline run'
-};
+function runTitleSegment(runId: string): string {
+  const id = runId.trim();
+  if (!id) return 'Pipeline run';
+  return id.length > 12 ? `Run ${id.slice(0, 12)}…` : `Run ${id}`;
+}
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ runId: string }>;
+}): Promise<Metadata> {
+  const { runId } = await params;
+  return { title: runTitleSegment(runId) };
+}
 
 export default async function PipelineRunDetailPage({
   params
