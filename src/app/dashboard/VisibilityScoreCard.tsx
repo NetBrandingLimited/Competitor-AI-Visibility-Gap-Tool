@@ -37,15 +37,7 @@ function signalFreshness(iso: string | null | undefined): { label: string; tone:
 export default function VisibilityScoreCard({ organizationId, canRecalculate, latest }: Props) {
   const freshness = latest ? signalFreshness(latest.signalsAsOf) : null;
   return (
-    <div
-      style={{
-        marginBottom: 28,
-        padding: 16,
-        border: '1px solid #ddd',
-        borderRadius: 8,
-        background: '#f8fafc'
-      }}
-    >
+    <div className="panel-box-info" style={{ marginBottom: 28 }}>
       <h2 style={{ marginTop: 0 }}>Visibility score (v1)</h2>
       <p className="text-muted-note mt-0">
         Heuristic score from your latest mock pipeline + trend snapshot + connector signals (when configured).{' '}

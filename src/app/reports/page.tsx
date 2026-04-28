@@ -62,15 +62,7 @@ export default async function ReportsPage() {
         numbers and queries.
       </p>
 
-      <div
-        style={{
-          marginBottom: 20,
-          padding: 12,
-          border: '1px solid #ddd',
-          borderRadius: 6,
-          background: '#fafafa'
-        }}
-      >
+      <div className="panel-box" style={{ marginBottom: 20 }}>
         <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>Tracking profile (saved on organization)</h2>
         <ul style={{ margin: 0, paddingLeft: 20 }}>
           <li>
