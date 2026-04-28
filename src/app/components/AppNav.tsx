@@ -1,9 +1,41 @@
+ 'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import type { CSSProperties } from 'react';
 
 const itemStyle: CSSProperties = { color: '#1d4ed8', textDecoration: 'none' };
+const activeItemStyle: CSSProperties = {
+  ...itemStyle,
+  fontWeight: 600,
+  textDecoration: 'underline'
+};
+
+type NavItem = {
+  label: string;
+  href: string;
+  exact?: boolean;
+};
+
+const navItems: NavItem[] = [
+  { label: 'Home', href: '/', exact: true },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Reports', href: '/reports' },
+  { label: 'Ops', href: '/ops' },
+  { label: 'Brand', href: '/settings/brand' },
+  { label: 'Connectors', href: '/settings/connectors' }
+];
+
+function isActivePath(pathname: string, item: NavItem): boolean {
+  if (item.exact) {
+    return pathname === item.href;
+  }
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
 
 export default function AppNav() {
+  const pathname = usePathname();
+
   return (
     <nav
       aria-label="Primary"
@@ -18,24 +50,14 @@ export default function AppNav() {
         fontSize: 14
       }}
     >
-      <Link href="/" style={itemStyle}>
-        Home
-      </Link>
-      <Link href="/dashboard" style={itemStyle}>
-        Dashboard
-      </Link>
-      <Link href="/reports" style={itemStyle}>
-        Reports
-      </Link>
-      <Link href="/ops" style={itemStyle}>
-        Ops
-      </Link>
-      <Link href="/settings/brand" style={itemStyle}>
-        Brand
-      </Link>
-      <Link href="/settings/connectors" style={itemStyle}>
-        Connectors
-      </Link>
+      {navItems.map((item) => {
+        const active = isActivePath(pathname, item);
+        return (
+          <Link key={item.href} href={item.href} style={active ? activeItemStyle : itemStyle} aria-current={active ? 'page' : undefined}>
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
