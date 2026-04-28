@@ -34,14 +34,17 @@ export async function GET(
     summary: digest.summary
   });
 
-  const safe = `${digest.periodStart}_${digest.periodEnd}`.replace(/[^\w.-]+/g, '-');
-  const filename = `weekly-digest-${safe}.md`;
+  const safePeriod = `${digest.periodStart}_${digest.periodEnd}`.replace(/[^\w.-]+/g, '-');
+  const safeOrg = orgName.replace(/[^\w.-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  const filename = `weekly-digest-${safeOrg || 'workspace'}-${safePeriod}.md`;
 
   return new NextResponse(body, {
     status: 200,
     headers: {
       'content-type': 'text/markdown; charset=utf-8',
-      'content-disposition': `attachment; filename="${filename}"`
+      'content-disposition': `attachment; filename="${filename}"`,
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff'
     }
   });
 }
