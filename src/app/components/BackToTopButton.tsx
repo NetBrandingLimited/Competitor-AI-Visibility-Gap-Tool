@@ -4,22 +4,39 @@ import { useEffect, useState } from 'react';
 
 export default function BackToTopButton() {
   const [visible, setVisible] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [compactViewport, setCompactViewport] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
       setVisible(window.scrollY > 320);
     };
+    const mediaReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mediaCompact = window.matchMedia('(max-width: 640px)');
+    const onMediaChange = () => {
+      setReduceMotion(mediaReduce.matches);
+      setCompactViewport(mediaCompact.matches);
+    };
+
+    onMediaChange();
     onScroll();
+
+    mediaReduce.addEventListener('change', onMediaChange);
+    mediaCompact.addEventListener('change', onMediaChange);
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      mediaReduce.removeEventListener('change', onMediaChange);
+      mediaCompact.removeEventListener('change', onMediaChange);
+      window.removeEventListener('scroll', onScroll);
+    };
   }, []);
 
-  if (!visible) return null;
+  if (!visible || compactViewport) return null;
 
   return (
     <button
       type="button"
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })}
       aria-label="Back to top"
       style={{
         position: 'fixed',
