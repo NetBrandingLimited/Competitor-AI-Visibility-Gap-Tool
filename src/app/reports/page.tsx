@@ -165,11 +165,11 @@ export default async function ReportsPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Topic</th>
-              <th className="data-table-th-right">Gap score</th>
-              <th className="data-table-th-right">Trigger hits</th>
-              <th className="data-table-th-right">Cluster weight</th>
-              <th className="data-table-th-left">Recommendation</th>
+              <th scope="col" className="data-table-th-left">Topic</th>
+              <th scope="col" className="data-table-th-right">Gap score</th>
+              <th scope="col" className="data-table-th-right">Trigger hits</th>
+              <th scope="col" className="data-table-th-right">Cluster weight</th>
+              <th scope="col" className="data-table-th-left">Recommendation</th>
             </tr>
           </thead>
           <tbody>
@@ -196,12 +196,12 @@ export default async function ReportsPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Digest</th>
-              <th className="data-table-th-left">Generated</th>
-              <th className="data-table-th-left">Period</th>
-              <th className="data-table-th-right">Score</th>
-              <th className="data-table-th-left">Signal source</th>
-              <th className="data-table-th-left">Top opportunities</th>
+              <th scope="col" className="data-table-th-left">Digest</th>
+              <th scope="col" className="data-table-th-left">Generated</th>
+              <th scope="col" className="data-table-th-left">Period</th>
+              <th scope="col" className="data-table-th-right">Score</th>
+              <th scope="col" className="data-table-th-left">Signal source</th>
+              <th scope="col" className="data-table-th-left">Top opportunities</th>
             </tr>
           </thead>
           <tbody>
@@ -233,10 +233,10 @@ export default async function ReportsPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Date</th>
-              <th className="data-table-th-right">Mentions</th>
-              <th className="data-table-th-left">Top brand</th>
-              <th className="data-table-th-right">Top brand mentions</th>
+              <th scope="col" className="data-table-th-left">Date</th>
+              <th scope="col" className="data-table-th-right">Mentions</th>
+              <th scope="col" className="data-table-th-left">Top brand</th>
+              <th scope="col" className="data-table-th-right">Top brand mentions</th>
             </tr>
           </thead>
           <tbody>
@@ -268,12 +268,12 @@ export default async function ReportsPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Run id</th>
-              <th className="data-table-th-left">Created</th>
-              <th className="data-table-th-left">Query</th>
-              <th className="data-table-th-right">Docs</th>
-              <th className="data-table-th-right">Triggers</th>
-              <th className="data-table-th-right">Clusters</th>
+              <th scope="col" className="data-table-th-left">Run id</th>
+              <th scope="col" className="data-table-th-left">Created</th>
+              <th scope="col" className="data-table-th-left">Query</th>
+              <th scope="col" className="data-table-th-right">Docs</th>
+              <th scope="col" className="data-table-th-right">Triggers</th>
+              <th scope="col" className="data-table-th-right">Clusters</th>
             </tr>
           </thead>
           <tbody>

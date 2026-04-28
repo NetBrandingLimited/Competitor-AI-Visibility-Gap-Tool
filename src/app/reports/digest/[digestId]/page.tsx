@@ -107,10 +107,10 @@ export default async function WeeklyDigestDetailPage({
             </caption>
             <thead>
               <tr>
-                <th className="data-table-th-left">Topic</th>
-                <th className="data-table-th-right">Gap</th>
-                <th className="data-table-th-right">Triggers</th>
-                <th className="data-table-th-left">Recommendation</th>
+                <th scope="col" className="data-table-th-left">Topic</th>
+                <th scope="col" className="data-table-th-right">Gap</th>
+                <th scope="col" className="data-table-th-right">Triggers</th>
+                <th scope="col" className="data-table-th-left">Recommendation</th>
               </tr>
             </thead>
             <tbody>

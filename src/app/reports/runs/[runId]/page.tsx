@@ -72,9 +72,9 @@ export default async function PipelineRunDetailPage({
           <caption className="sr-only">Trigger phrases for this pipeline run: phrase, category, and score.</caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Phrase</th>
-              <th className="data-table-th-left">Category</th>
-              <th className="data-table-th-right">Score</th>
+              <th scope="col" className="data-table-th-left">Phrase</th>
+              <th scope="col" className="data-table-th-left">Category</th>
+              <th scope="col" className="data-table-th-right">Score</th>
             </tr>
           </thead>
           <tbody>
@@ -97,9 +97,9 @@ export default async function PipelineRunDetailPage({
           <caption className="sr-only">Theme clusters for this pipeline run: label, keywords, and item count.</caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Label</th>
-              <th className="data-table-th-left">Keywords</th>
-              <th className="data-table-th-right">Items</th>
+              <th scope="col" className="data-table-th-left">Label</th>
+              <th scope="col" className="data-table-th-left">Keywords</th>
+              <th scope="col" className="data-table-th-right">Items</th>
             </tr>
           </thead>
           <tbody>

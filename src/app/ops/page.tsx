@@ -122,12 +122,12 @@ export default async function OpsPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Job id</th>
-              <th className="data-table-th-left">Status</th>
-              <th className="data-table-th-left">Query</th>
-              <th className="data-table-th-left">Pipeline run</th>
-              <th className="data-table-th-left">Weekly digest</th>
-              <th className="data-table-th-left">Completed</th>
+              <th scope="col" className="data-table-th-left">Job id</th>
+              <th scope="col" className="data-table-th-left">Status</th>
+              <th scope="col" className="data-table-th-left">Query</th>
+              <th scope="col" className="data-table-th-left">Pipeline run</th>
+              <th scope="col" className="data-table-th-left">Weekly digest</th>
+              <th scope="col" className="data-table-th-left">Completed</th>
             </tr>
           </thead>
           <tbody>

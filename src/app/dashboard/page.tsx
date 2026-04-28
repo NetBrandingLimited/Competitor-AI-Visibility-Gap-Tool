@@ -221,10 +221,10 @@ export default async function DashboardPage() {
           </caption>
           <thead>
             <tr>
-              <th className="data-table-th-left">Topic</th>
-              <th className="data-table-th-right">Gap score</th>
-              <th className="data-table-th-right">Trigger count</th>
-              <th className="data-table-th-left">Recommendation</th>
+              <th scope="col" className="data-table-th-left">Topic</th>
+              <th scope="col" className="data-table-th-right">Gap score</th>
+              <th scope="col" className="data-table-th-right">Trigger count</th>
+              <th scope="col" className="data-table-th-left">Recommendation</th>
             </tr>
           </thead>
           <tbody>
@@ -248,10 +248,10 @@ export default async function DashboardPage() {
         </caption>
         <thead>
           <tr>
-            <th className="data-table-th-left">Brand</th>
-            <th className="data-table-th-right">Mentions</th>
-            <th className="data-table-th-right">Share of voice</th>
-            <th className="data-table-th-right">
+            <th scope="col" className="data-table-th-left">Brand</th>
+            <th scope="col" className="data-table-th-right">Mentions</th>
+            <th scope="col" className="data-table-th-right">Share of voice</th>
+            <th scope="col" className="data-table-th-right">
               {leaderboardSource === 'pipeline' ? 'Δ vs prior run' : '7d delta'}
             </th>
           </tr>
@@ -278,10 +278,10 @@ export default async function DashboardPage() {
         </caption>
         <thead>
           <tr>
-            <th className="data-table-th-left">Source</th>
-            <th className="data-table-th-left">Query</th>
-            <th className="data-table-th-left">Top brand</th>
-            <th className="data-table-th-left">Published</th>
+            <th scope="col" className="data-table-th-left">Source</th>
+            <th scope="col" className="data-table-th-left">Query</th>
+            <th scope="col" className="data-table-th-left">Top brand</th>
+            <th scope="col" className="data-table-th-left">Published</th>
           </tr>
         </thead>
         <tbody>
