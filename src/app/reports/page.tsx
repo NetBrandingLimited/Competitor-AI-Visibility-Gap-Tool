@@ -155,6 +155,9 @@ export default async function ReportsPage() {
         <p>No topic breakdown available yet. Run the unified pipeline first.</p>
       ) : (
         <table className="data-table data-table-mb-16">
+          <caption className="sr-only">
+            Topic-level gap breakdown: topic, gap score, trigger hits, cluster weight, and recommendation.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Topic</th>
@@ -183,6 +186,9 @@ export default async function ReportsPage() {
         <p>No digest yet. Click &quot;Generate weekly digest&quot; above.</p>
       ) : (
         <table className="data-table data-table-mb-16">
+          <caption className="sr-only">
+            Weekly visibility digests: link, generated time, period, score, signal source, and top opportunities.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Digest</th>
@@ -217,6 +223,9 @@ export default async function ReportsPage() {
         <p>No snapshots yet for this workspace. Run the trend snapshot job below.</p>
       ) : (
         <table className="data-table">
+          <caption className="sr-only">
+            Stored daily trend snapshots: date, total mentions, top brand, and top brand mentions.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Date</th>
@@ -249,6 +258,9 @@ export default async function ReportsPage() {
         <p>No runs yet for this workspace. Run the unified pipeline below.</p>
       ) : (
         <table className="data-table">
+          <caption className="sr-only">
+            Unified pipeline runs for this workspace: run id, created time, query, document, trigger, and cluster counts.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Run id</th>

@@ -211,6 +211,9 @@ export default async function DashboardPage() {
 
       {gapInsights.topics.length > 0 ? (
         <table className="data-table data-table-mb-24">
+          <caption className="sr-only">
+            Top gap topics: topic, gap score, trigger count, and recommendation.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Topic</th>
@@ -234,6 +237,10 @@ export default async function DashboardPage() {
 
       <h2>Leaderboard</h2>
       <table className="data-table data-table-mb-24">
+        <caption className="sr-only">
+          Brand leaderboard: mentions, share of voice, and{' '}
+          {leaderboardSource === 'pipeline' ? 'change versus prior pipeline run' : 'seven-day change'}.
+        </caption>
         <thead>
           <tr>
             <th className="data-table-th-left">Brand</th>
@@ -261,6 +268,9 @@ export default async function DashboardPage() {
 
       <h2>Recent</h2>
       <table className="data-table">
+        <caption className="sr-only">
+          Recent mock search rows: source, query, top brand, and published time.
+        </caption>
         <thead>
           <tr>
             <th className="data-table-th-left">Source</th>

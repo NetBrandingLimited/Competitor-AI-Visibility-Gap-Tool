@@ -111,6 +111,10 @@ export default async function OpsPage() {
         <p>No scheduler jobs yet for this workspace.</p>
       ) : (
         <table className="data-table">
+          <caption className="sr-only">
+            Recent scheduler jobs for this workspace: job id, status, query, linked pipeline run and digest, and
+            completion time.
+          </caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Job id</th>

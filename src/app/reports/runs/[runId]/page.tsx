@@ -53,6 +53,7 @@ export default async function PipelineRunDetailPage({
         <p>No triggers found for this run.</p>
       ) : (
         <table className="data-table data-table-mb-16">
+          <caption className="sr-only">Trigger phrases for this pipeline run: phrase, category, and score.</caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Phrase</th>
@@ -77,6 +78,7 @@ export default async function PipelineRunDetailPage({
         <p>No clusters generated for this run.</p>
       ) : (
         <table className="data-table">
+          <caption className="sr-only">Theme clusters for this pipeline run: label, keywords, and item count.</caption>
           <thead>
             <tr>
               <th className="data-table-th-left">Label</th>

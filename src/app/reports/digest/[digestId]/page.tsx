@@ -86,6 +86,9 @@ export default async function WeeklyDigestDetailPage({
         <>
           <h2>Topic gaps (frozen at generation)</h2>
           <table className="data-table">
+            <caption className="sr-only">
+              Topic gaps at digest generation: topic, gap score, trigger count, and recommendation.
+            </caption>
             <thead>
               <tr>
                 <th className="data-table-th-left">Topic</th>
