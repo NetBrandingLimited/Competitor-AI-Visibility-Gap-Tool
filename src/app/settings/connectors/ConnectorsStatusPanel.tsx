@@ -475,7 +475,12 @@ export default function ConnectorsStatusPanel() {
       {testResults.length > 0 ? (
         <div className="mt-12">
           {testResults.map((t) => (
-            <p key={t.id} className={`${t.ok ? 'success' : 'error'} my-6-0`}>
+            <p
+              key={t.id}
+              className={`${t.ok ? 'success' : 'error'} my-6-0`}
+              role="status"
+              aria-live="polite"
+            >
               {t.ok ? 'PASS' : 'FAIL'} {t.id}: {t.detail}
             </p>
           ))}
@@ -487,7 +492,7 @@ export default function ConnectorsStatusPanel() {
         </p>
       ) : null}
       {signalsFetchedAt && liveSignals.length === 0 ? (
-        <p className="text-hint-empty">
+        <p className="text-hint-empty" role="status" aria-live="polite">
           No live metrics returned. Check property IDs, credentials, and API permissions.
         </p>
       ) : null}
