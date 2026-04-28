@@ -65,10 +65,6 @@ p { color: #333; }
 .app-nav-link:focus-visible {
   box-shadow: 0 0 0 2px #93c5fd;
 }
-.app-nav-link:hover {
-  color: #1e40af;
-  background: #eff6ff;
-}
 .app-nav-link:active {
   background: #dbeafe;
 }
@@ -113,10 +109,6 @@ p { color: #333; }
   cursor: pointer;
   transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
 }
-.back-to-top-button:hover {
-  background: #f8fafc;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
-}
 .back-to-top-button:active {
   transform: translateY(1px);
 }
@@ -135,6 +127,24 @@ p { color: #333; }
   padding: 6px 10px;
   font-size: 12px;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app-nav-link:hover {
+    color: #1e40af;
+    background: #eff6ff;
+  }
+  .back-to-top-button:hover {
+    background: #f8fafc;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav-link,
+  .back-to-top-button {
+    transition: none;
+  }
 }
 
 .login-shell {
