@@ -3,8 +3,10 @@ import { buildGapInsightsForOrg } from '@/lib/insights/gap';
 import { readTrendSnapshots } from '@/lib/trends/store';
 
 function escapeCsv(value: string | number): string {
-  const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+  const raw = String(value);
+  // Prevent CSV formula injection when opened in spreadsheet apps.
+  const str = /^[=+\-@]/.test(raw) || raw.startsWith('\t') ? `'${raw}` : raw;
+  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replaceAll('"', '""')}"`;
   }
   return str;
@@ -104,12 +106,14 @@ export async function GET() {
       .map(escapeCsv)
       .join(',')
   );
-  const csv = [header.join(','), ...trendRows, ...opportunityRows, ...topicRows].join('\n');
+  const csv = `\uFEFF${[header.join(','), ...trendRows, ...opportunityRows, ...topicRows].join('\n')}`;
 
   return new Response(csv, {
     headers: {
       'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': 'attachment; filename="visibility-report.csv"'
+      'content-disposition': 'attachment; filename="visibility-report.csv"',
+      'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff'
     }
   });
 }
