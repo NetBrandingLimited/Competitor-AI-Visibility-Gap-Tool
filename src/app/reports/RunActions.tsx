@@ -74,13 +74,25 @@ export default function RunActions() {
         Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query and mock
         document text. Set them under <a href="/settings/brand">Brand settings</a> first.
       </p>
-      <button onClick={runPipeline} disabled={pipeline.running} className="mr-8">
+      <button
+        type="button"
+        onClick={runPipeline}
+        disabled={pipeline.running}
+        aria-busy={pipeline.running}
+        className="mr-8"
+      >
         {pipeline.running ? 'Running pipeline...' : 'Run unified pipeline'}
       </button>
-      <button onClick={runTrends} disabled={trends.running}>
+      <button type="button" onClick={runTrends} disabled={trends.running} aria-busy={trends.running}>
         {trends.running ? 'Running snapshot job...' : 'Run trend snapshot'}
       </button>
-      <button onClick={generateDigest} disabled={digest.running} className="ml-8">
+      <button
+        type="button"
+        onClick={generateDigest}
+        disabled={digest.running}
+        aria-busy={digest.running}
+        className="ml-8"
+      >
         {digest.running ? 'Generating digest...' : 'Generate weekly digest'}
       </button>
       {pipeline.message ? <p className="mt-8">{pipeline.message}</p> : null}

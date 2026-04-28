@@ -267,6 +267,8 @@ p { color: #333; }
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #ddd;
+  font-size: 0.9375rem;
+  line-height: 1.45;
 }
 .data-table-mb-16 {
   margin-bottom: 16px;

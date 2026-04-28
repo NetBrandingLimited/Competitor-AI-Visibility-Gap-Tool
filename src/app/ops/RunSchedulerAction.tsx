@@ -42,7 +42,7 @@ export default function RunSchedulerAction() {
         />
         Force weekly digest generation in this run
       </label>
-      <button onClick={runNow} disabled={running}>
+      <button type="button" onClick={runNow} disabled={running} aria-busy={running}>
         {running ? 'Running scheduled job...' : 'Run scheduled job now'}
       </button>
       {message ? <p className="mt-8">{message}</p> : null}
