@@ -6,7 +6,7 @@ import CopyDigestSummary from '../CopyDigestSummary';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
-import { getWeeklyDigestForOrg, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -76,6 +76,9 @@ export default async function WeeklyDigestDetailPage({
         </li>
         <li>
           <strong>Visibility score:</strong> {digest.summary.score ?? '—'}
+        </li>
+        <li>
+          <strong>Pipeline documents:</strong> {weeklyDigestPipelineLabel(digest.summary)}
         </li>
         <li>
           <strong>Connector signals:</strong> {weeklyDigestSignalsLabel(digest.summary)}
