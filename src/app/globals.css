@@ -318,9 +318,6 @@ p { color: #333; }
 .data-table-nowrap {
   white-space: nowrap;
 }
-.data-table-col-completed {
-  min-width: 14rem;
-}
 .table-scroll-wrap {
   width: 100%;
   overflow-x: auto;
@@ -332,8 +329,16 @@ p { color: #333; }
   font-size: 0.85rem;
   display: none;
 }
-.data-table-min-ops {
-  min-width: 1080px;
+.data-table-td-wrap-break {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.data-table-td-break-all {
+  word-break: break-all;
+}
+.data-table-ops-scheduler {
+  table-layout: fixed;
+  width: 100%;
 }
 .data-table-min-reports-scroll {
   min-width: 960px;

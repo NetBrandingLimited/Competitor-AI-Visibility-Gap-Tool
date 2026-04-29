@@ -166,19 +166,28 @@ export default async function OpsPage() {
         <>
           <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
           <div className="table-scroll-wrap">
-            <table className="data-table data-table-min-ops">
+            <table className="data-table data-table-ops-scheduler">
               <caption className="sr-only">
                 Recent scheduler jobs for this workspace: job id, completion time, status, execution details, query,
                 linked pipeline run and digest, digest connector signals label, and quick links.
               </caption>
+              <colgroup>
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '14%' }} />
+                <col style={{ width: '7%' }} />
+                <col style={{ width: '22%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '10%' }} />
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '7%' }} />
+              </colgroup>
               <thead>
                 <tr>
                   <th scope="col" className="data-table-th-left data-table-sticky-col data-table-sticky-col-id">
                     Job id
                   </th>
-                  <th scope="col" className="data-table-th-left data-table-nowrap data-table-col-completed">
-                    Completed
-                  </th>
+                  <th scope="col" className="data-table-th-left">Completed</th>
                   <th scope="col" className="data-table-th-left">Status</th>
                   <th scope="col" className="data-table-th-left">Details</th>
                   <th scope="col" className="data-table-th-left">Query</th>
@@ -203,18 +212,18 @@ export default async function OpsPage() {
                       </div>
                     </td>
                     <td
-                      className="data-table-td data-table-nowrap data-table-col-completed"
+                      className="data-table-td data-table-td-wrap-break"
                       title={new Date(job.completedAt).toISOString()}
                     >
                       {new Date(job.completedAt).toLocaleString()}
                     </td>
                     <td className="data-table-td">{job.status}</td>
-                    <td className="data-table-td">{describeSchedulerJob(job)}</td>
-                    <td className="data-table-td">{job.query}</td>
-                    <td className="data-table-td">
+                    <td className="data-table-td data-table-td-wrap-break">{describeSchedulerJob(job)}</td>
+                    <td className="data-table-td data-table-td-wrap-break">{job.query}</td>
+                    <td className="data-table-td data-table-td-break-all">
                       {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
                     </td>
-                    <td className="data-table-td">
+                    <td className="data-table-td data-table-td-break-all">
                       {job.weeklyDigestId ? (
                         <Link href={`/reports/digest/${job.weeklyDigestId}`}>{job.weeklyDigestId}</Link>
                       ) : (
