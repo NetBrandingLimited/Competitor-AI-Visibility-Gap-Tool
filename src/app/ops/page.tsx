@@ -168,13 +168,16 @@ export default async function OpsPage() {
           <div className="table-scroll-wrap">
             <table className="data-table data-table-min-ops">
               <caption className="sr-only">
-                Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
-                and digest, digest connector signals label, quick links, and completion time.
+                Recent scheduler jobs for this workspace: job id, completion time, status, execution details, query,
+                linked pipeline run and digest, digest connector signals label, and quick links.
               </caption>
               <thead>
                 <tr>
                   <th scope="col" className="data-table-th-left data-table-sticky-col data-table-sticky-col-id">
                     Job id
+                  </th>
+                  <th scope="col" className="data-table-th-left data-table-nowrap data-table-col-completed">
+                    Completed
                   </th>
                   <th scope="col" className="data-table-th-left">Status</th>
                   <th scope="col" className="data-table-th-left">Details</th>
@@ -183,7 +186,6 @@ export default async function OpsPage() {
                   <th scope="col" className="data-table-th-left">Weekly digest</th>
                   <th scope="col" className="data-table-th-left">Digest signals</th>
                   <th scope="col" className="data-table-th-left">Actions</th>
-                  <th scope="col" className="data-table-th-left">Completed</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,6 +201,12 @@ export default async function OpsPage() {
                           className="btn-compact-inline btn-compact-inline-secondary"
                         />
                       </div>
+                    </td>
+                    <td
+                      className="data-table-td data-table-nowrap data-table-col-completed"
+                      title={new Date(job.completedAt).toISOString()}
+                    >
+                      {new Date(job.completedAt).toLocaleString()}
                     </td>
                     <td className="data-table-td">{job.status}</td>
                     <td className="data-table-td">{describeSchedulerJob(job)}</td>
@@ -241,7 +249,6 @@ export default async function OpsPage() {
                         '-'
                       )}
                     </td>
-                    <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

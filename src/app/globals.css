@@ -315,6 +315,12 @@ p { color: #333; }
   border-bottom: 1px solid #eee;
   white-space: nowrap;
 }
+.data-table-nowrap {
+  white-space: nowrap;
+}
+.data-table-col-completed {
+  min-width: 14rem;
+}
 .table-scroll-wrap {
   width: 100%;
   overflow-x: auto;
@@ -327,7 +333,7 @@ p { color: #333; }
   display: none;
 }
 .data-table-min-ops {
-  min-width: 980px;
+  min-width: 1080px;
 }
 .data-table-min-reports-scroll {
   min-width: 960px;
