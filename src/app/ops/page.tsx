@@ -114,7 +114,7 @@ export default async function OpsPage() {
         Production-style automation: hourly <code>GET /api/cron/weekly-scheduler</code> with{' '}
         <code>Authorization: Bearer $CRON_SECRET</code> generates digests only (no full pipeline) for orgs whose
         schedule is due; add <code>&amp;full=1</code> to run pipeline + trends + digest like Ops. See{' '}
-        <code>vercel.json</code>.
+        <code>vercel.json</code>. Export operational history via <code>/api/ops/scheduler-jobs.csv</code>.
       </p>
       <p>
         <Link href="/api/ops/scheduler-jobs.csv">Download scheduler jobs CSV</Link>

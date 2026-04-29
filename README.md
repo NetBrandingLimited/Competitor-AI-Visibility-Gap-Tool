@@ -28,6 +28,7 @@ Quick start
   - `POST /api/debug/scheduler/run?query=seo%20tool&limit=2`
   - `GET /api/debug/scheduler/run` for recent job history
   - `GET /ops` for a simple operations monitor page
+  - `GET /api/ops/scheduler-jobs.csv` for scheduler job export (pipeline provenance + digest signal labels)
 - Reports freshness thresholds (optional):
   - `FRESH_HOURS` (default `24`)
   - `AGING_HOURS` (default `72`)
