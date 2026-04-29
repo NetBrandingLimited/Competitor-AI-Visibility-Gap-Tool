@@ -35,6 +35,10 @@ Quick start
   - `GET /api/auth/session`
   - `POST /api/auth/logout`
   - `PATCH /api/orgs/[orgId]/brand` for brand name, category, competitors (requires EDITOR+)
+- Visibility API:
+  - `GET /api/orgs/[orgId]/visibility` (requires VIEWER+): latest snapshot under `latest`.
+  - `POST /api/orgs/[orgId]/visibility` (requires EDITOR+): recalculates and stores a snapshot.
+  - Convenience fields include `pipelineIngestionSource` and `pipelineIngestionSourceLabel` (alongside full `inputs`) to distinguish Search Console vs mock pipeline documents.
 
 Docs
 - See CURSOR_RUNBOOK.md for guided prompts and verification steps.
