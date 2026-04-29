@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForRequest } from '@/lib/active-org';
-import { runOrgIngestion } from '@/lib/ingestion/pipeline';
+import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   const limitRaw = request.nextUrl.searchParams.get('limit');
   const limit = limitRaw ? Number(limitRaw) : undefined;
 
-  const { result, ingestionSource } = await runOrgIngestion({
+  const { result, ingestionSource, gscDiagnostics } = await runOrgIngestionDebug({
     organizationId: active.organizationId,
     query,
     limitPerConnector: Number.isFinite(limit) ? limit : undefined,
@@ -48,5 +48,5 @@ export async function GET(request: NextRequest) {
     contentVariant: simpleHash(`${active.organizationId}-${Date.now()}`)
   });
 
-  return NextResponse.json({ ...result, ingestionSource });
+  return NextResponse.json({ ...result, ingestionSource, gscDiagnostics });
 }

@@ -2,7 +2,11 @@ import { enrichDocumentsWithOrgContext } from '@/lib/org-visibility-mock';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 
 import { MOCK_CONNECTORS } from './connectors';
-import { fetchGscQueryDocuments } from './gscQueryIngestion';
+import {
+  fetchGscQueryDocuments,
+  fetchGscQueryDocumentsWithDiagnostics,
+  type GscIngestionDiagnostics
+} from './gscQueryIngestion';
 import type {
   IngestionEvent,
   IngestionRunInput,
@@ -117,6 +121,45 @@ export async function runOrgIngestion(
       deduped
     ),
     ingestionSource: 'live_gsc_queries'
+  };
+}
+
+export async function runOrgIngestionDebug(
+  input: OrgIngestionInput
+): Promise<{
+  result: IngestionRunResult;
+  ingestionSource: PipelineIngestionSource;
+  gscDiagnostics: GscIngestionDiagnostics | null;
+}> {
+  const normalized = normalizeIngestionInput(input);
+  const rowLimit = Math.min(250, Math.max(10, normalized.limitPerConnector * 25));
+
+  const { docs: gscDocs, diagnostics } = await fetchGscQueryDocumentsWithDiagnostics({
+    organizationId: input.organizationId,
+    pipelineQuery: normalized.query,
+    rowLimit
+  });
+
+  if (gscDocs.length === 0) {
+    const result = await runMockIngestion(input);
+    return { result, ingestionSource: 'mock_ingestion', gscDiagnostics: null };
+  }
+
+  const preBrand = dedupeDocuments(gscDocs);
+  let deduped = preBrand;
+  if (normalized.brandContext) {
+    deduped = enrichDocumentsWithOrgContext(preBrand, normalized.brandContext);
+  }
+
+  return {
+    result: ingestionResultFromGscDocuments(
+      normalized,
+      gscDocs.length,
+      preBrand.length,
+      deduped
+    ),
+    ingestionSource: 'live_gsc_queries',
+    gscDiagnostics: diagnostics
   };
 }
 

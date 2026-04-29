@@ -244,6 +244,36 @@ type GscSearchAnalyticsClient = {
   asOf: string;
 };
 
+export type GscIngestionDiagnostics = {
+  queryAttempt: {
+    usedFiltered: boolean;
+    usedUnfiltered: boolean;
+    filteredRows: number;
+    unfilteredRows: number;
+  };
+  query: {
+    fetched: number;
+    filteredZeroEngagement: number;
+    filteredLowSignal: number;
+    docsCreated: number;
+  };
+  page: {
+    fetched: number;
+    filteredZeroEngagement: number;
+    filteredLowSignal: number;
+    docsCreated: number;
+  };
+  qp: {
+    fetched: number;
+    filteredZeroEngagement: number;
+    filteredLowSignal: number;
+    docsCreated: number;
+  };
+  mergedDocsBeforeDedupe: number;
+  dedupedDocs: number;
+  cappedDocs: number;
+};
+
 async function gscSearchAnalyticsClient(organizationId: string): Promise<GscSearchAnalyticsClient | null> {
   const ctx = await gscAuthAndSite(organizationId);
   if (!ctx) {
@@ -406,73 +436,137 @@ async function fetchQueryPagePairsWithClient(
  * Queries: query "contains" filter then unfiltered top queries.
  * When query rows exist, also merges top pages (page dimension) and top query+page pairs (two dimensions).
  */
-export async function fetchGscQueryDocuments(opts: {
+async function fetchGscQueryDocumentsInternal(opts: {
   organizationId: string;
   pipelineQuery: string;
   rowLimit: number;
-}): Promise<SourceDocument[]> {
+}): Promise<{ docs: SourceDocument[]; diagnostics: GscIngestionDiagnostics }> {
   const { organizationId, pipelineQuery, rowLimit } = opts;
   const capped = Math.min(250, Math.max(1, rowLimit));
 
   const client = await gscSearchAnalyticsClient(organizationId);
   if (!client) {
-    return [];
+    return {
+      docs: [],
+      diagnostics: {
+        queryAttempt: { usedFiltered: false, usedUnfiltered: false, filteredRows: 0, unfilteredRows: 0 },
+        query: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        page: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        qp: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        mergedDocsBeforeDedupe: 0,
+        dedupedDocs: 0,
+        cappedDocs: 0
+      }
+    };
   }
 
-  let pack = await fetchQueryRowsWithClient(client, capped, pipelineQuery, true);
+  const filteredPack = await fetchQueryRowsWithClient(client, capped, pipelineQuery, true);
+  const filteredRows = filteredPack?.rows.length ?? 0;
+  let pack = filteredPack;
+
+  const usedFiltered = Boolean(filteredPack && filteredPack.rows.length > 0);
+  let usedUnfiltered = false;
+  let unfilteredRows = 0;
+
   if (!pack || pack.rows.length === 0) {
     pack = await fetchQueryRowsWithClient(client, capped, pipelineQuery, false);
+    usedUnfiltered = Boolean(pack && pack.rows.length > 0);
+    unfilteredRows = pack?.rows.length ?? 0;
   }
   if (!pack || pack.rows.length === 0) {
-    return [];
+    return {
+      docs: [],
+      diagnostics: {
+        queryAttempt: {
+          usedFiltered,
+          usedUnfiltered,
+          filteredRows,
+          unfilteredRows
+        },
+        query: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        page: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        qp: { fetched: 0, filteredZeroEngagement: 0, filteredLowSignal: 0, docsCreated: 0 },
+        mergedDocsBeforeDedupe: 0,
+        dedupedDocs: 0,
+        cappedDocs: 0
+      }
+    };
   }
 
   const docs: SourceDocument[] = [];
+  let queryDocsCreated = 0;
+
   const rankedQueryRows = rankGscRows(pack.rows);
-  for (const row of rankedQueryRows) {
+  const queryFetched = rankedQueryRows.length;
+  const afterZero = rankedQueryRows.filter(rowHasAnyEngagement);
+  const filteredZeroEngagement = queryFetched - afterZero.length;
+  const afterQuality = afterZero.filter(rowPassesQualityThreshold);
+  const filteredLowSignal = afterZero.length - afterQuality.length;
+
+  for (const row of afterQuality) {
     const query = row.keys?.[0];
     if (!query || typeof query !== 'string') {
       continue;
     }
-    if (!rowHasAnyEngagement(row)) continue;
-    if (!rowPassesQualityThreshold(row)) continue;
     docs.push(rowToSourceDocument(query, row, pack.asOf));
+    queryDocsCreated += 1;
   }
+
+  let pageFetched = 0;
+  let pageFilteredZero = 0;
+  let pageFilteredLowSignal = 0;
+  let pageDocsCreated = 0;
 
   const pageRowBudget = Math.min(100, Math.max(5, Math.floor(capped / 2)));
   const pagePack = await fetchPageRowsWithClient(client, pageRowBudget, pipelineQuery);
   if (pagePack && pagePack.rows.length > 0) {
     const rankedPageRows = rankGscRows(pagePack.rows);
-    for (const row of rankedPageRows) {
+    pageFetched = rankedPageRows.length;
+    const pageAfterZero = rankedPageRows.filter(rowHasAnyEngagement);
+    pageFilteredZero = pageFetched - pageAfterZero.length;
+    const pageAfterQuality = pageAfterZero.filter(rowPassesQualityThreshold);
+    pageFilteredLowSignal = pageAfterZero.length - pageAfterQuality.length;
+
+    for (const row of pageAfterQuality) {
       const pageUrl = row.keys?.[0];
       if (!pageUrl || typeof pageUrl !== 'string') {
         continue;
       }
-      if (!rowHasAnyEngagement(row)) continue;
-      if (!rowPassesQualityThreshold(row)) continue;
       docs.push(rowPageToSourceDocument(pageUrl, row, pagePack.asOf));
+      pageDocsCreated += 1;
     }
   }
+
+  let qpFetched = 0;
+  let qpFilteredZero = 0;
+  let qpFilteredLowSignal = 0;
+  let qpDocsCreated = 0;
 
   const qpBudget = Math.min(80, Math.max(8, Math.floor(capped / 3)));
   const qpPack = await fetchQueryPagePairsWithClient(client, qpBudget, pipelineQuery);
   if (qpPack && qpPack.rows.length > 0) {
     const rankedQpRows = rankGscRows(qpPack.rows);
-    for (const row of rankedQpRows) {
+    qpFetched = rankedQpRows.length;
+    const qpAfterZero = rankedQpRows.filter(rowHasAnyEngagement);
+    qpFilteredZero = qpFetched - qpAfterZero.length;
+    const qpAfterQuality = qpAfterZero.filter(rowPassesQualityThreshold);
+    qpFilteredLowSignal = qpAfterZero.length - qpAfterQuality.length;
+
+    for (const row of qpAfterQuality) {
       const query = row.keys?.[0];
       const pageUrl = row.keys?.[1];
       if (!query || typeof query !== 'string' || !pageUrl || typeof pageUrl !== 'string') {
         continue;
       }
-      if (!rowHasAnyEngagement(row)) continue;
-      if (!rowPassesQualityThreshold(row)) continue;
       docs.push(rowQueryPagePairToSourceDocument(query, pageUrl, row, qpPack.asOf));
+      qpDocsCreated += 1;
     }
   }
 
   const mergedCount = docs.length;
   const uniqueDocs = dedupeGscDocs(docs);
   const cappedDocs = capGscDocumentList(uniqueDocs, capped);
+  const cappedDocsCount = cappedDocs.length;
   if (process.env.NODE_ENV === 'development' && mergedCount > 0) {
     const pageRows = pagePack?.rows.length ?? 0;
     const qpRows = qpPack?.rows.length ?? 0;
@@ -483,5 +577,47 @@ export async function fetchGscQueryDocuments(opts: {
     );
   }
 
-  return cappedDocs;
+  const diagnostics: GscIngestionDiagnostics = {
+    queryAttempt: { usedFiltered, usedUnfiltered, filteredRows, unfilteredRows },
+    query: {
+      fetched: queryFetched,
+      filteredZeroEngagement,
+      filteredLowSignal,
+      docsCreated: queryDocsCreated
+    },
+    page: {
+      fetched: pageFetched,
+      filteredZeroEngagement: pageFilteredZero,
+      filteredLowSignal: pageFilteredLowSignal,
+      docsCreated: pageDocsCreated
+    },
+    qp: {
+      fetched: qpFetched,
+      filteredZeroEngagement: qpFilteredZero,
+      filteredLowSignal: qpFilteredLowSignal,
+      docsCreated: qpDocsCreated
+    },
+    mergedDocsBeforeDedupe: mergedCount,
+    dedupedDocs: uniqueDocs.length,
+    cappedDocs: cappedDocsCount
+  };
+
+  return { docs: cappedDocs, diagnostics };
+}
+
+export async function fetchGscQueryDocuments(opts: {
+  organizationId: string;
+  pipelineQuery: string;
+  rowLimit: number;
+}): Promise<SourceDocument[]> {
+  const { docs } = await fetchGscQueryDocumentsInternal(opts);
+  return docs;
+}
+
+export async function fetchGscQueryDocumentsWithDiagnostics(opts: {
+  organizationId: string;
+  pipelineQuery: string;
+  rowLimit: number;
+}): Promise<{ docs: SourceDocument[]; diagnostics: GscIngestionDiagnostics }> {
+  return fetchGscQueryDocumentsInternal(opts);
 }
