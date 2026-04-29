@@ -11,6 +11,7 @@ type Props = {
     createdAt: string;
     reasons: VisibilityReasonV1[];
     signalSource?: 'cache' | 'live';
+    signalCacheKind?: 'ttl' | 'stale_fallback' | null;
     signalsAsOf?: string | null;
     signalCount?: number;
   } | null;
@@ -76,6 +77,12 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
           {freshness ? (
             <p className="status-chip-row">
               <span className={`status-chip status-chip-${freshness.tone}`}>signal recency: {freshness.label}</span>
+            </p>
+          ) : null}
+          {latest.signalCacheKind === 'stale_fallback' ? (
+            <p className="text-muted-note mt-8 mb-0" role="status">
+              Live connector fetch returned no metrics; this score uses the last cached signals. Try{' '}
+              <Link href="/settings/connectors">Fetch live signals</Link> on Connectors, then recalculate.
             </p>
           ) : null}
           <h3 className="subheading-sm">Why it changed (last run)</h3>

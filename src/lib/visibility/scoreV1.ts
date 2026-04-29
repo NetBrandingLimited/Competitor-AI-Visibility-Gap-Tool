@@ -23,16 +23,23 @@ export type VisibilityInputsV1 = {
   brandName: string | null;
   connectorSignalCount: number;
   connectorSignalSource: 'cache' | 'live';
+  /** When source is cache: why cached signals were used (TTL vs empty live fallback). */
+  connectorSignalCacheKind: 'ttl' | 'stale_fallback' | null;
   connectorSignalsAsOf: string | null;
 };
 
 function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
+  const cacheKind =
+    inputs.connectorSignalCacheKind === 'ttl' || inputs.connectorSignalCacheKind === 'stale_fallback'
+      ? inputs.connectorSignalCacheKind
+      : null;
   return {
     ...inputs,
     connectorSignalSource:
       inputs.connectorSignalSource === 'cache' || inputs.connectorSignalSource === 'live'
         ? inputs.connectorSignalSource
         : 'live',
+    connectorSignalCacheKind: cacheKind,
     connectorSignalsAsOf: typeof inputs.connectorSignalsAsOf === 'string' ? inputs.connectorSignalsAsOf : null
   };
 }
@@ -81,6 +88,7 @@ function parseCachedSignals(raw: string | null | undefined): VisibilitySignal[] 
 async function readSignalsForScoring(organizationId: string): Promise<{
   signals: VisibilitySignal[];
   source: 'cache' | 'live';
+  cacheKind: 'ttl' | 'stale_fallback' | null;
 }> {
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
@@ -93,7 +101,7 @@ async function readSignalsForScoring(organizationId: string): Promise<{
   const isFresh = fetchedAtMs > 0 && Date.now() - fetchedAtMs <= SIGNAL_CACHE_TTL_MS;
   const cached = parseCachedSignals(org?.connectorSignalsJson);
   if (isFresh && cached.length > 0) {
-    return { signals: cached, source: 'cache' };
+    return { signals: cached, source: 'cache', cacheKind: 'ttl' };
   }
   const live = await collectAllConnectorSignals({ organizationId });
   if (live.length > 0) {
@@ -104,14 +112,14 @@ async function readSignalsForScoring(organizationId: string): Promise<{
         connectorSignalsJson: JSON.stringify(live)
       }
     });
-    return { signals: live, source: 'live' };
+    return { signals: live, source: 'live', cacheKind: null };
   }
   // Fall back to the last cached snapshot when a refresh attempt yields no signals.
   // This avoids transient connector/API issues zeroing out score inputs.
   if (cached.length > 0) {
-    return { signals: cached, source: 'cache' };
+    return { signals: cached, source: 'cache', cacheKind: 'stale_fallback' };
   }
-  return { signals: live, source: 'live' };
+  return { signals: live, source: 'live', cacheKind: null };
 }
 
 function latestSignalAsOf(signals: VisibilitySignal[]): string | null {
@@ -296,6 +304,7 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
     brandName: org?.brandName ?? null,
     connectorSignalCount: signals.length,
     connectorSignalSource: signalState.source,
+    connectorSignalCacheKind: signalState.cacheKind,
     connectorSignalsAsOf: latestSignalAsOf(signals)
   };
 }

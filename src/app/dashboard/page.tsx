@@ -87,6 +87,7 @@ export default async function DashboardPage() {
                 createdAt: visibility.createdAt,
                 reasons: visibility.reasons,
                 signalSource: visibility.inputs.connectorSignalSource,
+                signalCacheKind: visibility.inputs.connectorSignalCacheKind,
                 signalCount: visibility.inputs.connectorSignalCount,
                 signalsAsOf: visibility.inputs.connectorSignalsAsOf
               }
