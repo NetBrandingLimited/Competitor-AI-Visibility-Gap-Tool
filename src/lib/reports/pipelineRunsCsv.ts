@@ -1,14 +1,5 @@
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
-
-function escapeCsv(value: string | number): string {
-  const raw = String(value);
-  // Prevent CSV formula injection when opened in spreadsheet apps.
-  const str = /^[=+\-@]/.test(raw) || raw.startsWith('\t') ? `'${raw}` : raw;
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
-    return `"${str.replaceAll('"', '""')}"`;
-  }
-  return str;
-}
+import { buildCsvDocument } from './csv';
 
 export function buildPipelineRunsCsv(runs: UnifiedPipelineRun[]): string {
   const header = [
@@ -32,8 +23,6 @@ export function buildPipelineRunsCsv(runs: UnifiedPipelineRun[]): string {
       run.triggerCount,
       run.clusterCount
     ]
-      .map(escapeCsv)
-      .join(',')
   );
-  return `\uFEFF${[header.join(','), ...rows].join('\n')}`;
+  return buildCsvDocument(header, rows);
 }

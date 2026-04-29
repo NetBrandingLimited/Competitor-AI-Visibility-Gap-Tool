@@ -1,16 +1,7 @@
 import { weeklyDigestPipelineLabel, weeklyDigestSignalsLabel, type WeeklyDigest } from '@/lib/digest/weekly';
 import type { GapInsights } from '@/lib/insights/gap';
 import type { TrendSnapshot } from '@/lib/trends/store';
-
-function escapeCsv(value: string | number): string {
-  const raw = String(value);
-  // Prevent CSV formula injection when opened in spreadsheet apps.
-  const str = /^[=+\-@]/.test(raw) || raw.startsWith('\t') ? `'${raw}` : raw;
-  if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
-    return `"${str.replaceAll('"', '""')}"`;
-  }
-  return str;
-}
+import { buildCsvDocument } from './csv';
 
 export function buildVisibilityReportCsv(
   snapshots: TrendSnapshot[],
@@ -67,8 +58,6 @@ export function buildVisibilityReportCsv(
       '',
       ''
     ]
-      .map(escapeCsv)
-      .join(',')
   );
 
   const opportunityRows = gapInsights.opportunities.map((item) =>
@@ -96,8 +85,6 @@ export function buildVisibilityReportCsv(
       '',
       ''
     ]
-      .map(escapeCsv)
-      .join(',')
   );
 
   const topicRows = gapInsights.topics.map((topic) =>
@@ -125,8 +112,6 @@ export function buildVisibilityReportCsv(
       '',
       ''
     ]
-      .map(escapeCsv)
-      .join(',')
   );
 
   const digestRows = latestDigest
@@ -155,10 +140,8 @@ export function buildVisibilityReportCsv(
           weeklyDigestPipelineLabel(latestDigest.summary),
           latestDigest.summary.pipelineIngestionSource ?? ''
         ]
-          .map(escapeCsv)
-          .join(',')
       ]
     : [];
 
-  return `\uFEFF${[header.join(','), ...trendRows, ...opportunityRows, ...topicRows, ...digestRows].join('\n')}`;
+  return buildCsvDocument(header, [...trendRows, ...opportunityRows, ...topicRows, ...digestRows]);
 }
