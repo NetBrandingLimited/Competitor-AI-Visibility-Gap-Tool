@@ -117,13 +117,15 @@ type GscQueryRow = {
   position?: number | null;
 };
 
-async function gscSearchAnalyticsClient(organizationId: string): Promise<{
+type GscSearchAnalyticsClient = {
   webmasters: ReturnType<typeof google.webmasters>;
   siteUrl: string;
   startDate: string;
   endDate: string;
   asOf: string;
-} | null> {
+};
+
+async function gscSearchAnalyticsClient(organizationId: string): Promise<GscSearchAnalyticsClient | null> {
   const ctx = await gscAuthAndSite(organizationId);
   if (!ctx) {
     return null;
@@ -140,7 +142,7 @@ async function gscSearchAnalyticsClient(organizationId: string): Promise<{
 }
 
 async function runSearchAnalytics(
-  client: NonNullable<Awaited<ReturnType<typeof gscSearchAnalyticsClient>>>,
+  client: GscSearchAnalyticsClient,
   requestBody: GscSearchAnalyticsBody
 ): Promise<GscQueryRow[] | null> {
   try {
@@ -161,16 +163,12 @@ async function runSearchAnalytics(
   }
 }
 
-async function fetchQueryRows(
-  organizationId: string,
+async function fetchQueryRowsWithClient(
+  client: GscSearchAnalyticsClient,
   rowLimit: number,
   pipelineQuery: string,
   useQueryContainsFilter: boolean
 ): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
-  const client = await gscSearchAnalyticsClient(organizationId);
-  if (!client) {
-    return null;
-  }
   const q = pipelineQuery.trim();
   const dimensionFilterGroups =
     useQueryContainsFilter && q.length >= 2
@@ -199,15 +197,11 @@ async function fetchQueryRows(
 }
 
 /** Top landing pages (page dimension); tries URL contains pipeline query then unfiltered. */
-async function fetchPageRows(
-  organizationId: string,
+async function fetchPageRowsWithClient(
+  client: GscSearchAnalyticsClient,
   rowLimit: number,
   pipelineQuery: string
 ): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
-  const client = await gscSearchAnalyticsClient(organizationId);
-  if (!client) {
-    return null;
-  }
   const q = pipelineQuery.trim();
   const capped = Math.min(100, Math.max(1, rowLimit));
 
@@ -259,9 +253,14 @@ export async function fetchGscQueryDocuments(opts: {
   const { organizationId, pipelineQuery, rowLimit } = opts;
   const capped = Math.min(250, Math.max(1, rowLimit));
 
-  let pack = await fetchQueryRows(organizationId, capped, pipelineQuery, true);
+  const client = await gscSearchAnalyticsClient(organizationId);
+  if (!client) {
+    return [];
+  }
+
+  let pack = await fetchQueryRowsWithClient(client, capped, pipelineQuery, true);
   if (!pack || pack.rows.length === 0) {
-    pack = await fetchQueryRows(organizationId, capped, pipelineQuery, false);
+    pack = await fetchQueryRowsWithClient(client, capped, pipelineQuery, false);
   }
   if (!pack || pack.rows.length === 0) {
     return [];
@@ -277,7 +276,7 @@ export async function fetchGscQueryDocuments(opts: {
   }
 
   const pageRowBudget = Math.min(100, Math.max(5, Math.floor(capped / 2)));
-  const pagePack = await fetchPageRows(organizationId, pageRowBudget, pipelineQuery);
+  const pagePack = await fetchPageRowsWithClient(client, pageRowBudget, pipelineQuery);
   if (pagePack && pagePack.rows.length > 0) {
     for (const row of pagePack.rows) {
       const pageUrl = row.keys?.[0];

@@ -1,18 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const hoisted = vi.hoisted(() => ({
-  queryMock: vi.fn(),
-  readOrgConnectorSettings: vi.fn(),
-  resolveGscSiteUrl: vi.fn()
-}));
+const hoisted = vi.hoisted(() => {
+  const queryMock = vi.fn();
+  const webmastersFactory = vi.fn(() => ({
+    searchanalytics: {
+      query: queryMock
+    }
+  }));
+  return {
+    queryMock,
+    webmastersFactory,
+    readOrgConnectorSettings: vi.fn(),
+    resolveGscSiteUrl: vi.fn()
+  };
+});
 
 vi.mock('googleapis', () => ({
   google: {
-    webmasters: vi.fn(() => ({
-      searchanalytics: {
-        query: hoisted.queryMock
-      }
-    }))
+    webmasters: hoisted.webmastersFactory
   }
 }));
 
@@ -35,6 +40,7 @@ describe('fetchGscQueryDocuments', () => {
 
   beforeEach(() => {
     hoisted.queryMock.mockReset();
+    hoisted.webmastersFactory.mockClear();
     hoisted.readOrgConnectorSettings.mockReset();
     hoisted.resolveGscSiteUrl.mockReset();
     for (const key of [
@@ -149,6 +155,7 @@ describe('fetchGscQueryDocuments', () => {
     expect(docs[1].title).toBe('Page: pricing');
     expect(docs[1].content).toContain('https://example.com/pricing');
     expect(docs[1].content).toContain('9 clicks');
+    expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
 
   it('uses a single API call when the filtered request returns rows', async () => {
@@ -184,5 +191,6 @@ describe('fetchGscQueryDocuments', () => {
     expect(docs[0].title).toBe('crm pricing');
     expect(docs[1].content).toContain('Landing page from Search Console');
     expect(docs[1].content).toContain('https://example.com/crm');
+    expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
 });
