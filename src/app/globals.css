@@ -334,6 +334,14 @@ p { color: #333; }
 thead .data-table-sticky-col {
   z-index: 2;
 }
+.data-table-sticky-col-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.8125rem;
+  min-width: 7.5rem;
+  max-width: 10.5rem;
+  vertical-align: top;
+  word-break: break-all;
+}
 
 .field-hint-small {
   display: block;

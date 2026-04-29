@@ -172,7 +172,9 @@ export default async function OpsPage() {
               </caption>
               <thead>
                 <tr>
-                  <th scope="col" className="data-table-th-left data-table-sticky-col">Job id</th>
+                  <th scope="col" className="data-table-th-left data-table-sticky-col data-table-sticky-col-id">
+                    Job id
+                  </th>
                   <th scope="col" className="data-table-th-left">Status</th>
                   <th scope="col" className="data-table-th-left">Details</th>
                   <th scope="col" className="data-table-th-left">Query</th>
@@ -186,7 +188,7 @@ export default async function OpsPage() {
               <tbody>
                 {jobs.map((job) => (
                   <tr key={job.id}>
-                    <td className="data-table-td data-table-sticky-col">{job.id}</td>
+                    <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">{job.id}</td>
                     <td className="data-table-td">{job.status}</td>
                     <td className="data-table-td">{describeSchedulerJob(job)}</td>
                     <td className="data-table-td">{job.query}</td>
