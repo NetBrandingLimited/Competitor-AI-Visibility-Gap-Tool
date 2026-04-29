@@ -269,13 +269,17 @@ export default async function ReportsPage() {
       {snapshots.length === 0 ? (
         <p>No snapshots yet for this workspace. Run the trend snapshot job below.</p>
       ) : (
-        <table className="data-table">
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-min-reports-snapshots">
           <caption className="sr-only">
-            Stored daily trend snapshots: date, total mentions, top brand, and top brand mentions.
+            Stored daily trend snapshots: date (sticky while scrolling), total mentions, top brand, and top brand
+            mentions.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Date</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col">Date</th>
               <th scope="col" className="data-table-th-right">Mentions</th>
               <th scope="col" className="data-table-th-left">Top brand</th>
               <th scope="col" className="data-table-th-right">Top brand mentions</th>
@@ -284,14 +288,16 @@ export default async function ReportsPage() {
           <tbody>
             {snapshots.map((row) => (
               <tr key={row.date}>
-                <td className="data-table-td">{row.date}</td>
+                <td className="data-table-td data-table-sticky-col">{row.date}</td>
                 <td className="data-table-td-right">{row.totalMentions}</td>
                 <td className="data-table-td">{row.topBrand}</td>
                 <td className="data-table-td-right">{row.topBrandMentions}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
 
       <h2 className="mt-24">Unified pipeline runs</h2>

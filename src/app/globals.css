@@ -347,6 +347,9 @@ p { color: #333; }
 .data-table-min-run-clusters {
   min-width: 800px;
 }
+.data-table-min-reports-snapshots {
+  min-width: 640px;
+}
 .data-table-sticky-col {
   position: sticky;
   left: 0;
