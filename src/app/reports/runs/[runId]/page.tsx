@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
+import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
 function runTitleSegment(runId: string): string {
@@ -68,11 +68,7 @@ export default async function PipelineRunDetailPage({
       <p>
         Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} | Clusters:{' '}
         {run.clusterCount}
-        {run.ingestionSource === 'live_gsc_queries'
-          ? ' | Ingestion: Search Console (queries, landing pages, query–page pairs)'
-          : run.ingestionSource === 'mock_ingestion'
-            ? ' | Ingestion: mock templates'
-            : null}
+        {run.ingestionSource ? ` | Ingestion: ${pipelineIngestionProvenanceLabel(run.ingestionSource)}` : null}
       </p>
       <p>
         <Link href="/reports">Back to reports</Link>

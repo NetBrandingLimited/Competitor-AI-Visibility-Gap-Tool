@@ -28,3 +28,16 @@ export function pipelineIngestionProvenanceLabel(
   }
   return 'Not recorded';
 }
+
+/** Longer UI copy describing what the pipeline document source means. */
+export function pipelineIngestionProvenanceDescription(
+  source: PipelineIngestionSource | null | undefined
+): string {
+  if (source === 'live_gsc_queries') {
+    return 'Documents are top search queries and landing pages from Search Console (28-day window), enriched with your brand context when configured.';
+  }
+  if (source === 'mock_ingestion') {
+    return 'Documents are mock templates (connect Search Console under Data connectors for live query rows).';
+  }
+  return 'Document source for this run is unspecified (older run).';
+}

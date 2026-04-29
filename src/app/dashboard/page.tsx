@@ -8,7 +8,11 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
-import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
+import {
+  ingestionSourceDisplayLabel,
+  pipelineIngestionProvenanceDescription,
+  pipelineIngestionProvenanceLabel
+} from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
@@ -69,14 +73,9 @@ export default async function DashboardPage() {
   const mockSnapshot = getDashboardSnapshotForOrganization(orgFields);
   const snapshot = pipelineSnapshot ?? mockSnapshot;
   const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
-  const pipelineDocProvenance =
-    latestRun?.ingestionSource === 'live_gsc_queries'
-      ? 'Documents are top search queries from Google Search Console (28-day window), enriched with your brand context when configured.'
-      : latestRun?.ingestionSource === 'mock_ingestion'
-        ? 'Documents are mock templates (connect Search Console under Data connectors for live query rows).'
-        : latestRun
-          ? 'Document source for this run is unspecified (older run).'
-          : null;
+  const pipelineDocProvenance = latestRun
+    ? pipelineIngestionProvenanceDescription(latestRun.ingestionSource)
+    : null;
   const { thresholds, input: freshnessThresholds } = getFreshnessConfig();
 
   return (
