@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import CopyDigestSummary from '../CopyDigestSummary';
+import CopyTextButton from '@/app/components/CopyTextButton';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
@@ -56,6 +57,14 @@ export default async function WeeklyDigestDetailPage({
       <h1>Weekly digest</h1>
       <p>
         Workspace: <strong>{active.organizationName}</strong>
+      </p>
+      <p className="mt-8">
+        Digest id: <code>{digest.id}</code>{' '}
+        <CopyTextButton
+          text={digest.id}
+          label="Copy digest id"
+          className="btn-compact-inline btn-compact-inline-secondary"
+        />
       </p>
       <ul className="list-line-relaxed">
         <li>

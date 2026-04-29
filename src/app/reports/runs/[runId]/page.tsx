@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import CopyTextButton from '@/app/components/CopyTextButton';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -54,7 +55,12 @@ export default async function PipelineRunDetailPage({
         Workspace: <strong>{active.organizationName}</strong>
       </p>
       <p>
-        Run id: <code>{run.id}</code>
+        Run id: <code>{run.id}</code>{' '}
+        <CopyTextButton
+          text={run.id}
+          label="Copy run id"
+          className="btn-compact-inline btn-compact-inline-secondary"
+        />
       </p>
       <p>
         Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} |
