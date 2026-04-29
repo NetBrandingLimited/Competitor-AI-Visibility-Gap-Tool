@@ -186,8 +186,16 @@ export default async function OpsPage() {
                 <td className="data-table-td">{job.status}</td>
                 <td className="data-table-td">{describeSchedulerJob(job)}</td>
                 <td className="data-table-td">{job.query}</td>
-                <td className="data-table-td">{job.pipelineRunId ?? '-'}</td>
-                <td className="data-table-td">{job.weeklyDigestId ?? '-'}</td>
+                <td className="data-table-td">
+                  {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
+                </td>
+                <td className="data-table-td">
+                  {job.weeklyDigestId ? (
+                    <Link href={`/reports/digest/${job.weeklyDigestId}`}>{job.weeklyDigestId}</Link>
+                  ) : (
+                    '-'
+                  )}
+                </td>
                 <td className="data-table-td">
                   {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
                 </td>
