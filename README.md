@@ -21,6 +21,8 @@ Quick start
 - Unified pipeline run:
   - `POST /api/debug/pipeline/run?query=seo%20tool&limit=2`
   - `GET /api/debug/pipeline/run` for latest run summary
+  - **Ingestion:** documents come from **Google Search Console** (top queries, 28-day window) when the workspace has **Settings → Data connectors** configured (GSC site URL + service account) and the API returns rows; otherwise **mock** Reddit/HN-style templates. Each saved run stores `ingestionSource`: `live_gsc_queries` or `mock_ingestion` (also on **Reports** and in `GET /api/reports/pipeline-runs.csv`).
+  - **Debug ingestion only** (no triggers/clusters/DB): `GET /api/debug/ingestion?query=seo%20tool&limit=2` — same GSC-vs-mock rules; JSON is an ingestion result plus `ingestionSource`. Requires an authenticated session with **EDITOR+** (same as `POST /api/debug/pipeline/run`).
 - Scheduler + monitoring baseline:
   - `POST /api/debug/scheduler/run?query=seo%20tool&limit=2`
   - `GET /api/debug/scheduler/run` for recent job history
