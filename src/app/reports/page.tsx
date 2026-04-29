@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import CopyTextButton from '@/app/components/CopyTextButton';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
@@ -284,7 +285,8 @@ export default async function ReportsPage() {
       ) : (
         <table className="data-table">
           <caption className="sr-only">
-            Unified pipeline runs for this workspace: run id, created time, query, document, trigger, and cluster counts.
+            Unified pipeline runs for this workspace: run id (open detail or copy id), created time, query, document,
+            trigger, and cluster counts.
           </caption>
           <thead>
             <tr>
@@ -300,12 +302,20 @@ export default async function ReportsPage() {
             {pipelineRuns.map((run) => (
               <tr key={run.id}>
                 <td className="data-table-td">
-                  <Link
-                    href={`/reports/runs/${run.id}`}
-                    aria-label={`Open pipeline run ${run.id} created ${new Date(run.createdAt).toLocaleString()}`}
-                  >
-                    {run.id}
-                  </Link>
+                  <div className="inline-run-id-cell">
+                    <Link
+                      href={`/reports/runs/${run.id}`}
+                      aria-label={`Open pipeline run ${run.id} created ${new Date(run.createdAt).toLocaleString()}`}
+                    >
+                      {run.id}
+                    </Link>
+                    <CopyTextButton
+                      text={run.id}
+                      label="Copy id"
+                      className="btn-compact-inline btn-compact-inline-secondary"
+                      ariaLabel={`Copy pipeline run id ${run.id}`}
+                    />
+                  </div>
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
                 <td className="data-table-td">{run.query}</td>

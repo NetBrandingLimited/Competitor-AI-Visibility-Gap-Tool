@@ -59,6 +59,7 @@ export default async function PipelineRunDetailPage({
         <CopyTextButton
           text={run.id}
           label="Copy run id"
+          ariaLabel={`Copy pipeline run id ${run.id}`}
           className="btn-compact-inline btn-compact-inline-secondary"
         />
       </p>

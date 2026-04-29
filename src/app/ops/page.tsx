@@ -195,6 +195,7 @@ export default async function OpsPage() {
                         <CopyTextButton
                           text={job.id}
                           label="Copy id"
+                          ariaLabel={`Copy scheduler job id ${job.id}`}
                           className="btn-compact-inline btn-compact-inline-secondary"
                         />
                       </div>

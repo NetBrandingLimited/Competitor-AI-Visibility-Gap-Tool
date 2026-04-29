@@ -363,6 +363,12 @@ thead .data-table-sticky-col {
   align-items: flex-start;
   gap: 6px;
 }
+.inline-run-id-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
 .debug-config-status {
   margin-left: 8px;
 }

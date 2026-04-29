@@ -63,6 +63,7 @@ export default async function WeeklyDigestDetailPage({
         <CopyTextButton
           text={digest.id}
           label="Copy digest id"
+          ariaLabel={`Copy weekly digest id ${digest.id}`}
           className="btn-compact-inline btn-compact-inline-secondary"
         />
       </p>
