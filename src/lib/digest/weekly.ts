@@ -1,11 +1,14 @@
 import { prisma } from '@/lib/prisma';
 import type { GapOpportunity, TopicGap } from '@/lib/insights/gap';
 import { buildGapInsightsFromLatestData, readGapLatestDataForOrg } from '@/lib/insights/gap';
+import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
+import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import { sendWeeklyDigestEmail } from '@/lib/email/weeklyDigestEmail';
 
 export type WeeklyDigestSummary = {
   score: number | null;
   signalSource: 'cache' | 'live' | null;
+  pipelineIngestionSource?: PipelineIngestionSource | null;
   /** When signalSource is cache: matches visibility scoring (TTL vs stale fallback). */
   connectorSignalCacheKind?: 'ttl' | 'stale_fallback' | null;
   topOpportunities: string[];
@@ -31,6 +34,12 @@ export function weeklyDigestSignalsLabel(
     return 'cache (within TTL)';
   }
   return 'cache';
+}
+
+export function weeklyDigestPipelineLabel(
+  summary: Pick<WeeklyDigestSummary, 'pipelineIngestionSource'>
+): string {
+  return pipelineIngestionProvenanceLabel(summary.pipelineIngestionSource ?? null);
 }
 
 export type WeeklyDigest = {
@@ -80,6 +89,7 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
   const empty: WeeklyDigestSummary = {
     score: null,
     signalSource: null,
+    pipelineIngestionSource: null,
     topOpportunities: []
   };
   try {
@@ -87,6 +97,10 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
     const score = typeof parsed.score === 'number' ? parsed.score : null;
     const signalSource =
       parsed.signalSource === 'cache' || parsed.signalSource === 'live' ? parsed.signalSource : null;
+    const pipelineIngestionSource =
+      parsed.pipelineIngestionSource === 'live_gsc_queries' || parsed.pipelineIngestionSource === 'mock_ingestion'
+        ? parsed.pipelineIngestionSource
+        : null;
     const topOpportunities = Array.isArray(parsed.topOpportunities)
       ? parsed.topOpportunities.filter((x): x is string => typeof x === 'string')
       : [];
@@ -113,6 +127,7 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
     return {
       score,
       signalSource,
+      pipelineIngestionSource,
       connectorSignalCacheKind,
       topOpportunities,
       opportunities,
@@ -158,6 +173,7 @@ export async function generateWeeklyDigest(organizationId: string): Promise<Week
   const summary: WeeklyDigestSummary = {
     score: gapLatest.visibility ? Math.round(gapLatest.visibility.score) : null,
     signalSource: gapLatest.visibility?.inputs?.connectorSignalSource ?? null,
+    pipelineIngestionSource: gapLatest.latestRun?.ingestionSource ?? null,
     connectorSignalCacheKind: gapLatest.visibility?.inputs?.connectorSignalCacheKind ?? null,
     topOpportunities: insights.opportunities.slice(0, 3).map((o) => o.title),
     opportunities: insights.opportunities,

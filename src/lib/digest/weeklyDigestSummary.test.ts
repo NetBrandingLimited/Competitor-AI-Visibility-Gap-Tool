@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseWeeklyDigestSummaryJson, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { parseWeeklyDigestSummaryJson, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 
 describe('weeklyDigestSignalsLabel', () => {
   it('returns em dash when signal source is missing', () => {
@@ -28,17 +28,30 @@ describe('weeklyDigestSignalsLabel', () => {
   });
 });
 
+describe('weeklyDigestPipelineLabel', () => {
+  it('maps live and mock pipeline sources', () => {
+    expect(weeklyDigestPipelineLabel({ pipelineIngestionSource: 'live_gsc_queries' })).toBe('Search Console');
+    expect(weeklyDigestPipelineLabel({ pipelineIngestionSource: 'mock_ingestion' })).toBe('Mock templates');
+  });
+
+  it('returns not recorded when pipeline source missing', () => {
+    expect(weeklyDigestPipelineLabel({ pipelineIngestionSource: null })).toBe('Not recorded');
+  });
+});
+
 describe('parseWeeklyDigestSummaryJson', () => {
   it('parses connector cache kind and signal source', () => {
     const raw = JSON.stringify({
       score: 42,
       signalSource: 'cache',
+      pipelineIngestionSource: 'live_gsc_queries',
       connectorSignalCacheKind: 'stale_fallback',
       topOpportunities: ['A', 'B']
     });
     const s = parseWeeklyDigestSummaryJson(raw);
     expect(s.score).toBe(42);
     expect(s.signalSource).toBe('cache');
+    expect(s.pipelineIngestionSource).toBe('live_gsc_queries');
     expect(s.connectorSignalCacheKind).toBe('stale_fallback');
     expect(s.topOpportunities).toEqual(['A', 'B']);
     expect(weeklyDigestSignalsLabel(s)).toBe('cache (fallback: live fetch had no metrics)');
@@ -53,6 +66,17 @@ describe('parseWeeklyDigestSummaryJson', () => {
     });
     const s = parseWeeklyDigestSummaryJson(raw);
     expect(s.connectorSignalCacheKind).toBeNull();
+  });
+
+  it('rejects invalid pipelineIngestionSource', () => {
+    const raw = JSON.stringify({
+      score: 1,
+      signalSource: 'live',
+      pipelineIngestionSource: 'unsupported',
+      topOpportunities: []
+    });
+    const s = parseWeeklyDigestSummaryJson(raw);
+    expect(s.pipelineIngestionSource).toBeNull();
   });
 
   it('returns empty summary on invalid JSON', () => {

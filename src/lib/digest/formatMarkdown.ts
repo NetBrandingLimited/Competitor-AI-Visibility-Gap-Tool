@@ -1,5 +1,5 @@
 import type { WeeklyDigestSummary } from '@/lib/digest/weekly';
-import { weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 
 export function formatWeeklyDigestMarkdown(params: {
   orgName: string;
@@ -15,6 +15,7 @@ export function formatWeeklyDigestMarkdown(params: {
     `- **Period:** ${periodStart} → ${periodEnd}`,
     `- **Generated:** ${generatedAt}`,
     `- **Visibility score:** ${summary.score ?? '—'}`,
+    `- **Pipeline documents:** ${weeklyDigestPipelineLabel(summary)}`,
     `- **Connector signals:** ${weeklyDigestSignalsLabel(summary)}`
   ];
   if (summary.insightsGeneratedAt) {

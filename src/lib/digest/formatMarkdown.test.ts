@@ -10,6 +10,7 @@ const baseParams = {
   summary: {
     score: 50,
     signalSource: 'live' as const,
+    pipelineIngestionSource: 'live_gsc_queries' as const,
     topOpportunities: ['One'],
     opportunities: undefined,
     topics: undefined,
@@ -18,6 +19,11 @@ const baseParams = {
 };
 
 describe('formatWeeklyDigestMarkdown', () => {
+  it('includes pipeline documents line from weeklyDigestPipelineLabel', () => {
+    const md = formatWeeklyDigestMarkdown(baseParams);
+    expect(md).toContain('- **Pipeline documents:** Search Console');
+  });
+
   it('includes connector signals line from weeklyDigestSignalsLabel (live)', () => {
     const md = formatWeeklyDigestMarkdown(baseParams);
     expect(md).toContain('- **Connector signals:** live');
