@@ -98,6 +98,8 @@ export default async function ReportsPage() {
         <Link href="/api/reports/trends.csv">Download trends-only CSV</Link>
         {' | '}
         <Link href="/api/reports/pipeline-runs.csv">Download pipeline runs CSV</Link>
+        {' | '}
+        <Link href="/api/reports/weekly-digests.csv">Download weekly digests CSV</Link>
       </p>
       <div className="callout-csv-help">
         <strong>Which CSV should I use?</strong>
@@ -112,6 +114,10 @@ export default async function ReportsPage() {
           <li>
             <code>pipeline runs CSV</code>: per-run operational metrics (docs, triggers, clusters, query, ingestion
             source).
+          </li>
+          <li>
+            <code>weekly digests CSV</code>: per-digest summary rows (score, connector signal mode, pipeline
+            document provenance label + raw source, and top opportunity headlines).
           </li>
         </ul>
       </div>
