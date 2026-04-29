@@ -10,7 +10,9 @@ import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
+import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
@@ -57,6 +59,25 @@ export default async function OpsPage() {
             select: { id: true, summaryJson: true }
           })
         ).map((row) => [row.id, weeklyDigestSignalsLabel(parseWeeklyDigestSummaryJson(row.summaryJson))])
+      )
+    : {};
+  const pipelineRunIds = Array.from(
+    new Set(jobs.map((job) => job.pipelineRunId).filter((id): id is string => Boolean(id)))
+  );
+  const pipelineIngestionLabels = pipelineRunIds.length
+    ? Object.fromEntries(
+        (
+          await prisma.pipelineRun.findMany({
+            where: { organizationId: active.organizationId, id: { in: pipelineRunIds } },
+            select: { id: true, ingestionSource: true }
+          })
+        ).map((row) => {
+          const ingestionSource: PipelineIngestionSource | undefined =
+            row.ingestionSource === 'live_gsc_queries' || row.ingestionSource === 'mock_ingestion'
+              ? row.ingestionSource
+              : undefined;
+          return [row.id, pipelineIngestionProvenanceLabel(ingestionSource)];
+        })
       )
     : {};
   const latestJob = jobs[0] ?? null;
@@ -128,7 +149,10 @@ export default async function OpsPage() {
           thresholds={freshnessThresholds}
           missingText="Not run yet"
         >
-          <code>{latestRun?.id}</code>
+          <>
+            <code>{latestRun?.id}</code>
+            {latestRun ? ` · ${pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}` : ''}
+          </>
         </StatusFreshnessItem>
         <StatusFreshnessItem
           label="Latest trend snapshot"
@@ -169,7 +193,7 @@ export default async function OpsPage() {
             <table className="data-table data-table-ops-scheduler">
               <caption className="sr-only">
                 Recent scheduler jobs for this workspace: job id, completion time, status, execution details, query,
-                linked pipeline run and digest, digest connector signals label, and quick links.
+                linked pipeline run and digest, pipeline document source, digest connector signals label, and quick links.
               </caption>
               <colgroup>
                 <col style={{ width: '12%' }} />
@@ -179,8 +203,9 @@ export default async function OpsPage() {
                 <col style={{ width: '10%' }} />
                 <col style={{ width: '10%' }} />
                 <col style={{ width: '10%' }} />
+                <col style={{ width: '9%' }} />
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '7%' }} />
+                <col style={{ width: '8%' }} />
               </colgroup>
               <thead>
                 <tr>
@@ -193,6 +218,7 @@ export default async function OpsPage() {
                   <th scope="col" className="data-table-th-left">Query</th>
                   <th scope="col" className="data-table-th-left">Pipeline run</th>
                   <th scope="col" className="data-table-th-left">Weekly digest</th>
+                  <th scope="col" className="data-table-th-left">Pipeline docs</th>
                   <th scope="col" className="data-table-th-left">Digest signals</th>
                   <th scope="col" className="data-table-th-left">Actions</th>
                 </tr>
@@ -229,6 +255,9 @@ export default async function OpsPage() {
                       ) : (
                         '-'
                       )}
+                    </td>
+                    <td className="data-table-td">
+                      {job.pipelineRunId ? (pipelineIngestionLabels[job.pipelineRunId] ?? 'Not recorded') : '-'}
                     </td>
                     <td className="data-table-td">
                       {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
