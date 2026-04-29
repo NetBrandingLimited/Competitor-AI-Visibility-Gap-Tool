@@ -31,6 +31,29 @@ function stableDocId(kind: 'q' | 'p' | 'qp', key: string): string {
   return `gsc-${kind}-${Math.abs(h).toString(36)}`;
 }
 
+function rowHasAnyEngagement(row: {
+  clicks?: number | null;
+  impressions?: number | null;
+}): boolean {
+  const clicks = typeof row.clicks === 'number' && Number.isFinite(row.clicks) ? row.clicks : 0;
+  const impressions =
+    typeof row.impressions === 'number' && Number.isFinite(row.impressions) ? row.impressions : 0;
+  return clicks > 0 || impressions > 0;
+}
+
+/** Deduplicate merged GSC docs before capping, so cap budget goes to unique URLs. */
+function dedupeGscDocs(docs: SourceDocument[]): SourceDocument[] {
+  const seen = new Set<string>();
+  const deduped: SourceDocument[] = [];
+  for (const doc of docs) {
+    const key = doc.url.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(doc);
+  }
+  return deduped;
+}
+
 function pageTitleFromUrl(pageUrl: string): string {
   try {
     const u = new URL(pageUrl);
@@ -353,6 +376,7 @@ export async function fetchGscQueryDocuments(opts: {
     if (!query || typeof query !== 'string') {
       continue;
     }
+    if (!rowHasAnyEngagement(row)) continue;
     docs.push(rowToSourceDocument(query, row, pack.asOf));
   }
 
@@ -364,6 +388,7 @@ export async function fetchGscQueryDocuments(opts: {
       if (!pageUrl || typeof pageUrl !== 'string') {
         continue;
       }
+      if (!rowHasAnyEngagement(row)) continue;
       docs.push(rowPageToSourceDocument(pageUrl, row, pagePack.asOf));
     }
   }
@@ -377,18 +402,21 @@ export async function fetchGscQueryDocuments(opts: {
       if (!query || typeof query !== 'string' || !pageUrl || typeof pageUrl !== 'string') {
         continue;
       }
+      if (!rowHasAnyEngagement(row)) continue;
       docs.push(rowQueryPagePairToSourceDocument(query, pageUrl, row, qpPack.asOf));
     }
   }
 
   const mergedCount = docs.length;
-  const cappedDocs = capGscDocumentList(docs, capped);
+  const uniqueDocs = dedupeGscDocs(docs);
+  const cappedDocs = capGscDocumentList(uniqueDocs, capped);
   if (process.env.NODE_ENV === 'development' && mergedCount > 0) {
     const pageRows = pagePack?.rows.length ?? 0;
     const qpRows = qpPack?.rows.length ?? 0;
     console.info(
       `[GSC ingestion] org=${organizationId.slice(0, 8)}… API rows: query=${pack.rows.length} page=${pageRows} pair=${qpRows} → merged docs=${mergedCount}` +
-        (cappedDocs.length < mergedCount ? ` (capped to ${cappedDocs.length})` : '')
+        (uniqueDocs.length < mergedCount ? ` (deduped to ${uniqueDocs.length})` : '') +
+        (cappedDocs.length < uniqueDocs.length ? ` (capped to ${cappedDocs.length})` : '')
     );
   }
 

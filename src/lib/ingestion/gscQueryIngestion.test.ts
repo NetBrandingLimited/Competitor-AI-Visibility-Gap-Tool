@@ -275,4 +275,50 @@ describe('fetchGscQueryDocuments', () => {
     expect(docs[2].url).toContain('gsc://query-page/');
     expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
+
+  it('skips zero-engagement rows and dedupes by URL', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    // query: includes duplicates + one zero-engagement query
+    // page: includes one zero-engagement landing page (should be skipped)
+    // qp: includes one zero-engagement query+page pair (should be skipped)
+    hoisted.queryMock
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            { keys: ['dup-q'], clicks: 2, impressions: 20, ctr: 0.05, position: 5 },
+            { keys: ['dup-q'], clicks: 3, impressions: 10, ctr: 0.06, position: 4 },
+            { keys: ['no-signal'], clicks: 0, impressions: 0, ctr: 0.01, position: 50 }
+          ]
+        }
+      })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [{ keys: ['https://example.com/zero'], clicks: 0, impressions: 0, ctr: 0.0, position: 10 }]
+        }
+      })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [{ keys: ['dup-q', 'https://example.com/zero'], clicks: 0, impressions: 0, ctr: 0.0, position: 10 }]
+        }
+      });
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'dup',
+      rowLimit: 10
+    });
+
+    // Only one unique query doc (duplicates deduped; zero-engagement rows skipped).
+    expect(docs).toHaveLength(1);
+    expect(docs[0].title).toBe('dup-q');
+    expect(docs[0].url).toContain('gsc://search-query/');
+    expect(hoisted.queryMock).toHaveBeenCalledTimes(3);
+  });
 });
