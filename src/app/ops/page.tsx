@@ -8,7 +8,7 @@ import StatusFreshnessItem from './StatusFreshnessItem';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
-import { readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -47,6 +47,17 @@ export default async function OpsPage() {
   }
 
   const jobs = await readSchedulerJobs(active.organizationId);
+  const digestIds = Array.from(new Set(jobs.map((job) => job.weeklyDigestId).filter((id): id is string => Boolean(id))));
+  const digestSignalLabels = digestIds.length
+    ? Object.fromEntries(
+        (
+          await prisma.weeklyDigest.findMany({
+            where: { organizationId: active.organizationId, id: { in: digestIds } },
+            select: { id: true, summaryJson: true }
+          })
+        ).map((row) => [row.id, weeklyDigestSignalsLabel(parseWeeklyDigestSummaryJson(row.summaryJson))])
+      )
+    : {};
   const latestJob = jobs[0] ?? null;
   const [latestRun, latestDigest, trendSnapshots] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
@@ -154,7 +165,7 @@ export default async function OpsPage() {
         <table className="data-table">
           <caption className="sr-only">
             Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
-            and digest, and completion time.
+            and digest, digest connector signals label, and completion time.
           </caption>
           <thead>
             <tr>
@@ -164,6 +175,7 @@ export default async function OpsPage() {
               <th scope="col" className="data-table-th-left">Query</th>
               <th scope="col" className="data-table-th-left">Pipeline run</th>
               <th scope="col" className="data-table-th-left">Weekly digest</th>
+              <th scope="col" className="data-table-th-left">Digest signals</th>
               <th scope="col" className="data-table-th-left">Completed</th>
             </tr>
           </thead>
@@ -176,6 +188,9 @@ export default async function OpsPage() {
                 <td className="data-table-td">{job.query}</td>
                 <td className="data-table-td">{job.pipelineRunId ?? '-'}</td>
                 <td className="data-table-td">{job.weeklyDigestId ?? '-'}</td>
+                <td className="data-table-td">
+                  {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
+                </td>
                 <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
               </tr>
             ))}
