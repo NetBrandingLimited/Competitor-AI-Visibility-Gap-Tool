@@ -352,6 +352,17 @@ thead .data-table-sticky-col {
 .btn-compact-inline {
   padding: 4px 10px;
 }
+.btn-compact-inline-secondary {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  padding: 2px 8px;
+}
+.id-cell-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
 .debug-config-status {
   margin-left: 8px;
 }

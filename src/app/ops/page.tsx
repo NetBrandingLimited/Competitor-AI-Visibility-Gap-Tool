@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import CopyTextButton from '@/app/components/CopyTextButton';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunSchedulerAction from './RunSchedulerAction';
 import StatusFreshnessItem from './StatusFreshnessItem';
@@ -188,7 +189,16 @@ export default async function OpsPage() {
               <tbody>
                 {jobs.map((job) => (
                   <tr key={job.id}>
-                    <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">{job.id}</td>
+                    <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
+                      <div className="id-cell-stack">
+                        <span>{job.id}</span>
+                        <CopyTextButton
+                          text={job.id}
+                          label="Copy id"
+                          className="btn-compact-inline btn-compact-inline-secondary"
+                        />
+                      </div>
+                    </td>
                     <td className="data-table-td">{job.status}</td>
                     <td className="data-table-td">{describeSchedulerJob(job)}</td>
                     <td className="data-table-td">{job.query}</td>
