@@ -3,31 +3,10 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
-
-function truncateUrlForCell(url: string, maxLen: number): string {
-  const t = url.trim();
-  if (t.length <= maxLen) {
-    return t;
-  }
-  return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
-}
-
-/** Renders a web link for http(s) URLs; otherwise plain text (e.g. synthetic `gsc://` ids). */
-function DocumentUrlCell({ url }: { url: string }) {
-  const trimmed = url.trim();
-  if (/^https?:\/\//i.test(trimmed)) {
-    const label = truncateUrlForCell(trimmed, 72);
-    return (
-      <a href={trimmed} target="_blank" rel="noopener noreferrer" title={trimmed}>
-        {label}
-      </a>
-    );
-  }
-  return <code>{truncateUrlForCell(trimmed, 72)}</code>;
-}
 
 function runTitleSegment(runId: string): string {
   const id = runId.trim();
