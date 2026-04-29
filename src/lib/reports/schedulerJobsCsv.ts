@@ -1,4 +1,3 @@
-import { weeklyDigestSignalsLabel, type WeeklyDigestSummary } from '@/lib/digest/weekly';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import type { SchedulerJobRecord } from '@/lib/scheduler/store';
