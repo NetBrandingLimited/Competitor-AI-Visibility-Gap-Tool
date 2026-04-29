@@ -40,7 +40,7 @@ p { color: #333; }
 .text-muted-note-wide {
   font-size: 14px;
   color: #444;
-  max-width: 720px;
+  max-width: 72ch;
 }
 .text-muted-subtle {
   color: #555;
