@@ -46,4 +46,18 @@ describe('buildWhyChanged', () => {
     const reasons = buildWhyChanged(previous, 60, nextInputs);
     expect(reasons.some((r) => r.code === 'PIPELINE_INGESTION_SOURCE')).toBe(false);
   });
+
+  it('labels legacy/null provenance transition explicitly', () => {
+    const previous = {
+      score: 60,
+      inputs: makeInputs({ pipelineIngestionSource: null })
+    };
+    const nextInputs = makeInputs({ pipelineIngestionSource: 'live_gsc_queries' });
+
+    const reasons = buildWhyChanged(previous, 60, nextInputs);
+    const reason = reasons.find((r) => r.code === 'PIPELINE_INGESTION_SOURCE');
+    expect(reason).toBeTruthy();
+    expect(reason?.message).toContain('not recorded / legacy');
+    expect(reason?.message).toContain('Search Console pipeline documents');
+  });
 });
