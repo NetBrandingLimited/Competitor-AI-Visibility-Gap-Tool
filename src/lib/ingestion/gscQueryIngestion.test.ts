@@ -321,4 +321,39 @@ describe('fetchGscQueryDocuments', () => {
     expect(docs[0].url).toContain('gsc://search-query/');
     expect(hoisted.queryMock).toHaveBeenCalledTimes(3);
   });
+
+  it('ranks query rows by impressions/clicks before document creation', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    // Query pack returns two valid rows; second row has higher impressions and should come first.
+    hoisted.queryMock
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            { keys: ['low'], clicks: 10, impressions: 5, ctr: 0.2, position: 2 },
+            { keys: ['high'], clicks: 1, impressions: 50, ctr: 0.01, position: 1 }
+          ]
+        }
+      })
+      .mockResolvedValueOnce({ data: { rows: [] } }) // page filtered
+      .mockResolvedValueOnce({ data: { rows: [] } }) // page unfiltered
+      .mockResolvedValueOnce({ data: { rows: [] } }) // qp filtered
+      .mockResolvedValueOnce({ data: { rows: [] } }); // qp unfiltered
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'dup',
+      rowLimit: 10
+    });
+
+    expect(docs).toHaveLength(2);
+    expect(docs[0].title).toBe('high');
+    expect(docs[1].title).toBe('low');
+  });
 });

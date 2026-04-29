@@ -41,6 +41,35 @@ function rowHasAnyEngagement(row: {
   return clicks > 0 || impressions > 0;
 }
 
+/**
+ * Rank GSC rows so that when we later cap/slice we keep the most impactful items.
+ * Priority: impressions (desc) -> clicks (desc) -> CTR (desc) -> position (asc).
+ */
+function rankGscRows(rows: GscQueryRow[]): GscQueryRow[] {
+  const indexed = rows.map((row, index) => ({ row, index }));
+  indexed.sort((a, b) => {
+    const aImp = typeof a.row.impressions === 'number' && Number.isFinite(a.row.impressions) ? a.row.impressions : 0;
+    const bImp = typeof b.row.impressions === 'number' && Number.isFinite(b.row.impressions) ? b.row.impressions : 0;
+    if (aImp !== bImp) return bImp - aImp;
+
+    const aClk = typeof a.row.clicks === 'number' && Number.isFinite(a.row.clicks) ? a.row.clicks : 0;
+    const bClk = typeof b.row.clicks === 'number' && Number.isFinite(b.row.clicks) ? b.row.clicks : 0;
+    if (aClk !== bClk) return bClk - aClk;
+
+    const aCtr = typeof a.row.ctr === 'number' && Number.isFinite(a.row.ctr) ? a.row.ctr : -1;
+    const bCtr = typeof b.row.ctr === 'number' && Number.isFinite(b.row.ctr) ? b.row.ctr : -1;
+    if (aCtr !== bCtr) return bCtr - aCtr;
+
+    const aPos = typeof a.row.position === 'number' && Number.isFinite(a.row.position) ? a.row.position : Number.POSITIVE_INFINITY;
+    const bPos = typeof b.row.position === 'number' && Number.isFinite(b.row.position) ? b.row.position : Number.POSITIVE_INFINITY;
+    if (aPos !== bPos) return aPos - bPos;
+
+    // Preserve original order for exact ties.
+    return a.index - b.index;
+  });
+  return indexed.map((x) => x.row);
+}
+
 /** Deduplicate merged GSC docs before capping, so cap budget goes to unique URLs. */
 function dedupeGscDocs(docs: SourceDocument[]): SourceDocument[] {
   const seen = new Set<string>();
@@ -371,7 +400,8 @@ export async function fetchGscQueryDocuments(opts: {
   }
 
   const docs: SourceDocument[] = [];
-  for (const row of pack.rows) {
+  const rankedQueryRows = rankGscRows(pack.rows);
+  for (const row of rankedQueryRows) {
     const query = row.keys?.[0];
     if (!query || typeof query !== 'string') {
       continue;
@@ -383,7 +413,8 @@ export async function fetchGscQueryDocuments(opts: {
   const pageRowBudget = Math.min(100, Math.max(5, Math.floor(capped / 2)));
   const pagePack = await fetchPageRowsWithClient(client, pageRowBudget, pipelineQuery);
   if (pagePack && pagePack.rows.length > 0) {
-    for (const row of pagePack.rows) {
+    const rankedPageRows = rankGscRows(pagePack.rows);
+    for (const row of rankedPageRows) {
       const pageUrl = row.keys?.[0];
       if (!pageUrl || typeof pageUrl !== 'string') {
         continue;
@@ -396,7 +427,8 @@ export async function fetchGscQueryDocuments(opts: {
   const qpBudget = Math.min(80, Math.max(8, Math.floor(capped / 3)));
   const qpPack = await fetchQueryPagePairsWithClient(client, qpBudget, pipelineQuery);
   if (qpPack && qpPack.rows.length > 0) {
-    for (const row of qpPack.rows) {
+    const rankedQpRows = rankGscRows(qpPack.rows);
+    for (const row of rankedQpRows) {
       const query = row.keys?.[0];
       const pageUrl = row.keys?.[1];
       if (!query || typeof query !== 'string' || !pageUrl || typeof pageUrl !== 'string') {
