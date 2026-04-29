@@ -207,12 +207,12 @@ export default async function ReportsPage() {
       ) : (
         <table className="data-table data-table-mb-16">
           <caption className="sr-only">
-            Weekly visibility digests: link, generated time, period, score, connector signals label, and top
-            opportunities.
+            Weekly visibility digests: digest id (open detail or copy id), generated time, period, score, connector signals
+            label, and top opportunities.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Digest</th>
+              <th scope="col" className="data-table-th-left">Digest id</th>
               <th scope="col" className="data-table-th-left">Generated</th>
               <th scope="col" className="data-table-th-left">Period</th>
               <th scope="col" className="data-table-th-right">Score</th>
@@ -224,12 +224,20 @@ export default async function ReportsPage() {
             {weeklyDigests.map((d) => (
               <tr key={d.id}>
                 <td className="data-table-td">
-                  <Link
-                    href={`/reports/digest/${d.id}`}
-                    aria-label={`View weekly digest generated ${new Date(d.generatedAt).toLocaleString()} for period ${d.periodStart} to ${d.periodEnd}`}
-                  >
-                    View
-                  </Link>
+                  <div className="inline-run-id-cell">
+                    <Link
+                      href={`/reports/digest/${d.id}`}
+                      aria-label={`View weekly digest ${d.id} generated ${new Date(d.generatedAt).toLocaleString()} for period ${d.periodStart} to ${d.periodEnd}`}
+                    >
+                      {d.id}
+                    </Link>
+                    <CopyTextButton
+                      text={d.id}
+                      label="Copy id"
+                      ariaLabel={`Copy weekly digest id ${d.id}`}
+                      className="btn-compact-inline btn-compact-inline-secondary"
+                    />
+                  </div>
                 </td>
                 <td className="data-table-td">{new Date(d.generatedAt).toLocaleString()}</td>
                 <td className="data-table-td">
