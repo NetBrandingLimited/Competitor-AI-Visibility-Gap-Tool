@@ -205,14 +205,19 @@ export default async function ReportsPage() {
       {weeklyDigests.length === 0 ? (
         <p>No digest yet. Click &quot;Generate weekly digest&quot; above.</p>
       ) : (
-        <table className="data-table data-table-mb-16">
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-mb-16 data-table-min-reports-scroll">
           <caption className="sr-only">
             Weekly visibility digests: digest id (open detail or copy id), generated time, period, score, connector signals
             label, and top opportunities.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Digest id</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col data-table-sticky-col-id">
+                Digest id
+              </th>
               <th scope="col" className="data-table-th-left">Generated</th>
               <th scope="col" className="data-table-th-left">Period</th>
               <th scope="col" className="data-table-th-right">Score</th>
@@ -223,7 +228,7 @@ export default async function ReportsPage() {
           <tbody>
             {weeklyDigests.map((d) => (
               <tr key={d.id}>
-                <td className="data-table-td">
+                <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                   <div className="inline-run-id-cell">
                     <Link
                       href={`/reports/digest/${d.id}`}
@@ -249,7 +254,9 @@ export default async function ReportsPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
 
       <h2>Stored daily snapshots</h2>
@@ -291,14 +298,19 @@ export default async function ReportsPage() {
       {pipelineRuns.length === 0 ? (
         <p>No runs yet for this workspace. Run the unified pipeline below.</p>
       ) : (
-        <table className="data-table">
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-min-reports-scroll">
           <caption className="sr-only">
             Unified pipeline runs for this workspace: run id (open detail or copy id), created time, query, document,
             trigger, and cluster counts.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Run id</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col data-table-sticky-col-id">
+                Run id
+              </th>
               <th scope="col" className="data-table-th-left">Created</th>
               <th scope="col" className="data-table-th-left">Query</th>
               <th scope="col" className="data-table-th-right">Docs</th>
@@ -309,7 +321,7 @@ export default async function ReportsPage() {
           <tbody>
             {pipelineRuns.map((run) => (
               <tr key={run.id}>
-                <td className="data-table-td">
+                <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                   <div className="inline-run-id-cell">
                     <Link
                       href={`/reports/runs/${run.id}`}
@@ -333,7 +345,9 @@ export default async function ReportsPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );
