@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
+import { pipelineIngestionProvenanceDescription } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import type { TrendSnapshot } from '@/lib/trends/store';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
@@ -58,13 +59,8 @@ function gapPipelineProvenancePhrase(run: UnifiedPipelineRun | null): string {
   if (!run) {
     return 'No pipeline run yet.';
   }
-  if (run.ingestionSource === 'live_gsc_queries') {
-    return 'Latest pipeline used live Search Console documents.';
-  }
-  if (run.ingestionSource === 'mock_ingestion') {
-    return 'Latest pipeline used mock document templates (add Search Console under Data connectors for live queries).';
-  }
-  return 'Latest pipeline does not record document provenance (older run).';
+  // Shared helper already returns a full sentence. We strip a trailing period so we can safely embed it.
+  return pipelineIngestionProvenanceDescription(run.ingestionSource).replace(/\.\s*$/, '');
 }
 
 export async function readGapLatestDataForOrg(organizationId: string): Promise<GapLatestData> {
