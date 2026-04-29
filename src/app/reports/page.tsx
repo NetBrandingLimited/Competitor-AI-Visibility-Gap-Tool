@@ -10,6 +10,7 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
@@ -363,13 +364,7 @@ export default async function ReportsPage() {
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
                 <td className="data-table-td">{run.query}</td>
-                <td className="data-table-td">
-                  {run.ingestionSource === 'live_gsc_queries'
-                    ? 'GSC queries'
-                    : run.ingestionSource === 'mock_ingestion'
-                      ? 'Mock'
-                      : '—'}
-                </td>
+                <td className="data-table-td">{pipelineIngestionProvenanceLabel(run.ingestionSource)}</td>
                 <td className="data-table-td-right">{run.documentCount}</td>
                 <td className="data-table-td-right">{run.triggerCount}</td>
                 <td className="data-table-td-right">{run.clusterCount}</td>

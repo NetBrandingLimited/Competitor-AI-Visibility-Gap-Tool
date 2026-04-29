@@ -8,7 +8,7 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
-import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
+import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
@@ -203,11 +203,7 @@ export default async function DashboardPage() {
           </Link>{' '}
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
           <code>{latestRun.query}</code>
-          {latestRun.ingestionSource === 'live_gsc_queries' ? (
-            <> · ingestion: GSC queries</>
-          ) : latestRun.ingestionSource === 'mock_ingestion' ? (
-            <> · ingestion: mock</>
-          ) : null}
+          {latestRun.ingestionSource ? <> · ingestion: {pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}</> : null}
         </p>
       ) : (
         <p>
