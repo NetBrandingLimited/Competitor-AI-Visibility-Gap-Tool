@@ -203,9 +203,23 @@ export default async function OpsPage() {
                 <td className="data-table-td">
                   {job.pipelineRunId || job.weeklyDigestId ? (
                     <>
-                      {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>Run</Link> : null}
+                      {job.pipelineRunId ? (
+                        <Link
+                          href={`/reports/runs/${job.pipelineRunId}`}
+                          aria-label={`Open pipeline run ${job.pipelineRunId} from scheduler job ${job.id}`}
+                        >
+                          Open run
+                        </Link>
+                      ) : null}
                       {job.pipelineRunId && job.weeklyDigestId ? ' | ' : null}
-                      {job.weeklyDigestId ? <Link href={`/reports/digest/${job.weeklyDigestId}`}>Digest</Link> : null}
+                      {job.weeklyDigestId ? (
+                        <Link
+                          href={`/reports/digest/${job.weeklyDigestId}`}
+                          aria-label={`Open weekly digest ${job.weeklyDigestId} from scheduler job ${job.id}`}
+                        >
+                          Open digest
+                        </Link>
+                      ) : null}
                     </>
                   ) : (
                     '-'
