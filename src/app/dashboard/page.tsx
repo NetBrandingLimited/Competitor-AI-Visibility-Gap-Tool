@@ -68,6 +68,14 @@ export default async function DashboardPage() {
   const mockSnapshot = getDashboardSnapshotForOrganization(orgFields);
   const snapshot = pipelineSnapshot ?? mockSnapshot;
   const leaderboardSource: 'pipeline' | 'mock' = pipelineSnapshot ? 'pipeline' : 'mock';
+  const pipelineDocProvenance =
+    latestRun?.ingestionSource === 'live_gsc_queries'
+      ? 'Documents are top search queries from Google Search Console (28-day window), enriched with your brand context when configured.'
+      : latestRun?.ingestionSource === 'mock_ingestion'
+        ? 'Documents are mock templates (connect Search Console under Data connectors for live query rows).'
+        : latestRun
+          ? 'Document source for this run is unspecified (older run).'
+          : null;
   const { thresholds, input: freshnessThresholds } = getFreshnessConfig();
 
   return (
@@ -168,6 +176,7 @@ export default async function DashboardPage() {
         {leaderboardSource === 'pipeline' ? (
           <>
             <strong>Live data</strong> from your latest pipeline run (mention counts in ingested text).{' '}
+            {pipelineDocProvenance ? <>{pipelineDocProvenance} </> : null}
             {previousRun ? (
               <>Share-of-voice change vs the prior run is shown in the last column.</>
             ) : (
@@ -192,6 +201,11 @@ export default async function DashboardPage() {
           </Link>{' '}
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
           <code>{latestRun.query}</code>
+          {latestRun.ingestionSource === 'live_gsc_queries' ? (
+            <> · ingestion: GSC queries</>
+          ) : latestRun.ingestionSource === 'mock_ingestion' ? (
+            <> · ingestion: mock</>
+          ) : null}
         </p>
       ) : (
         <p>

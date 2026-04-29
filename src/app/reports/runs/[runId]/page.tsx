@@ -64,8 +64,13 @@ export default async function PipelineRunDetailPage({
         />
       </p>
       <p>
-        Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} |
-        Clusters: {run.clusterCount}
+        Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} | Clusters:{' '}
+        {run.clusterCount}
+        {run.ingestionSource === 'live_gsc_queries'
+          ? ' | Ingestion: Google Search Console queries'
+          : run.ingestionSource === 'mock_ingestion'
+            ? ' | Ingestion: mock templates'
+            : null}
       </p>
       <p>
         <Link href="/reports">Back to reports</Link>

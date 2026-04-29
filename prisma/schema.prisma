@@ -72,6 +72,8 @@ model PipelineRun {
   documentCount      Int
   triggerCount       Int
   clusterCount       Int
+  /// live_gsc_queries | mock_ingestion — how documents were sourced for this run
+  ingestionSource    String?
   ingestionEventsRaw String
   documentsRaw       String
   triggersRaw        String

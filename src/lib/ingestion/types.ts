@@ -1,4 +1,4 @@
-export type ConnectorName = 'reddit-mock' | 'hn-mock';
+export type ConnectorName = 'reddit-mock' | 'hn-mock' | 'google_search_console';
 
 /** Mirrors org brand fields; kept here to avoid circular imports with org-visibility-mock. */
 export type IngestionBrandContext = {

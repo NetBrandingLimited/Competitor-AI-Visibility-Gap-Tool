@@ -1,6 +1,6 @@
 import { clusterThemes } from '@/lib/analysis/clusterThemes';
 import { extractQuestionTriggers } from '@/lib/analysis/extractTriggers';
-import { runMockIngestion } from '@/lib/ingestion/pipeline';
+import { runOrgIngestion } from '@/lib/ingestion/pipeline';
 import { defaultPipelineQueryFromOrg, simpleHash, type OrgBrandFields } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 
@@ -61,7 +61,8 @@ export async function runUnifiedPipeline(input: {
   const query =
     trimmed && trimmed.length > 0 ? trimmed : defaultPipelineQueryFromOrg(brandFields);
 
-  const ingestion = await runMockIngestion({
+  const { result: ingestion, ingestionSource } = await runOrgIngestion({
+    organizationId: input.organizationId,
     query,
     limitPerConnector: input.limitPerConnector,
     brandContext: brandFields,
@@ -82,6 +83,7 @@ export async function runUnifiedPipeline(input: {
     documentCount: ingestion.documents.length,
     triggerCount: triggers.length,
     clusterCount: clusters.length,
+    ingestionSource,
     ingestionEvents: ingestion.events.map((event) => event.type),
     documents: ingestion.documents,
     triggers,

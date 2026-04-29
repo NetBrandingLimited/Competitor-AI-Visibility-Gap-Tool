@@ -109,7 +109,8 @@ export default async function ReportsPage() {
             <code>trends-only CSV</code>: legacy trend schema for existing imports/dashboards.
           </li>
           <li>
-            <code>pipeline runs CSV</code>: per-run operational metrics (docs, triggers, clusters, query).
+            <code>pipeline runs CSV</code>: per-run operational metrics (docs, triggers, clusters, query, ingestion
+            source).
           </li>
         </ul>
       </div>
@@ -303,9 +304,10 @@ export default async function ReportsPage() {
       <h2 className="mt-24">Unified pipeline runs</h2>
       <p className="text-muted-note-wide">
         Each row is <strong>this workspace only</strong> (not mixed with other accounts). The <strong>Query</strong> is
-        built from your saved brand fields when you don&apos;t pass a custom query. <strong>Docs / Triggers / Clusters</strong>{' '}
-        are counts from mock ingestion plus on-device heuristics (not live Google or AI answers). New runs rotate mock
-        document wording by run id so trigger and cluster counts can differ between runs even with the same query.
+        built from your saved brand fields when you don&apos;t pass a custom query. <strong>Docs</strong> come from{' '}
+        Google Search Console query rows when the workspace has GSC configured and the API returns data; otherwise mock
+        templates are used. <strong>Triggers / Clusters</strong> are always derived on-device from document text (not
+        live AI answers). Mock runs still rotate wording by run id so counts can differ between runs with the same query.
       </p>
       {pipelineRuns.length === 0 ? (
         <p>No runs yet for this workspace. Run the unified pipeline below.</p>
@@ -325,6 +327,7 @@ export default async function ReportsPage() {
               </th>
               <th scope="col" className="data-table-th-left">Created</th>
               <th scope="col" className="data-table-th-left">Query</th>
+              <th scope="col" className="data-table-th-left">Ingestion</th>
               <th scope="col" className="data-table-th-right">Docs</th>
               <th scope="col" className="data-table-th-right">Triggers</th>
               <th scope="col" className="data-table-th-right">Clusters</th>
@@ -351,6 +354,13 @@ export default async function ReportsPage() {
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
                 <td className="data-table-td">{run.query}</td>
+                <td className="data-table-td">
+                  {run.ingestionSource === 'live_gsc_queries'
+                    ? 'GSC queries'
+                    : run.ingestionSource === 'mock_ingestion'
+                      ? 'Mock'
+                      : '—'}
+                </td>
                 <td className="data-table-td-right">{run.documentCount}</td>
                 <td className="data-table-td-right">{run.triggerCount}</td>
                 <td className="data-table-td-right">{run.clusterCount}</td>

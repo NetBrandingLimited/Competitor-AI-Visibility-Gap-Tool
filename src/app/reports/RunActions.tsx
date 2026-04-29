@@ -72,8 +72,9 @@ export default function RunActions() {
   return (
     <div className="stack-y-actions">
       <p className="text-muted-note mb-8">
-        Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query and mock
-        document text. Set them under <Link href="/settings/brand">Brand settings</Link> first.
+        Pipeline uses your saved <strong>brand &amp; competitors</strong> for the default search query. With{' '}
+        <Link href="/settings/connectors">Search Console</Link> configured, documents are live query rows; otherwise mock
+        text is used. Set brand fields under <Link href="/settings/brand">Brand settings</Link>.
       </p>
       <button
         type="button"
