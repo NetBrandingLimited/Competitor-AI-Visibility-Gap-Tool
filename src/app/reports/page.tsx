@@ -103,7 +103,8 @@ export default async function ReportsPage() {
         <strong>Which CSV should I use?</strong>
         <ul className="list-indent-mt8">
           <li>
-            <code>full report CSV</code>: trends + gap opportunities + topic recommendations in one file.
+            <code>full report CSV</code>: trends + gap opportunities + topic recommendations + latest weekly digest
+            provenance in one file.
           </li>
           <li>
             <code>trends-only CSV</code>: legacy trend schema for existing imports/dashboards.
