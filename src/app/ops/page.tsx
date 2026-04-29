@@ -111,6 +111,8 @@ export default async function OpsPage() {
         Scheduler runs in this workspace only. Default pipeline query comes from your brand settings; optional{' '}
         <code>query=</code> overrides. Weekly digest is generated only when schedule is due (or forced).
         Example: <code>POST /api/debug/scheduler/run?limit=2&amp;forceDigest=1</code> (requires sign-in).
+        Debug ingestion (live Search Console row filtering/capping):{' '}
+        <Link href="/debug/ingestion">/debug/ingestion</Link>.
         Production-style automation: hourly <code>GET /api/cron/weekly-scheduler</code> with{' '}
         <code>Authorization: Bearer $CRON_SECRET</code> generates digests only (no full pipeline) for orgs whose
         schedule is due; add <code>&amp;full=1</code> to run pipeline + trends + digest like Ops. See{' '}
