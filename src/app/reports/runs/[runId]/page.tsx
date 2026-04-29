@@ -7,6 +7,28 @@ import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
+function truncateUrlForCell(url: string, maxLen: number): string {
+  const t = url.trim();
+  if (t.length <= maxLen) {
+    return t;
+  }
+  return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
+}
+
+/** Renders a web link for http(s) URLs; otherwise plain text (e.g. synthetic `gsc://` ids). */
+function DocumentUrlCell({ url }: { url: string }) {
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    const label = truncateUrlForCell(trimmed, 72);
+    return (
+      <a href={trimmed} target="_blank" rel="noopener noreferrer" title={trimmed}>
+        {label}
+      </a>
+    );
+  }
+  return <code>{truncateUrlForCell(trimmed, 72)}</code>;
+}
+
 function runTitleSegment(runId: string): string {
   const id = runId.trim();
   if (!id) return 'Pipeline run';
@@ -86,7 +108,7 @@ export default async function PipelineRunDetailPage({
           <div className="table-scroll-wrap">
             <table className="data-table data-table-mb-16 data-table-min-run-triggers">
               <caption className="sr-only">
-                Ingested source documents for this pipeline run: source, title, document id, and published time.
+                Ingested source documents for this pipeline run: source, title, URL, document id, and published time.
               </caption>
               <thead>
                 <tr>
@@ -94,6 +116,7 @@ export default async function PipelineRunDetailPage({
                     Source
                   </th>
                   <th scope="col" className="data-table-th-left">Title</th>
+                  <th scope="col" className="data-table-th-left">URL</th>
                   <th scope="col" className="data-table-th-left">Id</th>
                   <th scope="col" className="data-table-th-left">Published</th>
                 </tr>
@@ -105,6 +128,9 @@ export default async function PipelineRunDetailPage({
                       {ingestionSourceDisplayLabel(doc.source)}
                     </td>
                     <td className="data-table-td">{doc.title}</td>
+                    <td className="data-table-td">
+                      <DocumentUrlCell url={doc.url} />
+                    </td>
                     <td className="data-table-td">
                       <code>{doc.id}</code>
                     </td>
