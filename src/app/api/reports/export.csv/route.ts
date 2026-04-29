@@ -53,7 +53,8 @@ export async function GET() {
     'digestPeriodEnd',
     'digestScore',
     'digestConnectorSignals',
-    'digestPipelineDocs'
+    'digestPipelineDocs',
+    'digestPipelineIngestionSource'
   ];
 
   const trendRows = snapshots.map((row) =>
@@ -64,6 +65,7 @@ export async function GET() {
       row.totalMentions,
       row.topBrand,
       row.topBrandMentions,
+      '',
       '',
       '',
       '',
@@ -106,6 +108,7 @@ export async function GET() {
       '',
       '',
       '',
+      '',
       ''
     ]
       .map(escapeCsv)
@@ -129,6 +132,7 @@ export async function GET() {
       topic.triggerCount,
       topic.clusterWeight,
       topic.recommendation,
+      '',
       '',
       '',
       '',
@@ -164,7 +168,8 @@ export async function GET() {
           latestDigest.periodEnd,
           latestDigest.summary.score ?? '',
           weeklyDigestSignalsLabel(latestDigest.summary),
-          weeklyDigestPipelineLabel(latestDigest.summary)
+          weeklyDigestPipelineLabel(latestDigest.summary),
+          latestDigest.summary.pipelineIngestionSource ?? ''
         ]
           .map(escapeCsv)
           .join(',')
