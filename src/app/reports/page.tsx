@@ -104,7 +104,7 @@ export default async function ReportsPage() {
         <ul className="list-indent-mt8">
           <li>
             <code>full report CSV</code>: trends + gap opportunities + topic recommendations + latest weekly digest
-            provenance in one file.
+            provenance in one file (includes both label + raw `digestPipelineIngestionSource`).
           </li>
           <li>
             <code>trends-only CSV</code>: legacy trend schema for existing imports/dashboards.
