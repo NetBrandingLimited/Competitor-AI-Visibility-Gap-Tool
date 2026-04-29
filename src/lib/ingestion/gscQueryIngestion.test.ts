@@ -130,6 +130,20 @@ describe('fetchGscQueryDocuments', () => {
             }
           ]
         }
+      })
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            {
+              keys: ['best crm for startups', 'https://example.com/pricing'],
+              clicks: 1,
+              impressions: 12,
+              ctr: 0.08,
+              position: 5
+            }
+          ]
+        }
       });
 
     const docs = await fetchGscQueryDocuments({
@@ -138,7 +152,7 @@ describe('fetchGscQueryDocuments', () => {
       rowLimit: 10
     });
 
-    expect(hoisted.queryMock).toHaveBeenCalledTimes(4);
+    expect(hoisted.queryMock).toHaveBeenCalledTimes(6);
     const firstBody = hoisted.queryMock.mock.calls[0][0].requestBody;
     expect(firstBody.dimensionFilterGroups).toBeDefined();
     const secondBody = hoisted.queryMock.mock.calls[1][0].requestBody;
@@ -148,13 +162,19 @@ describe('fetchGscQueryDocuments', () => {
     expect(pageBody.dimensions).toEqual(['page']);
     expect(pageBody.dimensionFilterGroups?.[0]?.filters?.[0]?.dimension).toBe('page');
 
-    expect(docs).toHaveLength(2);
+    const qpBody = hoisted.queryMock.mock.calls[4][0].requestBody;
+    expect(qpBody.dimensions).toEqual(['query', 'page']);
+
+    expect(docs).toHaveLength(3);
     expect(docs[0].title).toBe('best crm for startups');
     expect(docs[0].content).toContain('Search query:');
     expect(docs[1].url).toContain('gsc://landing-page/');
     expect(docs[1].title).toBe('Page: pricing');
     expect(docs[1].content).toContain('https://example.com/pricing');
     expect(docs[1].content).toContain('9 clicks');
+    expect(docs[2].url).toContain('gsc://query-page/');
+    expect(docs[2].title).toContain('→');
+    expect(docs[2].content).toContain('landing page');
     expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
 
@@ -178,6 +198,12 @@ describe('fetchGscQueryDocuments', () => {
         data: {
           rows: [{ keys: ['https://example.com/crm'], clicks: 3, impressions: 30, ctr: 0.1, position: 3 }]
         }
+      })
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [{ keys: ['crm pricing', 'https://example.com/crm'], clicks: 1, impressions: 8, ctr: 0.125, position: 2.5 }]
+        }
       });
 
     const docs = await fetchGscQueryDocuments({
@@ -186,11 +212,12 @@ describe('fetchGscQueryDocuments', () => {
       rowLimit: 10
     });
 
-    expect(hoisted.queryMock).toHaveBeenCalledTimes(3);
-    expect(docs).toHaveLength(2);
+    expect(hoisted.queryMock).toHaveBeenCalledTimes(5);
+    expect(docs).toHaveLength(3);
     expect(docs[0].title).toBe('crm pricing');
     expect(docs[1].content).toContain('Landing page from Search Console');
     expect(docs[1].content).toContain('https://example.com/crm');
+    expect(docs[2].url).toContain('gsc://query-page/');
     expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
 });

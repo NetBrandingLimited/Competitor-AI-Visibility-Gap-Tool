@@ -13,7 +13,7 @@ const WINDOW_DAYS = 28;
 
 type GscSearchAnalyticsBody = webmasters_v3.Schema$SearchAnalyticsQueryRequest;
 
-function stableDocId(kind: 'q' | 'p', key: string): string {
+function stableDocId(kind: 'q' | 'p' | 'qp', key: string): string {
   const payload = `${kind}:${key}`;
   let h = 0;
   for (let i = 0; i < payload.length; i++) {
@@ -56,6 +56,36 @@ function rowToSourceDocument(
     url: `gsc://search-query/${encodeURIComponent(query)}`,
     title: query,
     content: `Search query: ${query}. In the last ${WINDOW_DAYS} days: ${clicks} clicks, ${impressions} impressions, CTR ${ctrPct}, average position ${posStr}.`,
+    publishedAt: asOf
+  };
+}
+
+function rowQueryPagePairToSourceDocument(
+  query: string,
+  pageUrl: string,
+  row: {
+    clicks?: number | null;
+    impressions?: number | null;
+    ctr?: number | null;
+    position?: number | null;
+  },
+  asOf: string
+): SourceDocument {
+  const clicks = typeof row.clicks === 'number' && Number.isFinite(row.clicks) ? row.clicks : 0;
+  const impressions =
+    typeof row.impressions === 'number' && Number.isFinite(row.impressions) ? row.impressions : 0;
+  const ctr = typeof row.ctr === 'number' && Number.isFinite(row.ctr) ? row.ctr : null;
+  const position = typeof row.position === 'number' && Number.isFinite(row.position) ? row.position : null;
+  const ctrPct = ctr !== null ? `${(ctr * 100).toFixed(2)}%` : 'n/a';
+  const posStr = position !== null ? position.toFixed(2) : 'n/a';
+  const pageLabel = pageTitleFromUrl(pageUrl);
+  const pairKey = `${query}\t${pageUrl}`;
+  return {
+    id: stableDocId('qp', pairKey),
+    source: 'google_search_console',
+    url: `gsc://query-page/${encodeURIComponent(query)}|${encodeURIComponent(pageUrl)}`,
+    title: `${query} → ${pageLabel}`,
+    content: `Search query "${query}" with landing page ${pageUrl}. In the last ${WINDOW_DAYS} days: ${clicks} clicks, ${impressions} impressions, CTR ${ctrPct}, average position ${posStr}.`,
     publishedAt: asOf
   };
 }
@@ -240,10 +270,52 @@ async function fetchPageRowsWithClient(
   return { rows: unfiltered, asOf: client.asOf };
 }
 
+/** Query + page pairs (two dimensions); query "contains" filter then unfiltered. */
+async function fetchQueryPagePairsWithClient(
+  client: GscSearchAnalyticsClient,
+  rowLimit: number,
+  pipelineQuery: string
+): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
+  const q = pipelineQuery.trim();
+  const capped = Math.min(100, Math.max(1, rowLimit));
+  const tryFiltered = q.length >= 2;
+  if (tryFiltered) {
+    const filtered = await runSearchAnalytics(client, {
+      dimensions: ['query', 'page'],
+      rowLimit: capped,
+      dimensionFilterGroups: [
+        {
+          filters: [
+            {
+              dimension: 'query' as const,
+              operator: 'contains' as const,
+              expression: q
+            }
+          ]
+        }
+      ]
+    });
+    if (filtered === null) {
+      return null;
+    }
+    if (filtered.length > 0) {
+      return { rows: filtered, asOf: client.asOf };
+    }
+  }
+  const unfiltered = await runSearchAnalytics(client, {
+    dimensions: ['query', 'page'],
+    rowLimit: capped
+  });
+  if (unfiltered === null) {
+    return null;
+  }
+  return { rows: unfiltered, asOf: client.asOf };
+}
+
 /**
- * Top Search Console queries and landing pages as {@link SourceDocument} rows for the unified pipeline.
- * Queries: tries a query "contains" filter aligned with the pipeline query, then unfiltered top queries.
- * When query rows exist, also merges top pages (page dimension; optional URL contains filter, then unfiltered).
+ * Top Search Console queries, landing pages, and query–page pairs as {@link SourceDocument} rows.
+ * Queries: query "contains" filter then unfiltered top queries.
+ * When query rows exist, also merges top pages (page dimension) and top query+page pairs (two dimensions).
  */
 export async function fetchGscQueryDocuments(opts: {
   organizationId: string;
@@ -284,6 +356,19 @@ export async function fetchGscQueryDocuments(opts: {
         continue;
       }
       docs.push(rowPageToSourceDocument(pageUrl, row, pagePack.asOf));
+    }
+  }
+
+  const qpBudget = Math.min(80, Math.max(8, Math.floor(capped / 3)));
+  const qpPack = await fetchQueryPagePairsWithClient(client, qpBudget, pipelineQuery);
+  if (qpPack && qpPack.rows.length > 0) {
+    for (const row of qpPack.rows) {
+      const query = row.keys?.[0];
+      const pageUrl = row.keys?.[1];
+      if (!query || typeof query !== 'string' || !pageUrl || typeof pageUrl !== 'string') {
+        continue;
+      }
+      docs.push(rowQueryPagePairToSourceDocument(query, pageUrl, row, qpPack.asOf));
     }
   }
 
