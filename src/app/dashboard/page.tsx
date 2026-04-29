@@ -8,6 +8,7 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
+import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
@@ -321,9 +322,11 @@ export default async function DashboardPage() {
           </tr>
         </thead>
         <tbody>
-          {snapshot.recent.map((row) => (
-            <tr key={`${row.source}-${row.query}`}>
-              <td className="data-table-td data-table-sticky-col">{row.source}</td>
+          {snapshot.recent.map((row, index) => (
+            <tr key={`${row.source}-${row.publishedAt}-${index}`}>
+              <td className="data-table-td data-table-sticky-col">
+                {ingestionSourceDisplayLabel(row.source)}
+              </td>
               <td className="data-table-td">{row.query}</td>
               <td className="data-table-td">{row.topBrand}</td>
               <td className="data-table-td">{new Date(row.publishedAt).toLocaleString()}</td>
