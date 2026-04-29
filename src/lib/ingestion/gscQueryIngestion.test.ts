@@ -178,6 +178,61 @@ describe('fetchGscQueryDocuments', () => {
     expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
   });
 
+  it('caps merged documents while preserving query → page → pair order', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    const queryRows = Array.from({ length: 80 }, (_, i) => ({
+      keys: [`query-${i}`],
+      clicks: 1,
+      impressions: 2,
+      ctr: 0.5,
+      position: 1
+    }));
+    const pageRows = Array.from({ length: 30 }, (_, i) => ({
+      keys: [`https://example.com/p${i}`],
+      clicks: 1,
+      impressions: 1,
+      ctr: 1,
+      position: 1
+    }));
+    const qpRows = Array.from({ length: 20 }, (_, i) => ({
+      keys: [`qp-${i}`, `https://example.com/qp${i}`],
+      clicks: 1,
+      impressions: 1,
+      ctr: 1,
+      position: 1
+    }));
+
+    hoisted.queryMock
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({ data: { rows: queryRows } })
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({ data: { rows: pageRows } })
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({ data: { rows: qpRows } });
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'crm',
+      rowLimit: 60
+    });
+
+    expect(docs).toHaveLength(120);
+    expect(docs[0].title).toBe('query-0');
+    expect(docs[79].title).toBe('query-79');
+    expect(docs[80].url).toContain('gsc://landing-page/');
+    expect(docs[109].url).toContain('gsc://landing-page/');
+    expect(docs[110].url).toContain('gsc://query-page/');
+    expect(docs[119].url).toContain('gsc://query-page/');
+    expect(hoisted.webmastersFactory).toHaveBeenCalledTimes(1);
+  });
+
   it('uses a single API call when the filtered request returns rows', async () => {
     hoisted.readOrgConnectorSettings.mockResolvedValue({
       gscSiteUrl: 'https://example.com/',

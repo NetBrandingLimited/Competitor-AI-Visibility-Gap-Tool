@@ -11,6 +11,15 @@ const GSC_SCOPE_READONLY = 'https://www.googleapis.com/auth/webmasters.readonly'
 
 const WINDOW_DAYS = 28;
 
+/** After merging query, page, and query–page rows, cap total documents (priority order preserved). */
+function capGscDocumentList(docs: SourceDocument[], cappedRowBudget: number): SourceDocument[] {
+  const maxTotal = Math.min(220, Math.max(25, cappedRowBudget * 2));
+  if (docs.length <= maxTotal) {
+    return docs;
+  }
+  return docs.slice(0, maxTotal);
+}
+
 type GscSearchAnalyticsBody = webmasters_v3.Schema$SearchAnalyticsQueryRequest;
 
 function stableDocId(kind: 'q' | 'p' | 'qp', key: string): string {
@@ -372,5 +381,16 @@ export async function fetchGscQueryDocuments(opts: {
     }
   }
 
-  return docs;
+  const mergedCount = docs.length;
+  const cappedDocs = capGscDocumentList(docs, capped);
+  if (process.env.NODE_ENV === 'development' && mergedCount > 0) {
+    const pageRows = pagePack?.rows.length ?? 0;
+    const qpRows = qpPack?.rows.length ?? 0;
+    console.info(
+      `[GSC ingestion] org=${organizationId.slice(0, 8)}… API rows: query=${pack.rows.length} page=${pageRows} pair=${qpRows} → merged docs=${mergedCount}` +
+        (cappedDocs.length < mergedCount ? ` (capped to ${cappedDocs.length})` : '')
+    );
+  }
+
+  return cappedDocs;
 }
