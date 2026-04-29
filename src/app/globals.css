@@ -325,6 +325,15 @@ p { color: #333; }
 .data-table-min-ops {
   min-width: 980px;
 }
+.data-table-sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+}
+thead .data-table-sticky-col {
+  z-index: 2;
+}
 
 .field-hint-small {
   display: block;
@@ -789,6 +798,9 @@ p { color: #333; }
   }
   .table-scroll-hint {
     display: block;
+  }
+  .data-table-sticky-col {
+    box-shadow: 8px 0 10px -10px rgba(15, 23, 42, 0.35);
   }
 }
 
