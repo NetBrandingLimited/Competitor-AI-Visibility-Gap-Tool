@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { ingestionSourceDisplayLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
 function runTitleSegment(runId: string): string {
@@ -67,7 +68,7 @@ export default async function PipelineRunDetailPage({
         Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} | Clusters:{' '}
         {run.clusterCount}
         {run.ingestionSource === 'live_gsc_queries'
-          ? ' | Ingestion: Google Search Console queries'
+          ? ' | Ingestion: Search Console (queries, landing pages, query–page pairs)'
           : run.ingestionSource === 'mock_ingestion'
             ? ' | Ingestion: mock templates'
             : null}
@@ -75,6 +76,46 @@ export default async function PipelineRunDetailPage({
       <p>
         <Link href="/reports">Back to reports</Link>
       </p>
+
+      <h2>Source documents</h2>
+      {run.documents.length === 0 ? (
+        <p>No documents stored for this run.</p>
+      ) : (
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-mb-16 data-table-min-run-triggers">
+              <caption className="sr-only">
+                Ingested source documents for this pipeline run: source, title, document id, and published time.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="data-table-th-left data-table-sticky-col">
+                    Source
+                  </th>
+                  <th scope="col" className="data-table-th-left">Title</th>
+                  <th scope="col" className="data-table-th-left">Id</th>
+                  <th scope="col" className="data-table-th-left">Published</th>
+                </tr>
+              </thead>
+              <tbody>
+                {run.documents.map((doc, index) => (
+                  <tr key={`${doc.id}-${index}`}>
+                    <td className="data-table-td data-table-sticky-col">
+                      {ingestionSourceDisplayLabel(doc.source)}
+                    </td>
+                    <td className="data-table-td">{doc.title}</td>
+                    <td className="data-table-td">
+                      <code>{doc.id}</code>
+                    </td>
+                    <td className="data-table-td-nowrap">{new Date(doc.publishedAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       <h2>Trigger phrases</h2>
       {run.triggers.length === 0 ? (
