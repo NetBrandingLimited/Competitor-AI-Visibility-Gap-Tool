@@ -311,6 +311,20 @@ p { color: #333; }
   border-bottom: 1px solid #eee;
   white-space: nowrap;
 }
+.table-scroll-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll-hint {
+  margin: 8px 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+  display: none;
+}
+.data-table-min-ops {
+  min-width: 980px;
+}
 
 .field-hint-small {
   display: block;
@@ -772,6 +786,9 @@ p { color: #333; }
   }
   .app-nav-workspace-copy {
     min-width: 96px;
+  }
+  .table-scroll-hint {
+    display: block;
   }
 }
 

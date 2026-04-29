@@ -162,74 +162,79 @@ export default async function OpsPage() {
       {jobs.length === 0 ? (
         <p>No scheduler jobs yet for this workspace.</p>
       ) : (
-        <table className="data-table">
-          <caption className="sr-only">
-            Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
-            and digest, digest connector signals label, quick links, and completion time.
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col" className="data-table-th-left">Job id</th>
-              <th scope="col" className="data-table-th-left">Status</th>
-              <th scope="col" className="data-table-th-left">Details</th>
-              <th scope="col" className="data-table-th-left">Query</th>
-              <th scope="col" className="data-table-th-left">Pipeline run</th>
-              <th scope="col" className="data-table-th-left">Weekly digest</th>
-              <th scope="col" className="data-table-th-left">Digest signals</th>
-              <th scope="col" className="data-table-th-left">Actions</th>
-              <th scope="col" className="data-table-th-left">Completed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jobs.map((job) => (
-              <tr key={job.id}>
-                <td className="data-table-td">{job.id}</td>
-                <td className="data-table-td">{job.status}</td>
-                <td className="data-table-td">{describeSchedulerJob(job)}</td>
-                <td className="data-table-td">{job.query}</td>
-                <td className="data-table-td">
-                  {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
-                </td>
-                <td className="data-table-td">
-                  {job.weeklyDigestId ? (
-                    <Link href={`/reports/digest/${job.weeklyDigestId}`}>{job.weeklyDigestId}</Link>
-                  ) : (
-                    '-'
-                  )}
-                </td>
-                <td className="data-table-td">
-                  {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
-                </td>
-                <td className="data-table-td">
-                  {job.pipelineRunId || job.weeklyDigestId ? (
-                    <>
-                      {job.pipelineRunId ? (
-                        <Link
-                          href={`/reports/runs/${job.pipelineRunId}`}
-                          aria-label={`Open pipeline run ${job.pipelineRunId} from scheduler job ${job.id}`}
-                        >
-                          Open run
-                        </Link>
-                      ) : null}
-                      {job.pipelineRunId && job.weeklyDigestId ? ' | ' : null}
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-min-ops">
+              <caption className="sr-only">
+                Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
+                and digest, digest connector signals label, quick links, and completion time.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col" className="data-table-th-left">Job id</th>
+                  <th scope="col" className="data-table-th-left">Status</th>
+                  <th scope="col" className="data-table-th-left">Details</th>
+                  <th scope="col" className="data-table-th-left">Query</th>
+                  <th scope="col" className="data-table-th-left">Pipeline run</th>
+                  <th scope="col" className="data-table-th-left">Weekly digest</th>
+                  <th scope="col" className="data-table-th-left">Digest signals</th>
+                  <th scope="col" className="data-table-th-left">Actions</th>
+                  <th scope="col" className="data-table-th-left">Completed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {jobs.map((job) => (
+                  <tr key={job.id}>
+                    <td className="data-table-td">{job.id}</td>
+                    <td className="data-table-td">{job.status}</td>
+                    <td className="data-table-td">{describeSchedulerJob(job)}</td>
+                    <td className="data-table-td">{job.query}</td>
+                    <td className="data-table-td">
+                      {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
+                    </td>
+                    <td className="data-table-td">
                       {job.weeklyDigestId ? (
-                        <Link
-                          href={`/reports/digest/${job.weeklyDigestId}`}
-                          aria-label={`Open weekly digest ${job.weeklyDigestId} from scheduler job ${job.id}`}
-                        >
-                          Open digest
-                        </Link>
-                      ) : null}
-                    </>
-                  ) : (
-                    '-'
-                  )}
-                </td>
-                <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                        <Link href={`/reports/digest/${job.weeklyDigestId}`}>{job.weeklyDigestId}</Link>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                    <td className="data-table-td">
+                      {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
+                    </td>
+                    <td className="data-table-td">
+                      {job.pipelineRunId || job.weeklyDigestId ? (
+                        <>
+                          {job.pipelineRunId ? (
+                            <Link
+                              href={`/reports/runs/${job.pipelineRunId}`}
+                              aria-label={`Open pipeline run ${job.pipelineRunId} from scheduler job ${job.id}`}
+                            >
+                              Open run
+                            </Link>
+                          ) : null}
+                          {job.pipelineRunId && job.weeklyDigestId ? ' | ' : null}
+                          {job.weeklyDigestId ? (
+                            <Link
+                              href={`/reports/digest/${job.weeklyDigestId}`}
+                              aria-label={`Open weekly digest ${job.weeklyDigestId} from scheduler job ${job.id}`}
+                            >
+                              Open digest
+                            </Link>
+                          ) : null}
+                        </>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                    <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );
