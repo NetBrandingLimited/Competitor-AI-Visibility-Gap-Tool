@@ -68,6 +68,8 @@ export default async function DebugIngestionPage({
       })
     : null;
 
+  const gscDiagnostics = run?.gscDiagnostics ?? null;
+
   return (
     <section>
       <h1>Debug Ingestion</h1>
@@ -117,10 +119,53 @@ export default async function DebugIngestionPage({
           </p>
 
           <h3>GSC diagnostics</h3>
-          {run.gscDiagnostics ? (
-            <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-              {JSON.stringify(run.gscDiagnostics, null, 2)}
-            </pre>
+          {gscDiagnostics ? (
+            <>
+              <dl
+                style={{
+                  margin: '8px 0 16px 0',
+                  padding: '8px 12px',
+                  border: '1px solid rgba(0,0,0,0.08)'
+                }}
+              >
+                <dt>Query attempt</dt>
+                <dd>
+                  usedFiltered={String(gscDiagnostics.queryAttempt.usedFiltered)} · usedUnfiltered=
+                  {String(gscDiagnostics.queryAttempt.usedUnfiltered)} · filteredRows=
+                  {gscDiagnostics.queryAttempt.filteredRows} · unfilteredRows=
+                  {gscDiagnostics.queryAttempt.unfilteredRows}
+                </dd>
+                <dt>Query docs</dt>
+                <dd>
+                  fetched={gscDiagnostics.query.fetched} · zeroEngagementDropped=
+                  {gscDiagnostics.query.filteredZeroEngagement} · lowSignalDropped=
+                  {gscDiagnostics.query.filteredLowSignal} · created=
+                  {gscDiagnostics.query.docsCreated}
+                </dd>
+                <dt>Page docs</dt>
+                <dd>
+                  fetched={gscDiagnostics.page.fetched} · zeroEngagementDropped=
+                  {gscDiagnostics.page.filteredZeroEngagement} · lowSignalDropped=
+                  {gscDiagnostics.page.filteredLowSignal} · created=
+                  {gscDiagnostics.page.docsCreated}
+                </dd>
+                <dt>Query+Page docs</dt>
+                <dd>
+                  fetched={gscDiagnostics.qp.fetched} · zeroEngagementDropped=
+                  {gscDiagnostics.qp.filteredZeroEngagement} · lowSignalDropped=
+                  {gscDiagnostics.qp.filteredLowSignal} · created=
+                  {gscDiagnostics.qp.docsCreated}
+                </dd>
+                <dt>Merged → capped</dt>
+                <dd>
+                  mergedBeforeDedupe={gscDiagnostics.mergedDocsBeforeDedupe} · dedupedDocs=
+                  {gscDiagnostics.dedupedDocs} · cappedDocs={gscDiagnostics.cappedDocs}
+                </dd>
+              </dl>
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {JSON.stringify(gscDiagnostics, null, 2)}
+              </pre>
+            </>
           ) : (
             <p>Not recorded (fell back to mock ingestion).</p>
           )}
