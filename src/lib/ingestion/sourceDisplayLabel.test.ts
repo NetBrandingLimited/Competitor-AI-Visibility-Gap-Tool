@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ingestionSourceDisplayLabel } from './sourceDisplayLabel';
+import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from './sourceDisplayLabel';
 
 describe('ingestionSourceDisplayLabel', () => {
   it('maps known connector ids', () => {
@@ -11,5 +11,14 @@ describe('ingestionSourceDisplayLabel', () => {
 
   it('returns unknown values unchanged', () => {
     expect(ingestionSourceDisplayLabel('future_connector')).toBe('future_connector');
+  });
+});
+
+describe('pipelineIngestionProvenanceLabel', () => {
+  it('maps pipeline ingestion sources', () => {
+    expect(pipelineIngestionProvenanceLabel('live_gsc_queries')).toBe('Search Console');
+    expect(pipelineIngestionProvenanceLabel('mock_ingestion')).toBe('Mock templates');
+    expect(pipelineIngestionProvenanceLabel(undefined)).toBe('Not recorded');
+    expect(pipelineIngestionProvenanceLabel(null)).toBe('Not recorded');
   });
 });

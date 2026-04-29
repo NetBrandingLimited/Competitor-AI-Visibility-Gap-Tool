@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 import RecalculateVisibilityForm from './RecalculateVisibilityForm';
+import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
+import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import type { VisibilityReasonV1 } from '@/lib/visibility/scoreV1';
 
 type Props = {
@@ -10,6 +12,7 @@ type Props = {
     score: number;
     createdAt: string;
     reasons: VisibilityReasonV1[];
+    pipelineIngestionSource?: PipelineIngestionSource | null;
     signalSource?: 'cache' | 'live';
     signalCacheKind?: 'ttl' | 'stale_fallback' | null;
     signalsAsOf?: string | null;
@@ -41,7 +44,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
     <div className="panel-box-info mb-28">
       <h2 className="mt-0">Visibility score (v1)</h2>
       <p className="text-muted-note mt-0">
-        Heuristic score from your latest mock pipeline + trend snapshot + connector signals (when configured).{' '}
+        Heuristic score from your latest pipeline run + trend snapshot + connector signals (when configured).{' '}
         <Link
           href={`/api/orgs/${organizationId}/visibility`}
           target="_blank"
@@ -70,6 +73,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
           <p className="score-display-lg">{Math.round(latest.score)}</p>
           <p className="text-muted-small-subtle mt-0">
             Last updated: {new Date(latest.createdAt).toLocaleString()}
+            {` · pipeline docs: ${pipelineIngestionProvenanceLabel(latest.pipelineIngestionSource)}`}
             {latest.signalSource ? ` · signals: ${latest.signalSource}` : ''}
             {typeof latest.signalCount === 'number' ? ` · count: ${latest.signalCount}` : ''}
             {latest.signalsAsOf ? ` · asOf: ${latest.signalsAsOf}` : ''}

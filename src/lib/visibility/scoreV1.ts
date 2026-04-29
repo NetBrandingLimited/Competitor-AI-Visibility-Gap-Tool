@@ -2,6 +2,7 @@ import { collectAllConnectorSignals } from '@/lib/connectors';
 import type { VisibilitySignal } from '@/lib/connectors/types';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
+import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
 
 export type VisibilityReasonV1 = {
@@ -13,6 +14,8 @@ export type VisibilityReasonV1 = {
 
 export type VisibilityInputsV1 = {
   pipelineRunId: string | null;
+  /** Latest saved pipeline run document provenance (null if no run or legacy row). */
+  pipelineIngestionSource: PipelineIngestionSource | null;
   documentCount: number;
   triggerCount: number;
   clusterCount: number;
@@ -33,8 +36,13 @@ function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
     inputs.connectorSignalCacheKind === 'ttl' || inputs.connectorSignalCacheKind === 'stale_fallback'
       ? inputs.connectorSignalCacheKind
       : null;
+  const pipelineIngestionSource: PipelineIngestionSource | null =
+    inputs.pipelineIngestionSource === 'live_gsc_queries' || inputs.pipelineIngestionSource === 'mock_ingestion'
+      ? inputs.pipelineIngestionSource
+      : null;
   return {
     ...inputs,
+    pipelineIngestionSource,
     connectorSignalSource:
       inputs.connectorSignalSource === 'cache' || inputs.connectorSignalSource === 'live'
         ? inputs.connectorSignalSource
@@ -293,6 +301,22 @@ export function buildWhyChanged(
     });
   }
 
+  const ingestionLabel = (s: PipelineIngestionSource | null): string => {
+    if (s === 'live_gsc_queries') {
+      return 'Search Console pipeline documents';
+    }
+    if (s === 'mock_ingestion') {
+      return 'mock pipeline templates';
+    }
+    return 'not recorded / legacy';
+  };
+  if (p.pipelineIngestionSource !== n.pipelineIngestionSource) {
+    reasons.push({
+      code: 'PIPELINE_INGESTION_SOURCE',
+      message: `Pipeline document source changed (${ingestionLabel(p.pipelineIngestionSource)} → ${ingestionLabel(n.pipelineIngestionSource)}).`
+    });
+  }
+
   return reasons;
 }
 
@@ -310,6 +334,7 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
 
   return {
     pipelineRunId: latestRun?.id ?? null,
+    pipelineIngestionSource: latestRun?.ingestionSource ?? null,
     documentCount: latestRun?.documentCount ?? 0,
     triggerCount: latestRun?.triggerCount ?? 0,
     clusterCount: latestRun?.clusterCount ?? 0,

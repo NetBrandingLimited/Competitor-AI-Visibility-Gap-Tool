@@ -95,6 +95,7 @@ export default async function DashboardPage() {
                 score: visibility.score,
                 createdAt: visibility.createdAt,
                 reasons: visibility.reasons,
+                pipelineIngestionSource: visibility.inputs.pipelineIngestionSource,
                 signalSource: visibility.inputs.connectorSignalSource,
                 signalCacheKind: visibility.inputs.connectorSignalCacheKind,
                 signalCount: visibility.inputs.connectorSignalCount,

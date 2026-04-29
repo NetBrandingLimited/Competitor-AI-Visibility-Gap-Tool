@@ -54,6 +54,19 @@ function norm(value: string | null | undefined): string {
   return (value ?? '').trim().toLowerCase();
 }
 
+function gapPipelineProvenancePhrase(run: UnifiedPipelineRun | null): string {
+  if (!run) {
+    return 'No pipeline run yet.';
+  }
+  if (run.ingestionSource === 'live_gsc_queries') {
+    return 'Latest pipeline used live Search Console documents.';
+  }
+  if (run.ingestionSource === 'mock_ingestion') {
+    return 'Latest pipeline used mock document templates (add Search Console under Data connectors for live queries).';
+  }
+  return 'Latest pipeline does not record document provenance (older run).';
+}
+
 export async function readGapLatestDataForOrg(organizationId: string): Promise<GapLatestData> {
   const [org, latestRun, latestTrend, visibility] = await Promise.all([
     prisma.organization.findUnique({
@@ -138,7 +151,7 @@ export function buildGapInsightsFromLatestData(
     opportunities.push({
       id: 'baseline-maintain',
       title: 'Maintain momentum',
-      detail: 'No severe gaps detected in current mock signals. Continue publishing comparative and alternatives content to keep share.',
+      detail: `No severe gaps detected in current inputs. ${gapPipelineProvenancePhrase(latestRun)} Continue publishing comparative and alternatives content to keep share.`,
       priority: 'low'
     });
   }
