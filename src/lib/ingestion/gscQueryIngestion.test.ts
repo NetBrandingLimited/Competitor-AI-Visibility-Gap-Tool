@@ -1,0 +1,159 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const hoisted = vi.hoisted(() => ({
+  queryMock: vi.fn(),
+  readOrgConnectorSettings: vi.fn(),
+  resolveGscSiteUrl: vi.fn()
+}));
+
+vi.mock('googleapis', () => ({
+  google: {
+    webmasters: vi.fn(() => ({
+      searchanalytics: {
+        query: hoisted.queryMock
+      }
+    }))
+  }
+}));
+
+vi.mock('@/lib/connectors/google-service-account-auth', () => ({
+  createGoogleAuth: vi.fn(() => ({}))
+}));
+
+vi.mock('@/lib/connectors/org-settings', () => ({
+  readOrgConnectorSettings: hoisted.readOrgConnectorSettings,
+  resolveGscSiteUrl: hoisted.resolveGscSiteUrl
+}));
+
+import { fetchGscQueryDocuments } from './gscQueryIngestion';
+
+const orgId = 'org-test-1';
+const saJson = '{"type":"service_account","project_id":"p","private_key_id":"k","private_key":"-----BEGIN PRIVATE KEY-----\\nMII\\n-----END PRIVATE KEY-----\\n","client_email":"x@p.iam.gserviceaccount.com","client_id":"1"}';
+
+describe('fetchGscQueryDocuments', () => {
+  const envBackup: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    hoisted.queryMock.mockReset();
+    hoisted.readOrgConnectorSettings.mockReset();
+    hoisted.resolveGscSiteUrl.mockReset();
+    for (const key of [
+      'GOOGLE_APPLICATION_CREDENTIALS',
+      'GSC_SERVICE_ACCOUNT_JSON',
+      'GA4_SERVICE_ACCOUNT_JSON'
+    ] as const) {
+      envBackup[key] = process.env[key];
+      delete process.env[key];
+    }
+  });
+
+  afterEach(() => {
+    for (const [key, val] of Object.entries(envBackup)) {
+      if (val === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = val;
+      }
+    }
+  });
+
+  it('returns no documents when org has no credentials and no env creds', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: null,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'seo tool',
+      rowLimit: 25
+    });
+
+    expect(docs).toEqual([]);
+    expect(hoisted.queryMock).not.toHaveBeenCalled();
+  });
+
+  it('returns no documents when credentials exist but site URL cannot be resolved', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: null,
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue(null);
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'seo tool',
+      rowLimit: 25
+    });
+
+    expect(docs).toEqual([]);
+    expect(hoisted.queryMock).not.toHaveBeenCalled();
+  });
+
+  it('retries without query filter when filtered request returns no rows', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    hoisted.queryMock
+      .mockResolvedValueOnce({ data: { rows: [] } })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [{ keys: ['best crm for startups'], clicks: 2, impressions: 40, ctr: 0.05, position: 6.1 }]
+        }
+      });
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'crm',
+      rowLimit: 10
+    });
+
+    expect(hoisted.queryMock).toHaveBeenCalledTimes(2);
+    const firstBody = hoisted.queryMock.mock.calls[0][0].requestBody;
+    expect(firstBody.dimensionFilterGroups).toBeDefined();
+    const secondBody = hoisted.queryMock.mock.calls[1][0].requestBody;
+    expect(secondBody.dimensionFilterGroups).toBeUndefined();
+
+    expect(docs).toHaveLength(1);
+    expect(docs[0].source).toBe('google_search_console');
+    expect(docs[0].title).toBe('best crm for startups');
+    expect(docs[0].content).toContain('2 clicks');
+    expect(docs[0].content).toContain('40 impressions');
+  });
+
+  it('uses a single API call when the filtered request returns rows', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    hoisted.queryMock.mockResolvedValueOnce({
+      data: {
+        rows: [{ keys: ['crm pricing'], clicks: 1, impressions: 5, ctr: 0.2, position: 2 }]
+      }
+    });
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'crm',
+      rowLimit: 10
+    });
+
+    expect(hoisted.queryMock).toHaveBeenCalledTimes(1);
+    expect(docs).toHaveLength(1);
+    expect(docs[0].title).toBe('crm pricing');
+  });
+});
