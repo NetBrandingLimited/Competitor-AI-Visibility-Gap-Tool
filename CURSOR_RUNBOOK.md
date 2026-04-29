@@ -27,7 +27,7 @@ Phase 4 — Dashboard v1
 
 Phase 5 — Trends job + exports
 1) Prompt: "Add a cron-like job runner stub, accumulate daily snapshots, and enable CSV export for a report page."
-2) Verify: CSV downloads with example data; snapshots written to dev store. In current baseline, `GET /api/reports/export.csv` includes trends + gap rows + latest weekly digest provenance fields, including raw `digestPipelineIngestionSource`.
+2) Verify: CSV downloads with example data; snapshots written to dev store. In current baseline, `GET /api/reports/export.csv` includes trends + gap rows + latest weekly digest provenance fields (including raw `digestPipelineIngestionSource`), and `GET /api/reports/weekly-digests.csv` provides digest-only rows.
 
 Phase 6 — Unified pipeline: live GSC query ingestion (optional)
 1) Context: the unified pipeline prefers **Google Search Console** Search Analytics (aggregated **query**, **page**, and **query+page** requests, rolling 28-day window) when the org has **Settings → Data connectors** (GSC site URL + service account with `webmasters.readonly`) and the **query-only** request returns at least one row (pages and pairs are merged afterward, then **capped** in query→page→pair order so runs stay bounded); otherwise it uses **mock** document templates (same downstream triggers/clusters).
