@@ -16,7 +16,7 @@ Quick start
 - Phase 5 job + reports:
   - `POST /api/debug/trends/run` to generate/update a daily snapshot
   - `GET /api/debug/trends/run` to list stored snapshots
-  - `GET /api/reports/export.csv` to download CSV
+  - `GET /api/reports/export.csv` to download CSV (trends + gap rows + latest weekly digest provenance fields)
   - `GET /reports` for report page baseline
 - Unified pipeline run:
   - `POST /api/debug/pipeline/run?query=seo%20tool&limit=2`
