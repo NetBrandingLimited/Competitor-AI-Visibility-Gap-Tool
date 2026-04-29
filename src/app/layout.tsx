@@ -2,7 +2,7 @@ import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
-import AppNav from '@/app/components/AppNav';
+import AppNavClient from '@/app/components/AppNavClient';
 import BackToTopButton from '@/app/components/BackToTopButton';
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <div className="app-layout">
           <header>
-            <AppNav />
+            <AppNavClient />
           </header>
           <main id="main-content" tabIndex={-1}>
             {children}
