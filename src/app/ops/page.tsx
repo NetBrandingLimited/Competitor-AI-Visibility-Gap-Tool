@@ -117,6 +117,9 @@ export default async function OpsPage() {
         <code>vercel.json</code>.
       </p>
       <p>
+        <Link href="/api/ops/scheduler-jobs.csv">Download scheduler jobs CSV</Link>
+      </p>
+      <p>
         <Link href="/reports">Go to reports</Link>
       </p>
       <WeeklyDigestScheduleForm
