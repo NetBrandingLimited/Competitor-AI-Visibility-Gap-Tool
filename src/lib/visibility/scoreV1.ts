@@ -277,6 +277,22 @@ export function buildWhyChanged(
     });
   }
 
+  const connectorCacheLabel = (k: VisibilityInputsV1['connectorSignalCacheKind']): string => {
+    if (k === 'ttl') {
+      return 'cache (within TTL)';
+    }
+    if (k === 'stale_fallback') {
+      return 'cache (fallback: live fetch returned no metrics)';
+    }
+    return 'live or none';
+  };
+  if (p.connectorSignalCacheKind !== n.connectorSignalCacheKind) {
+    reasons.push({
+      code: 'CONNECTOR_CACHE_KIND',
+      message: `Connector scoring cache mode changed (${connectorCacheLabel(p.connectorSignalCacheKind)} → ${connectorCacheLabel(n.connectorSignalCacheKind)}).`
+    });
+  }
+
   return reasons;
 }
 
