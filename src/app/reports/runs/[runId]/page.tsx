@@ -75,11 +75,16 @@ export default async function PipelineRunDetailPage({
       {run.triggers.length === 0 ? (
         <p>No triggers found for this run.</p>
       ) : (
-        <table className="data-table data-table-mb-16">
-          <caption className="sr-only">Trigger phrases for this pipeline run: phrase, category, and score.</caption>
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-mb-16 data-table-min-run-triggers">
+          <caption className="sr-only">
+            Trigger phrases for this pipeline run: phrase (sticky while scrolling), category, and score.
+          </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Phrase</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col">Phrase</th>
               <th scope="col" className="data-table-th-left">Category</th>
               <th scope="col" className="data-table-th-right">Score</th>
             </tr>
@@ -87,24 +92,31 @@ export default async function PipelineRunDetailPage({
           <tbody>
             {run.triggers.map((trigger) => (
               <tr key={`${trigger.phrase}-${trigger.category}`}>
-                <td className="data-table-td">{trigger.phrase}</td>
+                <td className="data-table-td data-table-sticky-col">{trigger.phrase}</td>
                 <td className="data-table-td">{trigger.category}</td>
                 <td className="data-table-td-right">{trigger.score}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
 
       <h2>Theme clusters</h2>
       {run.clusters.length === 0 ? (
         <p>No clusters generated for this run.</p>
       ) : (
-        <table className="data-table">
-          <caption className="sr-only">Theme clusters for this pipeline run: label, keywords, and item count.</caption>
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-min-run-clusters">
+          <caption className="sr-only">
+            Theme clusters for this pipeline run: label (sticky while scrolling), keywords, and item count.
+          </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Label</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col">Label</th>
               <th scope="col" className="data-table-th-left">Keywords</th>
               <th scope="col" className="data-table-th-right">Items</th>
             </tr>
@@ -112,13 +124,15 @@ export default async function PipelineRunDetailPage({
           <tbody>
             {run.clusters.map((cluster) => (
               <tr key={cluster.id}>
-                <td className="data-table-td">{cluster.label}</td>
+                <td className="data-table-td data-table-sticky-col">{cluster.label}</td>
                 <td className="data-table-td">{cluster.keywords.join(', ')}</td>
                 <td className="data-table-td-right">{cluster.itemCount}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );

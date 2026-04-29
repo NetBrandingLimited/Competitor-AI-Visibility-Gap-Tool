@@ -335,6 +335,18 @@ p { color: #333; }
 .data-table-min-reports-topics {
   min-width: 820px;
 }
+.data-table-min-dashboard-leaderboard {
+  min-width: 720px;
+}
+.data-table-min-dashboard-recent {
+  min-width: 880px;
+}
+.data-table-min-run-triggers {
+  min-width: 720px;
+}
+.data-table-min-run-clusters {
+  min-width: 800px;
+}
 .data-table-sticky-col {
   position: sticky;
   left: 0;

@@ -1,0 +1,64 @@
+import { describe, expect, it } from 'vitest';
+
+import { parseWeeklyDigestSummaryJson, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+
+describe('weeklyDigestSignalsLabel', () => {
+  it('returns em dash when signal source is missing', () => {
+    expect(weeklyDigestSignalsLabel({ signalSource: null })).toBe('—');
+  });
+
+  it('returns live for live source', () => {
+    expect(weeklyDigestSignalsLabel({ signalSource: 'live' })).toBe('live');
+  });
+
+  it('describes TTL cache', () => {
+    expect(
+      weeklyDigestSignalsLabel({ signalSource: 'cache', connectorSignalCacheKind: 'ttl' })
+    ).toBe('cache (within TTL)');
+  });
+
+  it('describes stale fallback cache', () => {
+    expect(
+      weeklyDigestSignalsLabel({ signalSource: 'cache', connectorSignalCacheKind: 'stale_fallback' })
+    ).toBe('cache (fallback: live fetch had no metrics)');
+  });
+
+  it('returns generic cache when kind is unknown', () => {
+    expect(weeklyDigestSignalsLabel({ signalSource: 'cache' })).toBe('cache');
+  });
+});
+
+describe('parseWeeklyDigestSummaryJson', () => {
+  it('parses connector cache kind and signal source', () => {
+    const raw = JSON.stringify({
+      score: 42,
+      signalSource: 'cache',
+      connectorSignalCacheKind: 'stale_fallback',
+      topOpportunities: ['A', 'B']
+    });
+    const s = parseWeeklyDigestSummaryJson(raw);
+    expect(s.score).toBe(42);
+    expect(s.signalSource).toBe('cache');
+    expect(s.connectorSignalCacheKind).toBe('stale_fallback');
+    expect(s.topOpportunities).toEqual(['A', 'B']);
+    expect(weeklyDigestSignalsLabel(s)).toBe('cache (fallback: live fetch had no metrics)');
+  });
+
+  it('rejects invalid connectorSignalCacheKind', () => {
+    const raw = JSON.stringify({
+      score: 1,
+      signalSource: 'cache',
+      connectorSignalCacheKind: 'nope',
+      topOpportunities: []
+    });
+    const s = parseWeeklyDigestSummaryJson(raw);
+    expect(s.connectorSignalCacheKind).toBeNull();
+  });
+
+  it('returns empty summary on invalid JSON', () => {
+    const s = parseWeeklyDigestSummaryJson('not json');
+    expect(s.score).toBeNull();
+    expect(s.signalSource).toBeNull();
+    expect(s.topOpportunities).toEqual([]);
+  });
+});

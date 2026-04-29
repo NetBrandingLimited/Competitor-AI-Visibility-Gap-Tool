@@ -111,13 +111,16 @@ export default async function WeeklyDigestDetailPage({
       {digest.summary.topics && digest.summary.topics.length > 0 ? (
         <>
           <h2>Topic gaps (frozen at generation)</h2>
-          <table className="data-table">
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-min-reports-topics">
             <caption className="sr-only">
-              Topic gaps at digest generation: topic, gap score, trigger count, and recommendation.
+              Topic gaps at digest generation: topic (sticky while scrolling), gap score, trigger count, and
+              recommendation.
             </caption>
             <thead>
               <tr>
-                <th scope="col" className="data-table-th-left">Topic</th>
+                <th scope="col" className="data-table-th-left data-table-sticky-col">Topic</th>
                 <th scope="col" className="data-table-th-right">Gap</th>
                 <th scope="col" className="data-table-th-right">Triggers</th>
                 <th scope="col" className="data-table-th-left">Recommendation</th>
@@ -126,14 +129,15 @@ export default async function WeeklyDigestDetailPage({
             <tbody>
               {digest.summary.topics.map((t) => (
                 <tr key={t.topic}>
-                  <td className="data-table-td">{t.topic}</td>
+                  <td className="data-table-td data-table-sticky-col">{t.topic}</td>
                   <td className="data-table-td-right">{t.gapScore}</td>
                   <td className="data-table-td-right">{t.triggerCount}</td>
                   <td className="data-table-td">{t.recommendation}</td>
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
         </>
       ) : null}
       <p className="mt-8">

@@ -223,13 +223,16 @@ export default async function DashboardPage() {
       </ul>
 
       {gapInsights.topics.length > 0 ? (
-        <table className="data-table data-table-mb-24">
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-mb-24 data-table-min-reports-topics">
           <caption className="sr-only">
-            Top gap topics: topic, gap score, trigger count, and recommendation.
+            Top gap topics: topic (sticky while scrolling), gap score, trigger count, and recommendation.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Topic</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col">Topic</th>
               <th scope="col" className="data-table-th-right">Gap score</th>
               <th scope="col" className="data-table-th-right">Trigger count</th>
               <th scope="col" className="data-table-th-left">Recommendation</th>
@@ -238,25 +241,30 @@ export default async function DashboardPage() {
           <tbody>
             {gapInsights.topics.slice(0, 5).map((topic) => (
               <tr key={topic.topic}>
-                <td className="data-table-td">{topic.topic}</td>
+                <td className="data-table-td data-table-sticky-col">{topic.topic}</td>
                 <td className="data-table-td-right">{topic.gapScore}</td>
                 <td className="data-table-td-right">{topic.triggerCount}</td>
                 <td className="data-table-td">{topic.recommendation}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       ) : null}
 
       <h2>Leaderboard</h2>
-      <table className="data-table data-table-mb-24">
+      <>
+        <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+        <div className="table-scroll-wrap">
+          <table className="data-table data-table-mb-24 data-table-min-dashboard-leaderboard">
         <caption className="sr-only">
-          Brand leaderboard: mentions, share of voice, and{' '}
+          Brand leaderboard: brand (sticky while scrolling), mentions, share of voice, and{' '}
           {leaderboardSource === 'pipeline' ? 'change versus prior pipeline run' : 'seven-day change'}.
         </caption>
         <thead>
           <tr>
-            <th scope="col" className="data-table-th-left">Brand</th>
+            <th scope="col" className="data-table-th-left data-table-sticky-col">Brand</th>
             <th scope="col" className="data-table-th-right">Mentions</th>
             <th scope="col" className="data-table-th-right">Share of voice</th>
             <th scope="col" className="data-table-th-right">
@@ -267,7 +275,7 @@ export default async function DashboardPage() {
         <tbody>
           {snapshot.leaderboard.map((row) => (
             <tr key={row.brand}>
-              <td className="data-table-td">{row.brand}</td>
+              <td className="data-table-td data-table-sticky-col">{row.brand}</td>
               <td className="data-table-td-right">{row.mentions}</td>
               <td className="data-table-td-right">{formatPercent(row.shareOfVoice)}</td>
               <td className="data-table-td-right">
@@ -277,17 +285,22 @@ export default async function DashboardPage() {
             </tr>
           ))}
         </tbody>
-      </table>
+          </table>
+        </div>
+      </>
 
       <h2>Recent</h2>
-      <table className="data-table">
+      <>
+        <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+        <div className="table-scroll-wrap">
+          <table className="data-table data-table-min-dashboard-recent">
         <caption className="sr-only">
-          Recent {leaderboardSource === 'pipeline' ? 'pipeline-derived' : 'preview'} rows: source, query, top brand,
-          and published time.
+          Recent {leaderboardSource === 'pipeline' ? 'pipeline-derived' : 'preview'} rows: source (sticky while
+          scrolling), query, top brand, and published time.
         </caption>
         <thead>
           <tr>
-            <th scope="col" className="data-table-th-left">Source</th>
+            <th scope="col" className="data-table-th-left data-table-sticky-col">Source</th>
             <th scope="col" className="data-table-th-left">Query</th>
             <th scope="col" className="data-table-th-left">Top brand</th>
             <th scope="col" className="data-table-th-left">Published</th>
@@ -296,14 +309,16 @@ export default async function DashboardPage() {
         <tbody>
           {snapshot.recent.map((row) => (
             <tr key={`${row.source}-${row.query}`}>
-              <td className="data-table-td">{row.source}</td>
+              <td className="data-table-td data-table-sticky-col">{row.source}</td>
               <td className="data-table-td">{row.query}</td>
               <td className="data-table-td">{row.topBrand}</td>
               <td className="data-table-td">{new Date(row.publishedAt).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
-      </table>
+          </table>
+        </div>
+      </>
     </section>
   );
 }

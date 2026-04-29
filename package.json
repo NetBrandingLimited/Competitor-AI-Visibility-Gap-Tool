@@ -9,8 +9,10 @@
     "dev:turbo": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint src prisma/seed.ts scripts eslint.config.mjs next.config.js",
+    "lint": "eslint src prisma/seed.ts scripts eslint.config.mjs next.config.js vitest.config.ts",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "postinstall": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
@@ -38,6 +40,7 @@
     "eslint-config-next": "^16.2.4",
     "prisma": "5.22.0",
     "tsx": "^4.21.0",
-    "typescript": "5.4.2"
+    "typescript": "5.4.2",
+    "vitest": "^4.1.5"
   }
 }
