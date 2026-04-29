@@ -328,6 +328,9 @@ p { color: #333; }
 .data-table-min-reports-scroll {
   min-width: 960px;
 }
+.data-table-min-reports-topics {
+  min-width: 820px;
+}
 .data-table-sticky-col {
   position: sticky;
   left: 0;

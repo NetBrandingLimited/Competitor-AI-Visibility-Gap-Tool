@@ -174,13 +174,17 @@ export default async function ReportsPage() {
       {gapInsights.topics.length === 0 ? (
         <p>No topic breakdown available yet. Run the unified pipeline first.</p>
       ) : (
-        <table className="data-table data-table-mb-16">
+        <>
+          <p className="table-scroll-hint">On smaller screens, swipe horizontally to see all columns.</p>
+          <div className="table-scroll-wrap">
+            <table className="data-table data-table-mb-16 data-table-min-reports-topics">
           <caption className="sr-only">
-            Topic-level gap breakdown: topic, gap score, trigger hits, cluster weight, and recommendation.
+            Topic-level gap breakdown: topic (sticky while scrolling), gap score, trigger hits, cluster weight, and
+            recommendation.
           </caption>
           <thead>
             <tr>
-              <th scope="col" className="data-table-th-left">Topic</th>
+              <th scope="col" className="data-table-th-left data-table-sticky-col">Topic</th>
               <th scope="col" className="data-table-th-right">Gap score</th>
               <th scope="col" className="data-table-th-right">Trigger hits</th>
               <th scope="col" className="data-table-th-right">Cluster weight</th>
@@ -198,7 +202,9 @@ export default async function ReportsPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </>
       )}
 
       <h2>Weekly visibility digests</h2>
