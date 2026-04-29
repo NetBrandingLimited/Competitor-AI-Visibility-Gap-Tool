@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import type { webmasters_v3 } from 'googleapis';
 
 import { rollingGscWindowDays } from '@/lib/connectors/gsc-date-range';
 import { createGoogleAuth } from '@/lib/connectors/google-service-account-auth';
@@ -10,12 +11,26 @@ const GSC_SCOPE_READONLY = 'https://www.googleapis.com/auth/webmasters.readonly'
 
 const WINDOW_DAYS = 28;
 
-function stableDocId(query: string): string {
+type GscSearchAnalyticsBody = webmasters_v3.Schema$SearchAnalyticsQueryRequest;
+
+function stableDocId(kind: 'q' | 'p', key: string): string {
+  const payload = `${kind}:${key}`;
   let h = 0;
-  for (let i = 0; i < query.length; i++) {
-    h = (Math.imul(31, h) + query.charCodeAt(i)) | 0;
+  for (let i = 0; i < payload.length; i++) {
+    h = (Math.imul(31, h) + payload.charCodeAt(i)) | 0;
   }
-  return `gsc-q-${Math.abs(h).toString(36)}`;
+  return `gsc-${kind}-${Math.abs(h).toString(36)}`;
+}
+
+function pageTitleFromUrl(pageUrl: string): string {
+  try {
+    const u = new URL(pageUrl);
+    const path = u.pathname.replace(/\/$/, '') || '/';
+    const last = path.split('/').filter(Boolean).pop();
+    return last ? decodeURIComponent(last) : path;
+  } catch {
+    return pageUrl.slice(0, 120);
+  }
 }
 
 function rowToSourceDocument(
@@ -36,11 +51,39 @@ function rowToSourceDocument(
   const ctrPct = ctr !== null ? `${(ctr * 100).toFixed(2)}%` : 'n/a';
   const posStr = position !== null ? position.toFixed(2) : 'n/a';
   return {
-    id: stableDocId(query),
+    id: stableDocId('q', query),
     source: 'google_search_console',
     url: `gsc://search-query/${encodeURIComponent(query)}`,
     title: query,
     content: `Search query: ${query}. In the last ${WINDOW_DAYS} days: ${clicks} clicks, ${impressions} impressions, CTR ${ctrPct}, average position ${posStr}.`,
+    publishedAt: asOf
+  };
+}
+
+function rowPageToSourceDocument(
+  pageUrl: string,
+  row: {
+    clicks?: number | null;
+    impressions?: number | null;
+    ctr?: number | null;
+    position?: number | null;
+  },
+  asOf: string
+): SourceDocument {
+  const clicks = typeof row.clicks === 'number' && Number.isFinite(row.clicks) ? row.clicks : 0;
+  const impressions =
+    typeof row.impressions === 'number' && Number.isFinite(row.impressions) ? row.impressions : 0;
+  const ctr = typeof row.ctr === 'number' && Number.isFinite(row.ctr) ? row.ctr : null;
+  const position = typeof row.position === 'number' && Number.isFinite(row.position) ? row.position : null;
+  const ctrPct = ctr !== null ? `${(ctr * 100).toFixed(2)}%` : 'n/a';
+  const posStr = position !== null ? position.toFixed(2) : 'n/a';
+  const title = pageTitleFromUrl(pageUrl);
+  return {
+    id: stableDocId('p', pageUrl),
+    source: 'google_search_console',
+    url: `gsc://landing-page/${encodeURIComponent(pageUrl)}`,
+    title: `Page: ${title}`,
+    content: `Landing page from Search Console: ${pageUrl}. In the last ${WINDOW_DAYS} days: ${clicks} clicks, ${impressions} impressions, CTR ${ctrPct}, average position ${posStr}.`,
     publishedAt: asOf
   };
 }
@@ -74,12 +117,13 @@ type GscQueryRow = {
   position?: number | null;
 };
 
-async function fetchQueryRows(
-  organizationId: string,
-  rowLimit: number,
-  pipelineQuery: string,
-  useQueryContainsFilter: boolean
-): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
+async function gscSearchAnalyticsClient(organizationId: string): Promise<{
+  webmasters: ReturnType<typeof google.webmasters>;
+  siteUrl: string;
+  startDate: string;
+  endDate: string;
+  asOf: string;
+} | null> {
   const ctx = await gscAuthAndSite(organizationId);
   if (!ctx) {
     return null;
@@ -92,7 +136,41 @@ async function fetchQueryRows(
   );
   const webmasters = google.webmasters({ version: 'v3', auth });
   const { startDate, endDate, asOf } = rollingGscWindowDays(WINDOW_DAYS);
+  return { webmasters, siteUrl, startDate, endDate, asOf };
+}
 
+async function runSearchAnalytics(
+  client: NonNullable<Awaited<ReturnType<typeof gscSearchAnalyticsClient>>>,
+  requestBody: GscSearchAnalyticsBody
+): Promise<GscQueryRow[] | null> {
+  try {
+    const { data } = await client.webmasters.searchanalytics.query({
+      siteUrl: client.siteUrl,
+      requestBody: {
+        startDate: client.startDate,
+        endDate: client.endDate,
+        ...requestBody
+      }
+    });
+    return (data.rows ?? []) as GscQueryRow[];
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[GSC ingestion] searchanalytics.query failed:', err);
+    }
+    return null;
+  }
+}
+
+async function fetchQueryRows(
+  organizationId: string,
+  rowLimit: number,
+  pipelineQuery: string,
+  useQueryContainsFilter: boolean
+): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
+  const client = await gscSearchAnalyticsClient(organizationId);
+  if (!client) {
+    return null;
+  }
   const q = pipelineQuery.trim();
   const dimensionFilterGroups =
     useQueryContainsFilter && q.length >= 2
@@ -109,30 +187,69 @@ async function fetchQueryRows(
         ]
       : undefined;
 
-  try {
-    const { data } = await webmasters.searchanalytics.query({
-      siteUrl,
-      requestBody: {
-        startDate,
-        endDate,
-        dimensions: ['query'],
-        rowLimit,
-        dimensionFilterGroups
-      }
-    });
-    const rows = (data.rows ?? []) as GscQueryRow[];
-    return { rows, asOf };
-  } catch (err) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[GSC ingestion] searchanalytics.query failed:', err);
-    }
+  const rows = await runSearchAnalytics(client, {
+    dimensions: ['query'],
+    rowLimit,
+    dimensionFilterGroups
+  });
+  if (rows === null) {
     return null;
   }
+  return { rows, asOf: client.asOf };
+}
+
+/** Top landing pages (page dimension); tries URL contains pipeline query then unfiltered. */
+async function fetchPageRows(
+  organizationId: string,
+  rowLimit: number,
+  pipelineQuery: string
+): Promise<{ rows: GscQueryRow[]; asOf: string } | null> {
+  const client = await gscSearchAnalyticsClient(organizationId);
+  if (!client) {
+    return null;
+  }
+  const q = pipelineQuery.trim();
+  const capped = Math.min(100, Math.max(1, rowLimit));
+
+  const tryFiltered = q.length >= 2;
+  if (tryFiltered) {
+    const filtered = await runSearchAnalytics(client, {
+      dimensions: ['page'],
+      rowLimit: capped,
+      dimensionFilterGroups: [
+        {
+          filters: [
+            {
+              dimension: 'page' as const,
+              operator: 'contains' as const,
+              expression: q
+            }
+          ]
+        }
+      ]
+    });
+    if (filtered === null) {
+      return null;
+    }
+    if (filtered.length > 0) {
+      return { rows: filtered, asOf: client.asOf };
+    }
+  }
+
+  const unfiltered = await runSearchAnalytics(client, {
+    dimensions: ['page'],
+    rowLimit: capped
+  });
+  if (unfiltered === null) {
+    return null;
+  }
+  return { rows: unfiltered, asOf: client.asOf };
 }
 
 /**
- * Top Search Console queries as {@link SourceDocument} rows for the unified pipeline.
- * Tries a query "contains" filter aligned with the pipeline query, then falls back to unfiltered top queries.
+ * Top Search Console queries and landing pages as {@link SourceDocument} rows for the unified pipeline.
+ * Queries: tries a query "contains" filter aligned with the pipeline query, then unfiltered top queries.
+ * When query rows exist, also merges top pages (page dimension; optional URL contains filter, then unfiltered).
  */
 export async function fetchGscQueryDocuments(opts: {
   organizationId: string;
@@ -158,5 +275,18 @@ export async function fetchGscQueryDocuments(opts: {
     }
     docs.push(rowToSourceDocument(query, row, pack.asOf));
   }
+
+  const pageRowBudget = Math.min(100, Math.max(5, Math.floor(capped / 2)));
+  const pagePack = await fetchPageRows(organizationId, pageRowBudget, pipelineQuery);
+  if (pagePack && pagePack.rows.length > 0) {
+    for (const row of pagePack.rows) {
+      const pageUrl = row.keys?.[0];
+      if (!pageUrl || typeof pageUrl !== 'string') {
+        continue;
+      }
+      docs.push(rowPageToSourceDocument(pageUrl, row, pagePack.asOf));
+    }
+  }
+
   return docs;
 }
