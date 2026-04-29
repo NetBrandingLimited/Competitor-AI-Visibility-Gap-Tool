@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForRequest } from '@/lib/active-org';
-import { runMockIngestion } from '@/lib/ingestion/pipeline';
+import { runOrgIngestion } from '@/lib/ingestion/pipeline';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 
@@ -40,12 +40,13 @@ export async function GET(request: NextRequest) {
   const limitRaw = request.nextUrl.searchParams.get('limit');
   const limit = limitRaw ? Number(limitRaw) : undefined;
 
-  const result = await runMockIngestion({
+  const { result, ingestionSource } = await runOrgIngestion({
+    organizationId: active.organizationId,
     query,
     limitPerConnector: Number.isFinite(limit) ? limit : undefined,
     brandContext,
     contentVariant: simpleHash(`${active.organizationId}-${Date.now()}`)
   });
 
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, ingestionSource });
 }
