@@ -165,7 +165,7 @@ export default async function OpsPage() {
         <table className="data-table">
           <caption className="sr-only">
             Recent scheduler jobs for this workspace: job id, status, execution details, query, linked pipeline run
-            and digest, digest connector signals label, and completion time.
+            and digest, digest connector signals label, quick links, and completion time.
           </caption>
           <thead>
             <tr>
@@ -176,6 +176,7 @@ export default async function OpsPage() {
               <th scope="col" className="data-table-th-left">Pipeline run</th>
               <th scope="col" className="data-table-th-left">Weekly digest</th>
               <th scope="col" className="data-table-th-left">Digest signals</th>
+              <th scope="col" className="data-table-th-left">Actions</th>
               <th scope="col" className="data-table-th-left">Completed</th>
             </tr>
           </thead>
@@ -198,6 +199,17 @@ export default async function OpsPage() {
                 </td>
                 <td className="data-table-td">
                   {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
+                </td>
+                <td className="data-table-td">
+                  {job.pipelineRunId || job.weeklyDigestId ? (
+                    <>
+                      {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>Run</Link> : null}
+                      {job.pipelineRunId && job.weeklyDigestId ? ' | ' : null}
+                      {job.weeklyDigestId ? <Link href={`/reports/digest/${job.weeklyDigestId}`}>Digest</Link> : null}
+                    </>
+                  ) : (
+                    '-'
+                  )}
                 </td>
                 <td className="data-table-td">{new Date(job.completedAt).toLocaleString()}</td>
               </tr>
