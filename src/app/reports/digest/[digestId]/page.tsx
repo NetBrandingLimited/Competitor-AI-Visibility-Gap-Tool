@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
-import { getWeeklyDigestForOrg } from '@/lib/digest/weekly';
+import { getWeeklyDigestForOrg, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -68,7 +68,7 @@ export default async function WeeklyDigestDetailPage({
           <strong>Visibility score:</strong> {digest.summary.score ?? '—'}
         </li>
         <li>
-          <strong>Connector signal source:</strong> {digest.summary.signalSource ?? '—'}
+          <strong>Connector signals:</strong> {weeklyDigestSignalsLabel(digest.summary)}
         </li>
         {digest.summary.insightsGeneratedAt ? (
           <li>

@@ -39,6 +39,7 @@ type GapVisibilityInput = {
   createdAt: string;
   inputs?: {
     connectorSignalSource: 'cache' | 'live';
+    connectorSignalCacheKind?: 'ttl' | 'stale_fallback' | null;
   };
 } | null;
 

@@ -6,11 +6,32 @@ import { sendWeeklyDigestEmail } from '@/lib/email/weeklyDigestEmail';
 export type WeeklyDigestSummary = {
   score: number | null;
   signalSource: 'cache' | 'live' | null;
+  /** When signalSource is cache: matches visibility scoring (TTL vs stale fallback). */
+  connectorSignalCacheKind?: 'ttl' | 'stale_fallback' | null;
   topOpportunities: string[];
   opportunities?: GapOpportunity[];
   topics?: TopicGap[];
   insightsGeneratedAt?: string;
 };
+
+/** Human-readable connector line for digest UI and markdown export. */
+export function weeklyDigestSignalsLabel(
+  summary: Pick<WeeklyDigestSummary, 'signalSource' | 'connectorSignalCacheKind'>
+): string {
+  if (!summary.signalSource) {
+    return '—';
+  }
+  if (summary.signalSource === 'live') {
+    return 'live';
+  }
+  if (summary.connectorSignalCacheKind === 'stale_fallback') {
+    return 'cache (fallback: live fetch had no metrics)';
+  }
+  if (summary.connectorSignalCacheKind === 'ttl') {
+    return 'cache (within TTL)';
+  }
+  return 'cache';
+}
 
 export type WeeklyDigest = {
   id: string;
@@ -85,9 +106,14 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
     }
     const insightsGeneratedAt =
       typeof parsed.insightsGeneratedAt === 'string' ? parsed.insightsGeneratedAt : undefined;
+    const connectorSignalCacheKind =
+      parsed.connectorSignalCacheKind === 'ttl' || parsed.connectorSignalCacheKind === 'stale_fallback'
+        ? parsed.connectorSignalCacheKind
+        : null;
     return {
       score,
       signalSource,
+      connectorSignalCacheKind,
       topOpportunities,
       opportunities,
       topics,
@@ -132,6 +158,7 @@ export async function generateWeeklyDigest(organizationId: string): Promise<Week
   const summary: WeeklyDigestSummary = {
     score: gapLatest.visibility ? Math.round(gapLatest.visibility.score) : null,
     signalSource: gapLatest.visibility?.inputs?.connectorSignalSource ?? null,
+    connectorSignalCacheKind: gapLatest.visibility?.inputs?.connectorSignalCacheKind ?? null,
     topOpportunities: insights.opportunities.slice(0, 3).map((o) => o.title),
     opportunities: insights.opportunities,
     topics: insights.topics,
