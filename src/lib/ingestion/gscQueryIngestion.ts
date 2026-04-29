@@ -10,6 +10,8 @@ import type { SourceDocument } from './types';
 const GSC_SCOPE_READONLY = 'https://www.googleapis.com/auth/webmasters.readonly';
 
 const WINDOW_DAYS = 28;
+const MIN_IMPRESSIONS_FOR_LOW_SIGNAL_ROW = 10;
+const MAX_POSITION_FOR_LOW_SIGNAL_ROW = 20;
 
 /** After merging query, page, and query–page rows, cap total documents (priority order preserved). */
 function capGscDocumentList(docs: SourceDocument[], cappedRowBudget: number): SourceDocument[] {
@@ -39,6 +41,32 @@ function rowHasAnyEngagement(row: {
   const impressions =
     typeof row.impressions === 'number' && Number.isFinite(row.impressions) ? row.impressions : 0;
   return clicks > 0 || impressions > 0;
+}
+
+/**
+ * Keep clearly meaningful rows:
+ * - any clicked row
+ * - rows with enough impressions to matter
+ * - rows ranking reasonably well even if clicks are still sparse
+ */
+function rowPassesQualityThreshold(row: {
+  clicks?: number | null;
+  impressions?: number | null;
+  position?: number | null;
+}): boolean {
+  const clicks = typeof row.clicks === 'number' && Number.isFinite(row.clicks) ? row.clicks : 0;
+  const impressions =
+    typeof row.impressions === 'number' && Number.isFinite(row.impressions) ? row.impressions : 0;
+  const position =
+    typeof row.position === 'number' && Number.isFinite(row.position)
+      ? row.position
+      : Number.POSITIVE_INFINITY;
+
+  return (
+    clicks > 0 ||
+    impressions >= MIN_IMPRESSIONS_FOR_LOW_SIGNAL_ROW ||
+    position <= MAX_POSITION_FOR_LOW_SIGNAL_ROW
+  );
 }
 
 /**
@@ -407,6 +435,7 @@ export async function fetchGscQueryDocuments(opts: {
       continue;
     }
     if (!rowHasAnyEngagement(row)) continue;
+    if (!rowPassesQualityThreshold(row)) continue;
     docs.push(rowToSourceDocument(query, row, pack.asOf));
   }
 
@@ -420,6 +449,7 @@ export async function fetchGscQueryDocuments(opts: {
         continue;
       }
       if (!rowHasAnyEngagement(row)) continue;
+      if (!rowPassesQualityThreshold(row)) continue;
       docs.push(rowPageToSourceDocument(pageUrl, row, pagePack.asOf));
     }
   }
@@ -435,6 +465,7 @@ export async function fetchGscQueryDocuments(opts: {
         continue;
       }
       if (!rowHasAnyEngagement(row)) continue;
+      if (!rowPassesQualityThreshold(row)) continue;
       docs.push(rowQueryPagePairToSourceDocument(query, pageUrl, row, qpPack.asOf));
     }
   }

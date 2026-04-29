@@ -356,4 +356,56 @@ describe('fetchGscQueryDocuments', () => {
     expect(docs[0].title).toBe('high');
     expect(docs[1].title).toBe('low');
   });
+
+  it('filters low-signal rows but keeps clicked, high-impression, or strong-rank rows', async () => {
+    hoisted.readOrgConnectorSettings.mockResolvedValue({
+      gscSiteUrl: 'https://example.com/',
+      ga4PropertyId: null,
+      gscServiceAccountJson: saJson,
+      ga4ServiceAccountJson: null
+    });
+    hoisted.resolveGscSiteUrl.mockResolvedValue('https://example.com/');
+
+    hoisted.queryMock
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            { keys: ['too-weak'], clicks: 0, impressions: 2, ctr: 0, position: 42 },
+            { keys: ['has-click'], clicks: 1, impressions: 1, ctr: 1, position: 60 },
+            { keys: ['has-impressions'], clicks: 0, impressions: 15, ctr: 0, position: 80 },
+            { keys: ['has-rank'], clicks: 0, impressions: 3, ctr: 0, position: 8 }
+          ]
+        }
+      })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            { keys: ['https://example.com/weak'], clicks: 0, impressions: 3, ctr: 0, position: 50 },
+            { keys: ['https://example.com/good'], clicks: 0, impressions: 12, ctr: 0, position: 30 }
+          ]
+        }
+      })
+      .mockResolvedValueOnce({
+        data: {
+          rows: [
+            { keys: ['weak-pair', 'https://example.com/weak-pair'], clicks: 0, impressions: 1, ctr: 0, position: 70 },
+            { keys: ['good-pair', 'https://example.com/good-pair'], clicks: 0, impressions: 2, ctr: 0, position: 9 }
+          ]
+        }
+      });
+
+    const docs = await fetchGscQueryDocuments({
+      organizationId: orgId,
+      pipelineQuery: 'signal',
+      rowLimit: 10
+    });
+
+    expect(docs.map((doc) => doc.title)).toEqual([
+      'has-impressions',
+      'has-rank',
+      'has-click',
+      'Page: good',
+      'good-pair → good-pair'
+    ]);
+  });
 });
