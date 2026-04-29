@@ -9,7 +9,7 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
-import { listWeeklyDigests, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
@@ -218,7 +218,7 @@ export default async function ReportsPage() {
             <table className="data-table data-table-mb-16 data-table-min-reports-scroll">
           <caption className="sr-only">
             Weekly visibility digests: digest id (open detail or copy id), generated time, period, score, connector signals
-            label, and top opportunities.
+            label, pipeline document source, and top opportunities.
           </caption>
           <thead>
             <tr>
@@ -229,6 +229,7 @@ export default async function ReportsPage() {
               <th scope="col" className="data-table-th-left">Period</th>
               <th scope="col" className="data-table-th-right">Score</th>
               <th scope="col" className="data-table-th-left">Connector signals</th>
+              <th scope="col" className="data-table-th-left">Pipeline docs</th>
               <th scope="col" className="data-table-th-left">Top opportunities</th>
             </tr>
           </thead>
@@ -257,6 +258,7 @@ export default async function ReportsPage() {
                 </td>
                 <td className="data-table-td-right">{d.summary.score ?? '—'}</td>
                 <td className="data-table-td">{weeklyDigestSignalsLabel(d.summary)}</td>
+                <td className="data-table-td">{weeklyDigestPipelineLabel(d.summary)}</td>
                 <td className="data-table-td">{d.summary.topOpportunities.join(', ') || '—'}</td>
               </tr>
             ))}
