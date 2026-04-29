@@ -8,7 +8,7 @@ import StatusFreshnessItem from './StatusFreshnessItem';
 import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
-import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
+import { readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
@@ -132,7 +132,10 @@ export default async function OpsPage() {
           thresholds={freshnessThresholds}
           missingText="Not generated yet"
         >
-          <code>{latestDigest?.id}</code>
+          <>
+            <code>{latestDigest?.id}</code>
+            {latestDigest ? ` · ${weeklyDigestSignalsLabel(latestDigest.summary)}` : ''}
+          </>
         </StatusFreshnessItem>
       </ul>
       <FreshnessSectionCard title="Freshness thresholds">
