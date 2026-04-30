@@ -10,7 +10,11 @@ export default function GapOpportunityGscRunLink({ opportunity }: { opportunity:
   return (
     <>
       {' '}
-      <Link className="text-muted-note" href={`/reports/runs/${runId}#gsc-diagnostics`}>
+      <Link
+        className="text-muted-note"
+        href={`/reports/runs/${runId}#gsc-diagnostics`}
+        aria-label="View Search Console ingestion diagnostics for this pipeline run"
+      >
         GSC detail
       </Link>
     </>

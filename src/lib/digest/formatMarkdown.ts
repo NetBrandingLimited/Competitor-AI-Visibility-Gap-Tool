@@ -36,6 +36,10 @@ export function formatWeeklyDigestMarkdown(params: {
     lines.push('## All opportunities', '');
     for (const o of summary.opportunities) {
       lines.push(`### ${o.title} [${o.priority}]`, '', o.detail, '');
+      const gscRun = o.pipelineRunIdForGsc?.trim();
+      if (gscRun) {
+        lines.push(`- **Pipeline run (GSC diagnostics):** \`${gscRun}\` — open in app: \`/reports/runs/${gscRun}#gsc-diagnostics\``, '');
+      }
     }
   }
 

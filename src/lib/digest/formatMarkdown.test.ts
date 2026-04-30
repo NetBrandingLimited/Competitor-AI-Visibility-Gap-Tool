@@ -62,4 +62,26 @@ describe('formatWeeklyDigestMarkdown', () => {
     });
     expect(md).toContain('- **GSC ingestion (latest pipeline):** attempt=filtered; cap=3');
   });
+
+  it('includes pipeline run path under opportunities when pipelineRunIdForGsc is set', () => {
+    const md = formatWeeklyDigestMarkdown({
+      ...baseParams,
+      summary: {
+        ...baseParams.summary,
+        topOpportunities: [],
+        opportunities: [
+          {
+            id: 'score-under-threshold',
+            title: 'Visibility score below target',
+            detail: 'Current score is 50. Pipeline GSC: cap=2',
+            priority: 'high',
+            pipelineRunIdForGsc: 'run-xyz'
+          }
+        ]
+      }
+    });
+    expect(md).toContain('`run-xyz`');
+    expect(md).toContain('/reports/runs/run-xyz#gsc-diagnostics');
+    expect(md).toContain('Pipeline run (GSC diagnostics)');
+  });
 });
