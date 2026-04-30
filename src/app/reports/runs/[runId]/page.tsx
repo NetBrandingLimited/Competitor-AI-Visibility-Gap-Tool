@@ -52,6 +52,10 @@ export default async function PipelineRunDetailPage({
   }
 
   const queryHeader = tableCellEllipsisParts(run.query);
+  const gscSummaryText = run.gscIngestionDiagnostics
+    ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+    : '';
+  const gscSummaryParts = gscSummaryText ? tableCellEllipsisParts(gscSummaryText) : null;
 
   return (
     <section>
@@ -82,7 +86,13 @@ export default async function PipelineRunDetailPage({
             One-line summary (also included in pipeline runs CSV as <code>gscDiagnosticsSummary</code>):
           </p>
           <p>
-            <code>{formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}</code>{' '}
+            <code title={gscSummaryParts?.title}>{gscSummaryParts?.display}</code>{' '}
+            <CopyTextButton
+              text={gscSummaryText}
+              label="Copy summary"
+              ariaLabel="Copy GSC ingestion diagnostics summary"
+              className="btn-compact-inline btn-compact-inline-secondary"
+            />
             <CopyTextButton
               text={JSON.stringify(run.gscIngestionDiagnostics, null, 2)}
               label="Copy JSON"
