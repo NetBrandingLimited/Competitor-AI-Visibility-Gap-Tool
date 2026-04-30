@@ -10,7 +10,7 @@ import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationC
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -116,9 +116,14 @@ export default async function WeeklyDigestDetailPage({
         <p>None recorded for this digest.</p>
       ) : (
         <ul>
-          {digest.summary.topOpportunities.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
+          {digest.summary.topOpportunities.map((t) => {
+            const parts = tableCellEllipsisParts(t, GSC_SUMMARY_UI_STATUS_MAX);
+            return (
+              <li key={t}>
+                <span title={parts.title}>{parts.display}</span>
+              </li>
+            );
+          })}
         </ul>
       )}
       {digest.summary.opportunities && digest.summary.opportunities.length > 0 ? (
