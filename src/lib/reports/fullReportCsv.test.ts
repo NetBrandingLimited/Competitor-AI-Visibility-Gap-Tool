@@ -44,6 +44,7 @@ describe('buildVisibilityReportCsv', () => {
           score: 59,
           signalSource: 'live',
           pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: 'attempt=unfiltered; cap=5',
           topOpportunities: ['Win comparisons']
         }
       }
@@ -51,6 +52,8 @@ describe('buildVisibilityReportCsv', () => {
 
     expect(csv).toContain('section,date,generatedAt');
     expect(csv).toContain('digestPipelineIngestionSource');
+    expect(csv).toContain('digestPipelineGscDiagnosticsSummary');
+    expect(csv).toContain('attempt=unfiltered; cap=5');
     expect(csv).toContain('trend,2026-04-29');
     expect(csv).toContain('gap_opportunity');
     expect(csv).toContain('gap_topic');

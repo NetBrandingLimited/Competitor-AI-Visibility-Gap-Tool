@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import type { GapOpportunity, TopicGap } from '@/lib/insights/gap';
 import { buildGapInsightsFromLatestData, readGapLatestDataForOrg } from '@/lib/insights/gap';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import { sendWeeklyDigestEmail } from '@/lib/email/weeklyDigestEmail';
@@ -9,6 +10,8 @@ export type WeeklyDigestSummary = {
   score: number | null;
   signalSource: 'cache' | 'live' | null;
   pipelineIngestionSource?: PipelineIngestionSource | null;
+  /** Same string as pipeline CSV `gscDiagnosticsSummary` when the latest run had GSC diagnostics. */
+  pipelineGscDiagnosticsSummary?: string | null;
   /** When signalSource is cache: matches visibility scoring (TTL vs stale fallback). */
   connectorSignalCacheKind?: 'ttl' | 'stale_fallback' | null;
   topOpportunities: string[];
@@ -90,6 +93,7 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
     score: null,
     signalSource: null,
     pipelineIngestionSource: null,
+    pipelineGscDiagnosticsSummary: null,
     topOpportunities: []
   };
   try {
@@ -124,10 +128,15 @@ export function parseWeeklyDigestSummaryJson(raw: string): WeeklyDigestSummary {
       parsed.connectorSignalCacheKind === 'ttl' || parsed.connectorSignalCacheKind === 'stale_fallback'
         ? parsed.connectorSignalCacheKind
         : null;
+    const pipelineGscDiagnosticsSummary =
+      typeof parsed.pipelineGscDiagnosticsSummary === 'string' && parsed.pipelineGscDiagnosticsSummary.trim().length > 0
+        ? parsed.pipelineGscDiagnosticsSummary.trim()
+        : null;
     return {
       score,
       signalSource,
       pipelineIngestionSource,
+      pipelineGscDiagnosticsSummary,
       connectorSignalCacheKind,
       topOpportunities,
       opportunities,
@@ -174,6 +183,9 @@ export async function generateWeeklyDigest(organizationId: string): Promise<Week
     score: gapLatest.visibility ? Math.round(gapLatest.visibility.score) : null,
     signalSource: gapLatest.visibility?.inputs?.connectorSignalSource ?? null,
     pipelineIngestionSource: gapLatest.latestRun?.ingestionSource ?? null,
+    pipelineGscDiagnosticsSummary: gapLatest.latestRun?.gscIngestionDiagnostics
+      ? formatGscIngestionDiagnosticsSummary(gapLatest.latestRun.gscIngestionDiagnostics)
+      : null,
     connectorSignalCacheKind: gapLatest.visibility?.inputs?.connectorSignalCacheKind ?? null,
     topOpportunities: insights.opportunities.slice(0, 3).map((o) => o.title),
     opportunities: insights.opportunities,

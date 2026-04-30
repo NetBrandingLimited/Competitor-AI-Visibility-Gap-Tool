@@ -30,7 +30,8 @@ export function buildVisibilityReportCsv(
     'digestScore',
     'digestConnectorSignals',
     'digestPipelineDocs',
-    'digestPipelineIngestionSource'
+    'digestPipelineIngestionSource',
+    'digestPipelineGscDiagnosticsSummary'
   ];
 
   const trendRows = snapshots.map((row) =>
@@ -41,6 +42,7 @@ export function buildVisibilityReportCsv(
       row.totalMentions,
       row.topBrand,
       row.topBrandMentions,
+      '',
       '',
       '',
       '',
@@ -83,6 +85,7 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
+      '',
       ''
     ]
   );
@@ -104,6 +107,7 @@ export function buildVisibilityReportCsv(
       topic.triggerCount,
       topic.clusterWeight,
       topic.recommendation,
+      '',
       '',
       '',
       '',
@@ -138,7 +142,8 @@ export function buildVisibilityReportCsv(
           latestDigest.summary.score ?? '',
           weeklyDigestSignalsLabel(latestDigest.summary),
           weeklyDigestPipelineLabel(latestDigest.summary),
-          latestDigest.summary.pipelineIngestionSource ?? ''
+          latestDigest.summary.pipelineIngestionSource ?? '',
+          latestDigest.summary.pipelineGscDiagnosticsSummary ?? ''
         ]
       ]
     : [];

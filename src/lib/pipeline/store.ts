@@ -1,4 +1,4 @@
-import type { GscIngestionDiagnostics } from '@/lib/ingestion/gscDiagnostics';
+import { parseGscIngestionDiagnosticsRaw } from '@/lib/ingestion/gscDiagnostics';
 
 import type { PipelineIngestionSource, UnifiedPipelineRun } from './types';
 import { prisma } from '@/lib/prisma';
@@ -42,10 +42,8 @@ function rowToRun(row: {
       ? row.ingestionSource
       : undefined;
 
-  const gscIngestionDiagnostics =
-    row.gscIngestionDiagnosticsRaw && row.gscIngestionDiagnosticsRaw.trim().length > 0
-      ? tryParseJson<GscIngestionDiagnostics>(row.gscIngestionDiagnosticsRaw) ?? undefined
-      : undefined;
+  const parsedGsc = parseGscIngestionDiagnosticsRaw(row.gscIngestionDiagnosticsRaw);
+  const gscIngestionDiagnostics = parsedGsc ?? undefined;
 
   return {
     id: row.id,

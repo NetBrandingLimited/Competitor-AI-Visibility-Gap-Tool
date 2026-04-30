@@ -51,4 +51,15 @@ describe('formatWeeklyDigestMarkdown', () => {
     });
     expect(md).toContain('- **Insights snapshot:** 2026-04-08T09:00:00.000Z');
   });
+
+  it('includes GSC ingestion line when pipelineGscDiagnosticsSummary is set', () => {
+    const md = formatWeeklyDigestMarkdown({
+      ...baseParams,
+      summary: {
+        ...baseParams.summary,
+        pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=3'
+      }
+    });
+    expect(md).toContain('- **GSC ingestion (latest pipeline):** attempt=filtered; cap=3');
+  });
 });

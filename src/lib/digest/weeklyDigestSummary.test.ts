@@ -79,6 +79,18 @@ describe('parseWeeklyDigestSummaryJson', () => {
     expect(s.pipelineIngestionSource).toBeNull();
   });
 
+  it('parses pipelineGscDiagnosticsSummary when present', () => {
+    const raw = JSON.stringify({
+      score: 1,
+      signalSource: 'live',
+      pipelineIngestionSource: 'live_gsc_queries',
+      pipelineGscDiagnosticsSummary: 'attempt=filtered; q:fetched=2',
+      topOpportunities: []
+    });
+    const s = parseWeeklyDigestSummaryJson(raw);
+    expect(s.pipelineGscDiagnosticsSummary).toBe('attempt=filtered; q:fetched=2');
+  });
+
   it('returns empty summary on invalid JSON', () => {
     const s = parseWeeklyDigestSummaryJson('not json');
     expect(s.score).toBeNull();

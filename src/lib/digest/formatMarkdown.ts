@@ -18,6 +18,9 @@ export function formatWeeklyDigestMarkdown(params: {
     `- **Pipeline documents:** ${weeklyDigestPipelineLabel(summary)}`,
     `- **Connector signals:** ${weeklyDigestSignalsLabel(summary)}`
   ];
+  if (summary.pipelineGscDiagnosticsSummary) {
+    lines.push(`- **GSC ingestion (latest pipeline):** ${summary.pipelineGscDiagnosticsSummary}`);
+  }
   if (summary.insightsGeneratedAt) {
     lines.push(`- **Insights snapshot:** ${summary.insightsGeneratedAt}`);
   }

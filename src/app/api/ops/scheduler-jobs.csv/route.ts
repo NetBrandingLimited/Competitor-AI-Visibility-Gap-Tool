@@ -1,5 +1,6 @@
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { parseWeeklyDigestSummaryJson, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { formatGscIngestionDiagnosticsSummary, parseGscIngestionDiagnosticsRaw } from '@/lib/ingestion/gscDiagnostics';
 import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import { prisma } from '@/lib/prisma';
@@ -30,23 +31,36 @@ export async function GET() {
   const pipelineRunIds = Array.from(
     new Set(jobs.map((job) => job.pipelineRunId).filter((id): id is string => Boolean(id)))
   );
-  const pipelineIngestionSources: Record<string, PipelineIngestionSource | undefined> = pipelineRunIds.length
-    ? Object.fromEntries(
-        (
-          await prisma.pipelineRun.findMany({
-            where: { organizationId: active.organizationId, id: { in: pipelineRunIds } },
-            select: { id: true, ingestionSource: true }
-          })
-        ).map((row) => [
-          row.id,
-          row.ingestionSource === 'live_gsc_queries' || row.ingestionSource === 'mock_ingestion'
-            ? row.ingestionSource
-            : undefined
-        ])
-      )
-    : {};
+  const pipelineRows = pipelineRunIds.length
+    ? await prisma.pipelineRun.findMany({
+        where: { organizationId: active.organizationId, id: { in: pipelineRunIds } },
+        select: { id: true, ingestionSource: true, gscIngestionDiagnosticsRaw: true }
+      })
+    : [];
 
-  const csv = buildSchedulerJobsCsv(jobs, digestSignalLabels, pipelineIngestionSources);
+  const pipelineIngestionSources: Record<string, PipelineIngestionSource | undefined> = Object.fromEntries(
+    pipelineRows.map((row) => [
+      row.id,
+      row.ingestionSource === 'live_gsc_queries' || row.ingestionSource === 'mock_ingestion'
+        ? row.ingestionSource
+        : undefined
+    ])
+  );
+
+  const pipelineRunGscDiagnosticsSummaries: Record<string, string> = {};
+  for (const row of pipelineRows) {
+    const parsed = parseGscIngestionDiagnosticsRaw(row.gscIngestionDiagnosticsRaw);
+    if (parsed) {
+      pipelineRunGscDiagnosticsSummaries[row.id] = formatGscIngestionDiagnosticsSummary(parsed);
+    }
+  }
+
+  const csv = buildSchedulerJobsCsv(
+    jobs,
+    digestSignalLabels,
+    pipelineIngestionSources,
+    pipelineRunGscDiagnosticsSummaries
+  );
 
   return new Response(csv, {
     headers: buildDownloadHeaders('text/csv; charset=utf-8', 'scheduler-jobs.csv')

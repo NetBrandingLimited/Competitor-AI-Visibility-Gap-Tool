@@ -7,7 +7,9 @@ import { buildCsvDocument } from './csv';
 export function buildSchedulerJobsCsv(
   jobs: SchedulerJobRecord[],
   digestSignalLabels: Record<string, string>,
-  pipelineIngestionSources: Record<string, PipelineIngestionSource | undefined>
+  pipelineIngestionSources: Record<string, PipelineIngestionSource | undefined>,
+  /** Pre-formatted GSC ingestion summary per pipeline run id (same string as pipeline runs CSV). */
+  pipelineRunGscDiagnosticsSummaries: Record<string, string> = {}
 ): string {
   const header = [
     'id',
@@ -18,6 +20,7 @@ export function buildSchedulerJobsCsv(
     'pipelineRunId',
     'pipelineDocs',
     'pipelineIngestionSource',
+    'pipelineRunGscDiagnosticsSummary',
     'weeklyDigestId',
     'digestSignals',
     'errorMessage'
@@ -32,6 +35,7 @@ export function buildSchedulerJobsCsv(
     job.pipelineRunId ?? '',
     job.pipelineRunId ? pipelineIngestionProvenanceLabel(pipelineIngestionSources[job.pipelineRunId]) : '',
     job.pipelineRunId ? pipelineIngestionSources[job.pipelineRunId] ?? '' : '',
+    job.pipelineRunId ? pipelineRunGscDiagnosticsSummaries[job.pipelineRunId] ?? '' : '',
     job.weeklyDigestId ?? '',
     job.weeklyDigestId ? digestSignalLabels[job.weeklyDigestId] ?? '' : '',
     job.errorMessage ?? ''

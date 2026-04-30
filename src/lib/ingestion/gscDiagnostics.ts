@@ -28,6 +28,18 @@ export type GscIngestionDiagnostics = {
   cappedDocs: number;
 };
 
+/** Parse persisted `PipelineRun.gscIngestionDiagnosticsRaw` (shared by store, CSV routes, etc.). */
+export function parseGscIngestionDiagnosticsRaw(raw: string | null | undefined): GscIngestionDiagnostics | null {
+  if (raw == null || String(raw).trim().length === 0) {
+    return null;
+  }
+  try {
+    return JSON.parse(String(raw)) as GscIngestionDiagnostics;
+  } catch {
+    return null;
+  }
+}
+
 export function formatGscIngestionDiagnosticsSummary(d: GscIngestionDiagnostics): string {
   const q = d.query;
   const p = d.page;

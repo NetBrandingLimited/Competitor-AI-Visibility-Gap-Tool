@@ -14,6 +14,7 @@ describe('buildWeeklyDigestsCsv', () => {
           score: 58,
           signalSource: 'live',
           pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=2',
           topOpportunities: ['Win alternatives', 'Improve pricing page']
         }
       }
@@ -24,5 +25,7 @@ describe('buildWeeklyDigestsCsv', () => {
     expect(csv).toContain('Search Console');
     expect(csv).toContain('live_gsc_queries');
     expect(csv).toContain('Win alternatives | Improve pricing page');
+    expect(csv).toContain('pipelineGscDiagnosticsSummary');
+    expect(csv).toContain('attempt=filtered; cap=2');
   });
 });

@@ -11,6 +11,7 @@ export function buildWeeklyDigestsCsv(digests: WeeklyDigest[]): string {
     'connectorSignals',
     'pipelineDocs',
     'pipelineIngestionSource',
+    'pipelineGscDiagnosticsSummary',
     'topOpportunities'
   ];
   const rows = digests.map((digest) =>
@@ -23,6 +24,7 @@ export function buildWeeklyDigestsCsv(digests: WeeklyDigest[]): string {
       weeklyDigestSignalsLabel(digest.summary),
       weeklyDigestPipelineLabel(digest.summary),
       digest.summary.pipelineIngestionSource ?? '',
+      digest.summary.pipelineGscDiagnosticsSummary ?? '',
       digest.summary.topOpportunities.join(' | ')
     ]
   );

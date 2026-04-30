@@ -80,6 +80,12 @@ export default async function WeeklyDigestDetailPage({
         <li>
           <strong>Pipeline documents:</strong> {weeklyDigestPipelineLabel(digest.summary)}
         </li>
+        {digest.summary.pipelineGscDiagnosticsSummary ? (
+          <li>
+            <strong>GSC ingestion (latest pipeline):</strong>{' '}
+            <code className="text-priority-muted">{digest.summary.pipelineGscDiagnosticsSummary}</code>
+          </li>
+        ) : null}
         <li>
           <strong>Connector signals:</strong> {weeklyDigestSignalsLabel(digest.summary)}
         </li>
