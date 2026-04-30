@@ -38,6 +38,9 @@ export type GapInsights = {
 /** List rows use the native `title` tooltip when detail text is at least this long (e.g. appended pipeline GSC). */
 export const GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS = 160;
 
+/** Topic gap tables set `title` on recommendation cells when text is at least this long. */
+export const GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS = 160;
+
 type GapOrgFields = {
   brandName: string | null;
   competitorA: string | null;

@@ -19,7 +19,8 @@ import {
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import {
   buildGapInsightsFromLatestData,
-  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
+  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS,
+  GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
 } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
@@ -254,7 +255,16 @@ export default async function ReportsPage() {
                 <td className="data-table-td-right">{topic.gapScore}</td>
                 <td className="data-table-td-right">{topic.triggerCount}</td>
                 <td className="data-table-td-right">{topic.clusterWeight}</td>
-                <td className="data-table-td">{topic.recommendation}</td>
+                <td
+                  className="data-table-td"
+                  title={
+                    topic.recommendation.length > GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
+                      ? topic.recommendation
+                      : undefined
+                  }
+                >
+                  {topic.recommendation}
+                </td>
               </tr>
             ))}
           </tbody>

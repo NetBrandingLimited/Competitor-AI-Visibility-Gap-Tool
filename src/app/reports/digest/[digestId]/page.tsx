@@ -8,7 +8,10 @@ import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink'
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS } from '@/lib/insights/gap';
+import {
+  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS,
+  GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
+} from '@/lib/insights/gap';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -150,7 +153,16 @@ export default async function WeeklyDigestDetailPage({
                   <td className="data-table-td data-table-sticky-col">{t.topic}</td>
                   <td className="data-table-td-right">{t.gapScore}</td>
                   <td className="data-table-td-right">{t.triggerCount}</td>
-                  <td className="data-table-td">{t.recommendation}</td>
+                  <td
+                    className="data-table-td"
+                    title={
+                      t.recommendation.length > GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
+                        ? t.recommendation
+                        : undefined
+                    }
+                  >
+                    {t.recommendation}
+                  </td>
                 </tr>
               ))}
             </tbody>
