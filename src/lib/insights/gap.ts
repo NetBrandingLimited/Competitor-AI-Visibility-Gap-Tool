@@ -38,10 +38,10 @@ export type GapInsights = {
 /** Opportunity list rows: max detail characters before ellipsis; full text appears in `title` when truncated. */
 export const GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS = 160;
 
-/** Topic gap tables set `title` on recommendation cells when text is at least this long. */
+/** Topic gap tables: max recommendation characters before ellipsis; full text in `title` when truncated. */
 export const GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS = 160;
 
-/** Topic label column: native `title` when cluster label is at least this long. */
+/** Topic label column: max characters before ellipsis; full text in `title` when truncated. */
 export const GAP_TOPIC_LABEL_TITLE_THRESHOLD_CHARS = 48;
 
 type GapOrgFields = {
