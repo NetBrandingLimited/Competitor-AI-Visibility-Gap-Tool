@@ -1,3 +1,4 @@
+import { ellipsisGscDiagnosticsSummaryForUi, GSC_SUMMARY_UI_PARAGRAPH_MAX } from '@/lib/ingestion/gscDiagnostics';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
@@ -112,10 +113,15 @@ export function buildGapInsightsFromLatestData(
   }
 
   if (visibility && visibility.score < 55) {
+    let detail = `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`;
+    const gsc = visibility.inputs.pipelineGscDiagnosticsSummary?.trim();
+    if (gsc) {
+      detail += ` Pipeline GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, GSC_SUMMARY_UI_PARAGRAPH_MAX)}`;
+    }
     opportunities.push({
       id: 'score-under-threshold',
       title: 'Visibility score below target',
-      detail: `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`,
+      detail,
       priority: 'high'
     });
   }
