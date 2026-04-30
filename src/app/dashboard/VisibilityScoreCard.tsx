@@ -12,7 +12,9 @@ type Props = {
     score: number;
     createdAt: string;
     reasons: VisibilityReasonV1[];
+    pipelineRunId?: string | null;
     pipelineIngestionSource?: PipelineIngestionSource | null;
+    pipelineGscDiagnosticsSummary?: string | null;
     signalSource?: 'cache' | 'live';
     signalCacheKind?: 'ttl' | 'stale_fallback' | null;
     signalsAsOf?: string | null;
@@ -74,6 +76,21 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
           <p className="text-muted-small-subtle mt-0">
             Last updated: {new Date(latest.createdAt).toLocaleString()}
             {` · pipeline docs: ${pipelineIngestionProvenanceLabel(latest.pipelineIngestionSource)}`}
+            {latest.pipelineGscDiagnosticsSummary && latest.pipelineRunId ? (
+              <>
+                {' · '}
+                <Link
+                  href={`/reports/runs/${latest.pipelineRunId}#gsc-diagnostics`}
+                  className="text-priority-muted"
+                  title={latest.pipelineGscDiagnosticsSummary}
+                >
+                  GSC:{' '}
+                  {latest.pipelineGscDiagnosticsSummary.length > 44
+                    ? `${latest.pipelineGscDiagnosticsSummary.slice(0, 44)}…`
+                    : latest.pipelineGscDiagnosticsSummary}
+                </Link>
+              </>
+            ) : null}
             {latest.signalSource ? ` · signals: ${latest.signalSource}` : ''}
             {typeof latest.signalCount === 'number' ? ` · count: ${latest.signalCount}` : ''}
             {latest.signalsAsOf ? ` · asOf: ${latest.signalsAsOf}` : ''}

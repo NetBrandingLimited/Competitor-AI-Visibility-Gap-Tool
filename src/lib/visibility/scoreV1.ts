@@ -1,5 +1,6 @@
 import { collectAllConnectorSignals } from '@/lib/connectors';
 import type { VisibilitySignal } from '@/lib/connectors/types';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
@@ -16,6 +17,8 @@ export type VisibilityInputsV1 = {
   pipelineRunId: string | null;
   /** Latest saved pipeline run document provenance (null if no run or legacy row). */
   pipelineIngestionSource: PipelineIngestionSource | null;
+  /** GSC ingestion one-liner for the latest pipeline run at scoring time (null if none / mock). */
+  pipelineGscDiagnosticsSummary: string | null;
   documentCount: number;
   triggerCount: number;
   clusterCount: number;
@@ -40,9 +43,14 @@ function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
     inputs.pipelineIngestionSource === 'live_gsc_queries' || inputs.pipelineIngestionSource === 'mock_ingestion'
       ? inputs.pipelineIngestionSource
       : null;
+  const pipelineGscDiagnosticsSummary =
+    typeof inputs.pipelineGscDiagnosticsSummary === 'string' && inputs.pipelineGscDiagnosticsSummary.trim().length > 0
+      ? inputs.pipelineGscDiagnosticsSummary.trim()
+      : null;
   return {
     ...inputs,
     pipelineIngestionSource,
+    pipelineGscDiagnosticsSummary,
     connectorSignalSource:
       inputs.connectorSignalSource === 'cache' || inputs.connectorSignalSource === 'live'
         ? inputs.connectorSignalSource
@@ -317,6 +325,20 @@ export function buildWhyChanged(
     });
   }
 
+  const prevGsc = p.pipelineGscDiagnosticsSummary ?? null;
+  const nextGsc = n.pipelineGscDiagnosticsSummary ?? null;
+  if (prevGsc !== nextGsc) {
+    reasons.push({
+      code: 'PIPELINE_GSC_DIAGNOSTICS',
+      message:
+        prevGsc === null && nextGsc !== null
+          ? 'Search Console ingestion diagnostics are now recorded for the pipeline run used in this score.'
+          : nextGsc === null && prevGsc !== null
+            ? 'Search Console ingestion diagnostics are no longer present on the latest pipeline run.'
+            : 'Search Console ingestion diagnostics summary changed for the latest pipeline run.'
+    });
+  }
+
   return reasons;
 }
 
@@ -335,6 +357,9 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
   return {
     pipelineRunId: latestRun?.id ?? null,
     pipelineIngestionSource: latestRun?.ingestionSource ?? null,
+    pipelineGscDiagnosticsSummary: latestRun?.gscIngestionDiagnostics
+      ? formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)
+      : null,
     documentCount: latestRun?.documentCount ?? 0,
     triggerCount: latestRun?.triggerCount ?? 0,
     clusterCount: latestRun?.clusterCount ?? 0,

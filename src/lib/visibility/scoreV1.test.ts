@@ -6,6 +6,7 @@ function makeInputs(overrides: Partial<VisibilityInputsV1> = {}): VisibilityInpu
   return {
     pipelineRunId: 'run-1',
     pipelineIngestionSource: 'mock_ingestion',
+    pipelineGscDiagnosticsSummary: null,
     documentCount: 10,
     triggerCount: 5,
     clusterCount: 3,
@@ -45,6 +46,17 @@ describe('buildWhyChanged', () => {
 
     const reasons = buildWhyChanged(previous, 60, nextInputs);
     expect(reasons.some((r) => r.code === 'PIPELINE_INGESTION_SOURCE')).toBe(false);
+  });
+
+  it('includes reason when GSC diagnostics summary changes', () => {
+    const previous = {
+      score: 60,
+      inputs: makeInputs({ pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=1' })
+    };
+    const nextInputs = makeInputs({ pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=2' });
+
+    const reasons = buildWhyChanged(previous, 60, nextInputs);
+    expect(reasons.some((r) => r.code === 'PIPELINE_GSC_DIAGNOSTICS')).toBe(true);
   });
 
   it('labels legacy/null provenance transition explicitly', () => {

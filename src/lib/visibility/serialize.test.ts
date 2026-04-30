@@ -14,6 +14,7 @@ describe('visibility serializers', () => {
       inputs: {
         pipelineRunId: 'run-1',
         pipelineIngestionSource: 'live_gsc_queries',
+        pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=3',
         documentCount: 22,
         triggerCount: 8,
         clusterCount: 4,
@@ -31,6 +32,7 @@ describe('visibility serializers', () => {
 
     expect(payload.pipelineIngestionSource).toBe('live_gsc_queries');
     expect(payload.pipelineIngestionSourceLabel).toBe('Search Console');
+    expect(payload.pipelineGscDiagnosticsSummary).toBe('attempt=filtered; cap=3');
     expect(payload.signalSource).toBe('live');
     expect(payload.signalCount).toBe(3);
   });
@@ -42,6 +44,7 @@ describe('visibility serializers', () => {
       inputs: {
         pipelineRunId: 'run-2',
         pipelineIngestionSource: null,
+        pipelineGscDiagnosticsSummary: null,
         documentCount: 10,
         triggerCount: 2,
         clusterCount: 1,
@@ -59,6 +62,7 @@ describe('visibility serializers', () => {
 
     expect(payload.pipelineIngestionSource).toBeNull();
     expect(payload.pipelineIngestionSourceLabel).toBe('Not recorded');
+    expect(payload.pipelineGscDiagnosticsSummary).toBeNull();
     expect(payload.signalSource).toBe('cache');
     expect(payload.signalCount).toBe(0);
   });
