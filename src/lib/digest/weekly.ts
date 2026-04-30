@@ -69,7 +69,11 @@ function parseOpportunity(raw: unknown): GapOpportunity | null {
     return null;
   }
   const priority = isPriority(o.priority) ? o.priority : 'medium';
-  return { id, title, detail, priority };
+  const pipelineRunIdForGsc =
+    typeof o.pipelineRunIdForGsc === 'string' && o.pipelineRunIdForGsc.trim().length > 0
+      ? o.pipelineRunIdForGsc.trim()
+      : undefined;
+  return { id, title, detail, priority, ...(pipelineRunIdForGsc ? { pipelineRunIdForGsc } : {}) };
 }
 
 function parseTopic(raw: unknown): TopicGap | null {

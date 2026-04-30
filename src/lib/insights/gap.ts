@@ -16,6 +16,8 @@ export type GapOpportunity = {
   title: string;
   detail: string;
   priority: 'high' | 'medium' | 'low';
+  /** Present when detail includes a pipeline GSC line; links to that run’s diagnostics. */
+  pipelineRunIdForGsc?: string;
 };
 
 export type TopicGap = {
@@ -87,6 +89,20 @@ function appendPipelineGscToDetail(
   return gsc ? `${detail} Pipeline GSC: ${gsc}` : detail;
 }
 
+/** Run to link for GSC diagnostics when the gap detail includes a Pipeline GSC line. */
+function pipelineRunIdForGscLink(
+  latestRun: UnifiedPipelineRun | null,
+  visibility: GapVisibilityInput
+): string | null {
+  if (!ellipsisPipelineGscForGapDetail(latestRun, visibility)) {
+    return null;
+  }
+  if (latestRun?.gscIngestionDiagnostics != null) {
+    return latestRun.id;
+  }
+  return visibility?.inputs.pipelineRunId ?? null;
+}
+
 export async function readGapLatestDataForOrg(organizationId: string): Promise<GapLatestData> {
   const [org, latestRun, latestTrend, visibility] = await Promise.all([
     prisma.organization.findUnique({
@@ -129,6 +145,8 @@ export function buildGapInsightsFromLatestData(
     upstreamTimes.length > 0
       ? new Date(Math.max(...upstreamTimes.map((iso) => new Date(iso).getTime()))).toISOString()
       : null;
+  const pipelineRunIdForGsc = pipelineRunIdForGscLink(latestRun, visibility);
+  const gscRunLinkFields = pipelineRunIdForGsc ? { pipelineRunIdForGsc } : {};
   if (latestTrend) {
     const top = norm(latestTrend.topBrand);
     const brand = norm(brandName);
@@ -141,7 +159,8 @@ export function buildGapInsightsFromLatestData(
           latestRun,
           visibility
         ),
-        priority: 'high'
+        priority: 'high',
+        ...gscRunLinkFields
       });
     }
   }
@@ -155,7 +174,8 @@ export function buildGapInsightsFromLatestData(
         latestRun,
         visibility
       ),
-      priority: 'high'
+      priority: 'high',
+      ...gscRunLinkFields
     });
   }
 
@@ -174,7 +194,8 @@ export function buildGapInsightsFromLatestData(
           latestRun,
           visibility
         ),
-        priority: 'medium'
+        priority: 'medium',
+        ...gscRunLinkFields
       });
     }
   }

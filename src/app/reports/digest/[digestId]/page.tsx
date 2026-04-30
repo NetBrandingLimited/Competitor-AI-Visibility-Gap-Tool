@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import CopyDigestSummary from '../CopyDigestSummary';
 import CopyTextButton from '@/app/components/CopyTextButton';
+import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
@@ -119,6 +120,7 @@ export default async function WeeklyDigestDetailPage({
             {digest.summary.opportunities.map((o) => (
               <li key={o.id} title={o.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? o.detail : undefined}>
                 <strong>{o.title}</strong> <span className="text-priority-muted">[{o.priority}]</span> — {o.detail}
+                <GapOpportunityGscRunLink opportunity={o} />
               </li>
             ))}
           </ul>

@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
+import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
@@ -271,6 +272,7 @@ export default async function DashboardPage() {
         {gapInsights.opportunities.slice(0, 3).map((op) => (
           <li key={op.id} className="mb-8" title={op.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? op.detail : undefined}>
             <strong>{op.title}</strong> ({op.priority}) — {op.detail}
+            <GapOpportunityGscRunLink opportunity={op} />
           </li>
         ))}
       </ul>

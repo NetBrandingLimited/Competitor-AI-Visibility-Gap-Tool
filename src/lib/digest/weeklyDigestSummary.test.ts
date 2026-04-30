@@ -97,4 +97,24 @@ describe('parseWeeklyDigestSummaryJson', () => {
     expect(s.signalSource).toBeNull();
     expect(s.topOpportunities).toEqual([]);
   });
+
+  it('parses pipelineRunIdForGsc on opportunities when present', () => {
+    const raw = JSON.stringify({
+      score: 1,
+      signalSource: 'live',
+      topOpportunities: [],
+      opportunities: [
+        {
+          id: 'score-under-threshold',
+          title: 'Low score',
+          detail: '… Pipeline GSC: cap=1',
+          priority: 'high',
+          pipelineRunIdForGsc: 'run-abc'
+        }
+      ]
+    });
+    const s = parseWeeklyDigestSummaryJson(raw);
+    expect(s.opportunities).toHaveLength(1);
+    expect(s.opportunities![0].pipelineRunIdForGsc).toBe('run-abc');
+  });
 });

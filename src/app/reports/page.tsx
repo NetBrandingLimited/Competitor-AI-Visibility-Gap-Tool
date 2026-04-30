@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
@@ -220,6 +221,7 @@ export default async function ReportsPage() {
         {gapInsights.opportunities.map((item) => (
           <li key={item.id} title={item.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? item.detail : undefined}>
             <strong>{item.title}</strong> [{item.priority}] — {item.detail}
+            <GapOpportunityGscRunLink opportunity={item} />
           </li>
         ))}
       </ul>

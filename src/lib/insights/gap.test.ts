@@ -44,6 +44,7 @@ describe('buildGapInsightsFromLatestData', () => {
     expect(insights.opportunities).toHaveLength(1);
     expect(insights.opportunities[0].id).toBe('baseline-maintain');
     expect(insights.opportunities[0].detail).toContain('Search Console');
+    expect(insights.opportunities[0].pipelineRunIdForGsc).toBeUndefined();
   });
 
   it('includes mock provenance in baseline maintain-momentum copy', () => {
@@ -113,6 +114,7 @@ describe('buildGapInsightsFromLatestData', () => {
     expect(low).toBeDefined();
     expect(low!.detail).toContain('Pipeline GSC:');
     expect(low!.detail).toContain('attempt=filtered');
+    expect(low!.pipelineRunIdForGsc).toBe('run-gsc');
   });
 
   it('appends pipeline GSC from run diagnostics to trigger coverage opportunity', () => {
@@ -146,6 +148,7 @@ describe('buildGapInsightsFromLatestData', () => {
     expect(trig).toBeDefined();
     expect(trig!.detail).toContain('Pipeline GSC:');
     expect(trig!.detail).toContain('attempt=filtered');
+    expect(trig!.pipelineRunIdForGsc).toBe('run-trig');
   });
 
   it('appends pipeline GSC from visibility snapshot to trend leadership opportunity when run has no diagnostics', () => {
@@ -193,5 +196,6 @@ describe('buildGapInsightsFromLatestData', () => {
     expect(trend!.detail).toContain('BetaCo');
     expect(trend!.detail).toContain('Pipeline GSC:');
     expect(trend!.detail).toContain('attempt=unfiltered');
+    expect(trend!.pipelineRunIdForGsc).toBe('run-trend');
   });
 });
