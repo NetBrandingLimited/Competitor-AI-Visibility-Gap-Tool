@@ -374,10 +374,11 @@ export default async function DashboardPage() {
           {snapshot.recent.map((row, index) => {
             const queryCell = tableCellEllipsisParts(row.query);
             const brandCell = tableCellEllipsisParts(row.topBrand);
+            const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(row.source));
             return (
             <tr key={`${row.source}-${row.publishedAt}-${index}`}>
-              <td className="data-table-td data-table-sticky-col">
-                {ingestionSourceDisplayLabel(row.source)}
+              <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
+                {sourceCell.display}
               </td>
               <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
                 {queryCell.display}

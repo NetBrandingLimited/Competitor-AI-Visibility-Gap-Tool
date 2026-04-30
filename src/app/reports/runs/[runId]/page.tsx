@@ -134,10 +134,11 @@ export default async function PipelineRunDetailPage({
               <tbody>
                 {run.documents.map((doc, index) => {
                   const titleCell = tableCellEllipsisParts(doc.title);
+                  const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(doc.source));
                   return (
                   <tr key={`${doc.id}-${index}`}>
-                    <td className="data-table-td data-table-sticky-col">
-                      {ingestionSourceDisplayLabel(doc.source)}
+                    <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
+                      {sourceCell.display}
                     </td>
                     <td className="data-table-td data-table-td-wrap-break" title={titleCell.title}>
                       {titleCell.display}
@@ -179,6 +180,7 @@ export default async function PipelineRunDetailPage({
           <tbody>
             {run.triggers.map((trigger) => {
               const phraseCell = tableCellEllipsisParts(trigger.phrase);
+              const categoryCell = tableCellEllipsisParts(trigger.category);
               return (
                 <tr key={`${trigger.phrase}-${trigger.category}`}>
                   <td
@@ -187,7 +189,9 @@ export default async function PipelineRunDetailPage({
                   >
                     {phraseCell.display}
                   </td>
-                  <td className="data-table-td">{trigger.category}</td>
+                  <td className="data-table-td" title={categoryCell.title}>
+                    {categoryCell.display}
+                  </td>
                   <td className="data-table-td-right">{trigger.score}</td>
                 </tr>
               );
