@@ -1,6 +1,6 @@
 'use client';
 
-import { ellipsisGscDiagnosticsSummaryForUi } from '@/lib/ingestion/gscDiagnostics';
+import { ellipsisGscDiagnosticsSummaryForUi, GSC_SUMMARY_UI_STATUS_MAX } from '@/lib/ingestion/gscDiagnostics';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,7 +30,7 @@ export default function RunActions() {
       let message = 'Unified pipeline run completed.';
       const gsc = typeof data.gscDiagnosticsSummary === 'string' ? data.gscDiagnosticsSummary.trim() : '';
       if (gsc.length > 0) {
-        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, 140)}`;
+        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, GSC_SUMMARY_UI_STATUS_MAX)}`;
       }
       setPipeline({ running: false, message });
       router.refresh();
@@ -68,7 +68,18 @@ export default function RunActions() {
       if (!response.ok) {
         throw new Error(`Digest failed (${response.status})`);
       }
-      setDigest({ running: false, message: 'Weekly digest generated.' });
+      const data = (await response.json()) as {
+        digest?: { id: string; summary?: { pipelineGscDiagnosticsSummary?: string | null } };
+      };
+      let message = 'Weekly digest generated.';
+      if (data.digest?.id) {
+        message += ` Id: ${data.digest.id}.`;
+      }
+      const digestGsc = data.digest?.summary?.pipelineGscDiagnosticsSummary?.trim();
+      if (digestGsc) {
+        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(digestGsc, GSC_SUMMARY_UI_STATUS_MAX)}`;
+      }
+      setDigest({ running: false, message });
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Digest generation failed.';

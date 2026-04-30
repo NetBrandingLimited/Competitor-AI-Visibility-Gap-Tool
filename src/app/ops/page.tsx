@@ -10,7 +10,11 @@ import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { ellipsisGscDiagnosticsSummaryForUi, formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import {
+  ellipsisGscDiagnosticsSummaryForUi,
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_NARROW_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
@@ -214,7 +218,11 @@ export default async function OpsPage() {
                       className="text-priority-muted"
                       title={latestVisibility.inputs.pipelineGscDiagnosticsSummary}
                     >
-                      GSC: {ellipsisGscDiagnosticsSummaryForUi(latestVisibility.inputs.pipelineGscDiagnosticsSummary, 44)}
+                      GSC:{' '}
+                      {ellipsisGscDiagnosticsSummaryForUi(
+                        latestVisibility.inputs.pipelineGscDiagnosticsSummary,
+                        GSC_SUMMARY_UI_NARROW_MAX
+                      )}
                     </Link>
                   </>
                 ) : null}

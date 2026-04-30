@@ -28,6 +28,18 @@ export type GscIngestionDiagnostics = {
   cappedDocs: number;
 };
 
+/** Single-line status (Ops, visibility card). */
+export const GSC_SUMMARY_UI_NARROW_MAX = 44;
+
+/** Dashboard digest + latest-run lines. */
+export const GSC_SUMMARY_UI_PARAGRAPH_MAX = 48;
+
+/** Reports tables; default max for {@link ellipsisGscDiagnosticsSummaryForUi}. */
+export const GSC_SUMMARY_UI_TABLE_MAX = 56;
+
+/** Post-action status toasts after API runs. */
+export const GSC_SUMMARY_UI_STATUS_MAX = 140;
+
 /** Parse persisted `PipelineRun.gscIngestionDiagnosticsRaw` (shared by store, CSV routes, etc.). */
 export function parseGscIngestionDiagnosticsRaw(raw: string | null | undefined): GscIngestionDiagnostics | null {
   if (raw == null || String(raw).trim().length === 0) {
@@ -44,7 +56,7 @@ export function parseGscIngestionDiagnosticsRaw(raw: string | null | undefined):
  * Truncate a formatted diagnostics summary for dense UI (status lines, table cells).
  * Prefer putting the full string in an element `title` for hover / accessibility.
  */
-export function ellipsisGscDiagnosticsSummaryForUi(summary: string, maxChars = 56): string {
+export function ellipsisGscDiagnosticsSummaryForUi(summary: string, maxChars: number = GSC_SUMMARY_UI_TABLE_MAX): string {
   const t = summary.trim();
   if (t.length <= maxChars) {
     return t;

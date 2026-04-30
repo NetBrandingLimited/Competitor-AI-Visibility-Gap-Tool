@@ -10,7 +10,11 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { ellipsisGscDiagnosticsSummaryForUi, formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import {
+  ellipsisGscDiagnosticsSummaryForUi,
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_TABLE_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -176,7 +180,11 @@ export default async function ReportsPage() {
                 className="text-priority-muted"
                 title={visibility.inputs.pipelineGscDiagnosticsSummary}
               >
-                GSC: {ellipsisGscDiagnosticsSummaryForUi(visibility.inputs.pipelineGscDiagnosticsSummary)}
+                GSC:{' '}
+                {ellipsisGscDiagnosticsSummaryForUi(
+                  visibility.inputs.pipelineGscDiagnosticsSummary,
+                  GSC_SUMMARY_UI_TABLE_MAX
+                )}
               </Link>
             </>
           ) : null}
@@ -307,7 +315,10 @@ export default async function ReportsPage() {
                       className="text-priority-muted"
                       title={d.summary.pipelineGscDiagnosticsSummary}
                     >
-                      {ellipsisGscDiagnosticsSummaryForUi(d.summary.pipelineGscDiagnosticsSummary)}
+                      {ellipsisGscDiagnosticsSummaryForUi(
+                        d.summary.pipelineGscDiagnosticsSummary,
+                        GSC_SUMMARY_UI_TABLE_MAX
+                      )}
                     </Link>
                   ) : (
                     '—'
@@ -421,7 +432,8 @@ export default async function ReportsPage() {
                       >
                         GSC:{' '}
                         {ellipsisGscDiagnosticsSummaryForUi(
-                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics),
+                          GSC_SUMMARY_UI_TABLE_MAX
                         )}
                       </Link>
                     </div>

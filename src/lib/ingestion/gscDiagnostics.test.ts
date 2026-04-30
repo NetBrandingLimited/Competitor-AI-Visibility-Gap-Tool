@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_TABLE_MAX,
   parseGscIngestionDiagnosticsRaw,
   type GscIngestionDiagnostics
 } from '@/lib/ingestion/gscDiagnostics';
@@ -55,5 +56,10 @@ describe('ellipsisGscDiagnosticsSummaryForUi', () => {
 
   it('trims whitespace before measuring', () => {
     expect(ellipsisGscDiagnosticsSummaryForUi('  hi  ', 10)).toBe('hi');
+  });
+
+  it('uses GSC_SUMMARY_UI_TABLE_MAX when maxChars is omitted', () => {
+    const long = 'x'.repeat(GSC_SUMMARY_UI_TABLE_MAX + 3);
+    expect(ellipsisGscDiagnosticsSummaryForUi(long)).toBe(`${'x'.repeat(GSC_SUMMARY_UI_TABLE_MAX)}…`);
   });
 });

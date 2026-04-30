@@ -8,7 +8,11 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
-import { ellipsisGscDiagnosticsSummaryForUi, formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import {
+  ellipsisGscDiagnosticsSummaryForUi,
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_PARAGRAPH_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import {
   ingestionSourceDisplayLabel,
   pipelineIngestionProvenanceDescription,
@@ -127,7 +131,10 @@ export default async function DashboardPage() {
                   className="text-priority-muted"
                   title={latestDigest.summary.pipelineGscDiagnosticsSummary}
                 >
-                  {ellipsisGscDiagnosticsSummaryForUi(latestDigest.summary.pipelineGscDiagnosticsSummary, 48)}
+                  {ellipsisGscDiagnosticsSummaryForUi(
+                    latestDigest.summary.pipelineGscDiagnosticsSummary,
+                    GSC_SUMMARY_UI_PARAGRAPH_MAX
+                  )}
                 </Link>
               </>
             ) : null}
@@ -230,7 +237,7 @@ export default async function DashboardPage() {
               >
                 {ellipsisGscDiagnosticsSummaryForUi(
                   formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
-                  48
+                  GSC_SUMMARY_UI_PARAGRAPH_MAX
                 )}
               </Link>
             </>
