@@ -5,7 +5,11 @@ import { redirect } from 'next/navigation';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import {
+  ellipsisGscDiagnosticsSummaryForUi,
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_TABLE_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -118,12 +122,22 @@ export default async function PipelineRunDetailPage({
                 </tr>
               </thead>
               <tbody>
-                {run.documents.map((doc, index) => (
+                {run.documents.map((doc, index) => {
+                  const docTitle = doc.title;
+                  const docTitleLong = docTitle.length > GSC_SUMMARY_UI_TABLE_MAX;
+                  return (
                   <tr key={`${doc.id}-${index}`}>
                     <td className="data-table-td data-table-sticky-col">
                       {ingestionSourceDisplayLabel(doc.source)}
                     </td>
-                    <td className="data-table-td">{doc.title}</td>
+                    <td
+                      className="data-table-td data-table-td-wrap-break"
+                      title={docTitleLong ? docTitle : undefined}
+                    >
+                      {docTitleLong
+                        ? ellipsisGscDiagnosticsSummaryForUi(docTitle, GSC_SUMMARY_UI_TABLE_MAX)
+                        : docTitle}
+                    </td>
                     <td className="data-table-td">
                       <DocumentUrlCell url={doc.url} />
                     </td>
@@ -132,7 +146,8 @@ export default async function PipelineRunDetailPage({
                     </td>
                     <td className="data-table-td-nowrap">{new Date(doc.publishedAt).toLocaleString()}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -158,13 +173,24 @@ export default async function PipelineRunDetailPage({
             </tr>
           </thead>
           <tbody>
-            {run.triggers.map((trigger) => (
-              <tr key={`${trigger.phrase}-${trigger.category}`}>
-                <td className="data-table-td data-table-sticky-col">{trigger.phrase}</td>
-                <td className="data-table-td">{trigger.category}</td>
-                <td className="data-table-td-right">{trigger.score}</td>
-              </tr>
-            ))}
+            {run.triggers.map((trigger) => {
+              const phrase = trigger.phrase;
+              const phraseLong = phrase.length > GSC_SUMMARY_UI_TABLE_MAX;
+              return (
+                <tr key={`${trigger.phrase}-${trigger.category}`}>
+                  <td
+                    className="data-table-td data-table-sticky-col data-table-td-wrap-break"
+                    title={phraseLong ? phrase : undefined}
+                  >
+                    {phraseLong
+                      ? ellipsisGscDiagnosticsSummaryForUi(phrase, GSC_SUMMARY_UI_TABLE_MAX)
+                      : phrase}
+                  </td>
+                  <td className="data-table-td">{trigger.category}</td>
+                  <td className="data-table-td-right">{trigger.score}</td>
+                </tr>
+              );
+            })}
           </tbody>
             </table>
           </div>
@@ -190,13 +216,32 @@ export default async function PipelineRunDetailPage({
             </tr>
           </thead>
           <tbody>
-            {run.clusters.map((cluster) => (
+            {run.clusters.map((cluster) => {
+              const kwJoined = cluster.keywords.join(', ');
+              const kwLong = kwJoined.length > GSC_SUMMARY_UI_TABLE_MAX;
+              const labelLong = cluster.label.length > GSC_SUMMARY_UI_TABLE_MAX;
+              return (
               <tr key={cluster.id}>
-                <td className="data-table-td data-table-sticky-col">{cluster.label}</td>
-                <td className="data-table-td">{cluster.keywords.join(', ')}</td>
+                <td
+                  className="data-table-td data-table-sticky-col data-table-td-wrap-break"
+                  title={labelLong ? cluster.label : undefined}
+                >
+                  {labelLong
+                    ? ellipsisGscDiagnosticsSummaryForUi(cluster.label, GSC_SUMMARY_UI_TABLE_MAX)
+                    : cluster.label}
+                </td>
+                <td
+                  className="data-table-td data-table-td-wrap-break"
+                  title={kwLong ? kwJoined : undefined}
+                >
+                  {kwLong
+                    ? ellipsisGscDiagnosticsSummaryForUi(kwJoined, GSC_SUMMARY_UI_TABLE_MAX)
+                    : kwJoined}
+                </td>
                 <td className="data-table-td-right">{cluster.itemCount}</td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
             </table>
           </div>

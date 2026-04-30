@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
+import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
@@ -291,7 +292,7 @@ export default async function DashboardPage() {
           <tbody>
             {gapInsights.topics.slice(0, 5).map((topic) => (
               <tr key={topic.topic}>
-                <td className="data-table-td data-table-sticky-col">{topic.topic}</td>
+                <GapTopicLabelCell topic={topic.topic} className="data-table-td data-table-sticky-col" />
                 <td className="data-table-td-right">{topic.gapScore}</td>
                 <td className="data-table-td-right">{topic.triggerCount}</td>
                 <GapTopicRecommendationCell recommendation={topic.recommendation} />

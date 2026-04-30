@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
+import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
@@ -245,7 +246,7 @@ export default async function ReportsPage() {
           <tbody>
             {gapInsights.topics.map((topic) => (
               <tr key={topic.topic}>
-                <td className="data-table-td">{topic.topic}</td>
+                <GapTopicLabelCell topic={topic.topic} />
                 <td className="data-table-td-right">{topic.gapScore}</td>
                 <td className="data-table-td-right">{topic.triggerCount}</td>
                 <td className="data-table-td-right">{topic.clusterWeight}</td>
@@ -329,7 +330,7 @@ export default async function ReportsPage() {
                   )}
                 </td>
                 <td
-                  className="data-table-td"
+                  className="data-table-td data-table-td-wrap-break"
                   title={
                     d.summary.topOpportunities.length > 0 &&
                     topOpportunitiesJoined.length > GSC_SUMMARY_UI_TABLE_MAX

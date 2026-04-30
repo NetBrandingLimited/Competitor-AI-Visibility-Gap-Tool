@@ -5,6 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 import CopyDigestSummary from '../CopyDigestSummary';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
+import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
@@ -144,7 +145,7 @@ export default async function WeeklyDigestDetailPage({
             <tbody>
               {digest.summary.topics.map((t) => (
                 <tr key={t.topic}>
-                  <td className="data-table-td data-table-sticky-col">{t.topic}</td>
+                  <GapTopicLabelCell topic={t.topic} className="data-table-td data-table-sticky-col" />
                   <td className="data-table-td-right">{t.gapScore}</td>
                   <td className="data-table-td-right">{t.triggerCount}</td>
                   <GapTopicRecommendationCell

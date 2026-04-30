@@ -41,6 +41,9 @@ export const GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS = 160;
 /** Topic gap tables set `title` on recommendation cells when text is at least this long. */
 export const GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS = 160;
 
+/** Topic label column: native `title` when cluster label is at least this long. */
+export const GAP_TOPIC_LABEL_TITLE_THRESHOLD_CHARS = 48;
+
 type GapOrgFields = {
   brandName: string | null;
   competitorA: string | null;
