@@ -285,7 +285,9 @@ export default async function ReportsPage() {
             </tr>
           </thead>
           <tbody>
-            {weeklyDigests.map((d) => (
+            {weeklyDigests.map((d) => {
+              const topOpportunitiesJoined = d.summary.topOpportunities.join(', ');
+              return (
               <tr key={d.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                   <div className="inline-run-id-cell">
@@ -326,9 +328,25 @@ export default async function ReportsPage() {
                     '—'
                   )}
                 </td>
-                <td className="data-table-td">{d.summary.topOpportunities.join(', ') || '—'}</td>
+                <td
+                  className="data-table-td"
+                  title={
+                    d.summary.topOpportunities.length > 0 &&
+                    topOpportunitiesJoined.length > GSC_SUMMARY_UI_TABLE_MAX
+                      ? topOpportunitiesJoined
+                      : undefined
+                  }
+                >
+                  {d.summary.topOpportunities.length === 0
+                    ? '—'
+                    : ellipsisGscDiagnosticsSummaryForUi(
+                        topOpportunitiesJoined,
+                        GSC_SUMMARY_UI_TABLE_MAX
+                      )}
+                </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
             </table>
           </div>
