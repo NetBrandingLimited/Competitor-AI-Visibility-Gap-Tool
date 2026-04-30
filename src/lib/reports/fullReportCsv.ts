@@ -1,12 +1,18 @@
 import { weeklyDigestPipelineLabel, weeklyDigestSignalsLabel, type WeeklyDigest } from '@/lib/digest/weekly';
 import type { GapInsights } from '@/lib/insights/gap';
 import type { TrendSnapshot } from '@/lib/trends/store';
+import type { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 import { buildCsvDocument } from './csv';
+
+type LatestVisibilitySnapshot = NonNullable<Awaited<ReturnType<typeof getLatestVisibilityScore>>>;
+
+const VIS_COLS_TAIL = ['', '', '', '', ''] as const;
 
 export function buildVisibilityReportCsv(
   snapshots: TrendSnapshot[],
   gapInsights: GapInsights,
-  latestDigest: WeeklyDigest | null
+  latestDigest: WeeklyDigest | null,
+  latestVisibility: LatestVisibilitySnapshot | null = null
 ): string {
   const header = [
     'section',
@@ -31,7 +37,12 @@ export function buildVisibilityReportCsv(
     'digestConnectorSignals',
     'digestPipelineDocs',
     'digestPipelineIngestionSource',
-    'digestPipelineGscDiagnosticsSummary'
+    'digestPipelineGscDiagnosticsSummary',
+    'visibilityScore',
+    'visibilityCreatedAt',
+    'visibilityPipelineIngestionSource',
+    'visibilityPipelineGscDiagnosticsSummary',
+    'visibilityPipelineRunId'
   ];
 
   const trendRows = snapshots.map((row) =>
@@ -58,7 +69,8 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ''
+      '',
+      ...VIS_COLS_TAIL
     ]
   );
 
@@ -86,7 +98,8 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ''
+      '',
+      ...VIS_COLS_TAIL
     ]
   );
 
@@ -114,7 +127,8 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ''
+      '',
+      ...VIS_COLS_TAIL
     ]
   );
 
@@ -143,10 +157,52 @@ export function buildVisibilityReportCsv(
           weeklyDigestSignalsLabel(latestDigest.summary),
           weeklyDigestPipelineLabel(latestDigest.summary),
           latestDigest.summary.pipelineIngestionSource ?? '',
-          latestDigest.summary.pipelineGscDiagnosticsSummary ?? ''
+          latestDigest.summary.pipelineGscDiagnosticsSummary ?? '',
+          ...VIS_COLS_TAIL
         ]
       ]
     : [];
 
-  return buildCsvDocument(header, [...trendRows, ...opportunityRows, ...topicRows, ...digestRows]);
+  const visibilityRows = latestVisibility
+    ? [
+        [
+          'visibility_score',
+          '',
+          latestVisibility.createdAt,
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          Math.round(latestVisibility.score),
+          latestVisibility.createdAt,
+          latestVisibility.inputs.pipelineIngestionSource ?? '',
+          latestVisibility.inputs.pipelineGscDiagnosticsSummary ?? '',
+          latestVisibility.inputs.pipelineRunId ?? ''
+        ]
+      ]
+    : [];
+
+  return buildCsvDocument(header, [
+    ...trendRows,
+    ...opportunityRows,
+    ...topicRows,
+    ...digestRows,
+    ...visibilityRows
+  ]);
 }

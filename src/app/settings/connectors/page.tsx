@@ -14,7 +14,9 @@ export default function ConnectorsSettingsPage() {
       <p>
         Google Search Console and GA4 use rolling 28-day windows (UTC dates) into visibility signals when property
         identifiers and credentials are set. Inline JSON can live in <code>GSC_SERVICE_ACCOUNT_JSON</code> or{' '}
-        <code>GA4_SERVICE_ACCOUNT_JSON</code>; otherwise set <code>GOOGLE_APPLICATION_CREDENTIALS</code>.
+        <code>GA4_SERVICE_ACCOUNT_JSON</code>; otherwise set <code>GOOGLE_APPLICATION_CREDENTIALS</code>. To inspect
+        how live GSC rows are filtered for the pipeline, use{' '}
+        <Link href="/debug/ingestion">Debug ingestion</Link> (editor role).
       </p>
       <p>Set property identifiers per organization below (these override global env values when provided).</p>
       <p>

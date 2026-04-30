@@ -35,14 +35,7 @@ type GapOrgFields = {
   competitorC: string | null;
 };
 
-type GapVisibilityInput = {
-  score: number;
-  createdAt: string;
-  inputs?: {
-    connectorSignalSource: 'cache' | 'live';
-    connectorSignalCacheKind?: 'ttl' | 'stale_fallback' | null;
-  };
-} | null;
+type GapVisibilityInput = Awaited<ReturnType<typeof getLatestVisibilityScore>>;
 
 export type GapLatestData = {
   org: GapOrgFields | null;

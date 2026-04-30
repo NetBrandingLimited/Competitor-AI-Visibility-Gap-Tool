@@ -23,7 +23,7 @@ export async function GET() {
     gapLatest.visibility
   );
   const latestDigest = digests[0] ?? null;
-  const csv = buildVisibilityReportCsv(snapshots, gapInsights, latestDigest);
+  const csv = buildVisibilityReportCsv(snapshots, gapInsights, latestDigest, gapLatest.visibility);
 
   return new Response(csv, {
     headers: buildDownloadHeaders('text/csv; charset=utf-8', 'visibility-report.csv')

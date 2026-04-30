@@ -60,5 +60,46 @@ describe('buildVisibilityReportCsv', () => {
     expect(csv).toContain('weekly_digest');
     expect(csv).toContain('Search Console');
     expect(csv).toContain('live_gsc_queries');
+    expect(csv).toContain('visibilityScore');
+  });
+
+  it('adds visibility_score row when latest visibility snapshot exists', () => {
+    const csv = buildVisibilityReportCsv(
+      [],
+      {
+        generatedAt: '2026-04-29T00:05:00.000Z',
+        upstreamAsOf: '2026-04-29T00:00:00.000Z',
+        opportunities: [],
+        topics: []
+      },
+      null,
+      {
+        score: 61,
+        createdAt: '2026-04-29T00:20:00.000Z',
+        reasons: [],
+        inputs: {
+          pipelineRunId: 'run-vis',
+          pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: 'attempt=filtered; cap=9',
+          documentCount: 10,
+          triggerCount: 5,
+          clusterCount: 3,
+          trendDate: '2026-04-29',
+          totalMentions: 40,
+          topBrand: 'Acme',
+          topBrandMentions: 20,
+          brandName: 'Acme',
+          connectorSignalCount: 2,
+          connectorSignalSource: 'live',
+          connectorSignalCacheKind: null,
+          connectorSignalsAsOf: '2026-04-29'
+        }
+      }
+    );
+
+    expect(csv).toContain('visibility_score');
+    expect(csv).toContain('run-vis');
+    expect(csv).toContain('attempt=filtered; cap=9');
+    expect(csv).toContain('61');
   });
 });
