@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
+import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
@@ -22,8 +23,7 @@ import {
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
 import {
   buildGapInsightsFromLatestData,
-  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS,
-  GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
+  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
 } from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
@@ -300,16 +300,7 @@ export default async function DashboardPage() {
                 <td className="data-table-td data-table-sticky-col">{topic.topic}</td>
                 <td className="data-table-td-right">{topic.gapScore}</td>
                 <td className="data-table-td-right">{topic.triggerCount}</td>
-                <td
-                  className="data-table-td"
-                  title={
-                    topic.recommendation.length > GAP_TOPIC_RECOMMENDATION_TITLE_THRESHOLD_CHARS
-                      ? topic.recommendation
-                      : undefined
-                  }
-                >
-                  {topic.recommendation}
-                </td>
+                <GapTopicRecommendationCell recommendation={topic.recommendation} />
               </tr>
             ))}
           </tbody>
