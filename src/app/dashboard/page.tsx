@@ -12,7 +12,6 @@ import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/l
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
 import {
-  ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_PARAGRAPH_MAX,
   tableCellEllipsisParts
@@ -75,6 +74,7 @@ export default async function DashboardPage() {
   ]);
   const latestRun = recentRuns[0] ?? null;
   const dashboardLatestRunQueryParts = latestRun ? tableCellEllipsisParts(latestRun.query) : null;
+  const dashboardTrendTopBrandParts = latestTrend ? tableCellEllipsisParts(latestTrend.topBrand) : null;
   const previousRun = recentRuns[1] ?? null;
   const gapInsights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 
@@ -136,10 +136,12 @@ export default async function DashboardPage() {
                   className="text-priority-muted"
                   title={latestDigest.summary.pipelineGscDiagnosticsSummary}
                 >
-                  {ellipsisGscDiagnosticsSummaryForUi(
-                    latestDigest.summary.pipelineGscDiagnosticsSummary,
-                    GSC_SUMMARY_UI_PARAGRAPH_MAX
-                  )}
+                  {
+                    tableCellEllipsisParts(
+                      latestDigest.summary.pipelineGscDiagnosticsSummary,
+                      GSC_SUMMARY_UI_PARAGRAPH_MAX
+                    ).display
+                  }
                 </Link>
               </>
             ) : null}
@@ -261,7 +263,7 @@ export default async function DashboardPage() {
       {latestTrend ? (
         <p>
           Latest trend snapshot: <code>{latestTrend.date}</code> ({latestTrend.totalMentions} mentions, top brand{' '}
-          {latestTrend.topBrand})
+          <span title={dashboardTrendTopBrandParts?.title}>{dashboardTrendTopBrandParts?.display}</span>)
         </p>
       ) : (
         <p>No trend snapshots for this workspace yet. Run a snapshot from Reports.</p>
