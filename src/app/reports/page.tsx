@@ -13,7 +13,11 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { formatGscIngestionDiagnosticsSummary, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import {
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_STATUS_MAX,
+  tableCellEllipsisParts
+} from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -29,6 +33,11 @@ export const metadata: Metadata = {
 function display(value: string | null | undefined): string {
   const t = value?.trim();
   return t && t.length > 0 ? t : '—';
+}
+
+function profileFieldDisplay(value: string | null | undefined) {
+  const parts = tableCellEllipsisParts(display(value), GSC_SUMMARY_UI_STATUS_MAX);
+  return <span title={parts.title}>{parts.display}</span>;
 }
 
 export default async function ReportsPage() {
@@ -79,19 +88,19 @@ export default async function ReportsPage() {
         <h2 className="heading-panel">Tracking profile (saved on organization)</h2>
         <ul className="list-indent">
           <li>
-            <strong>Brand name:</strong> {display(org?.brandName)}
+            <strong>Brand name:</strong> {profileFieldDisplay(org?.brandName)}
           </li>
           <li>
-            <strong>Category:</strong> {display(org?.category)}
+            <strong>Category:</strong> {profileFieldDisplay(org?.category)}
           </li>
           <li>
-            <strong>Competitor A:</strong> {display(org?.competitorA)}
+            <strong>Competitor A:</strong> {profileFieldDisplay(org?.competitorA)}
           </li>
           <li>
-            <strong>Competitor B:</strong> {display(org?.competitorB)}
+            <strong>Competitor B:</strong> {profileFieldDisplay(org?.competitorB)}
           </li>
           <li>
-            <strong>Competitor C:</strong> {display(org?.competitorC)}
+            <strong>Competitor C:</strong> {profileFieldDisplay(org?.competitorC)}
           </li>
         </ul>
       </div>
