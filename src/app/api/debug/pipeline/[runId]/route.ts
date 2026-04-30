@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { resolveActiveOrgSessionForRequest } from '@/lib/active-org';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
 export async function GET(
@@ -16,5 +17,10 @@ export async function GET(
   if (!run) {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
-  return NextResponse.json({ run });
+  return NextResponse.json({
+    run,
+    gscDiagnosticsSummary: run.gscIngestionDiagnostics
+      ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+      : null
+  });
 }
