@@ -10,7 +10,7 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import { ellipsisGscDiagnosticsSummaryForUi, formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -26,11 +26,6 @@ export const metadata: Metadata = {
 function display(value: string | null | undefined): string {
   const t = value?.trim();
   return t && t.length > 0 ? t : '—';
-}
-
-/** Short label for digest table cells; full string in title / digest detail. */
-function ellipsisPipelineGscSummary(s: string, maxChars = 56): string {
-  return s.length > maxChars ? `${s.slice(0, maxChars)}…` : s;
 }
 
 export default async function ReportsPage() {
@@ -181,7 +176,7 @@ export default async function ReportsPage() {
                 className="text-priority-muted"
                 title={visibility.inputs.pipelineGscDiagnosticsSummary}
               >
-                GSC: {ellipsisPipelineGscSummary(visibility.inputs.pipelineGscDiagnosticsSummary)}
+                GSC: {ellipsisGscDiagnosticsSummaryForUi(visibility.inputs.pipelineGscDiagnosticsSummary)}
               </Link>
             </>
           ) : null}
@@ -312,7 +307,7 @@ export default async function ReportsPage() {
                       className="text-priority-muted"
                       title={d.summary.pipelineGscDiagnosticsSummary}
                     >
-                      {ellipsisPipelineGscSummary(d.summary.pipelineGscDiagnosticsSummary)}
+                      {ellipsisGscDiagnosticsSummaryForUi(d.summary.pipelineGscDiagnosticsSummary)}
                     </Link>
                   ) : (
                     '—'

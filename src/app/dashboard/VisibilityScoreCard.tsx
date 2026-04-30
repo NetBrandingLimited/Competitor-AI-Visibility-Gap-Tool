@@ -3,6 +3,7 @@ import Link from 'next/link';
 import RecalculateVisibilityForm from './RecalculateVisibilityForm';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
+import { ellipsisGscDiagnosticsSummaryForUi } from '@/lib/ingestion/gscDiagnostics';
 import type { VisibilityReasonV1 } from '@/lib/visibility/scoreV1';
 
 type Props = {
@@ -84,10 +85,7 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
                   className="text-priority-muted"
                   title={latest.pipelineGscDiagnosticsSummary}
                 >
-                  GSC:{' '}
-                  {latest.pipelineGscDiagnosticsSummary.length > 44
-                    ? `${latest.pipelineGscDiagnosticsSummary.slice(0, 44)}…`
-                    : latest.pipelineGscDiagnosticsSummary}
+                  GSC: {ellipsisGscDiagnosticsSummaryForUi(latest.pipelineGscDiagnosticsSummary, 44)}
                 </Link>
               </>
             ) : null}

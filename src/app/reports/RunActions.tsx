@@ -1,5 +1,6 @@
 'use client';
 
+import { ellipsisGscDiagnosticsSummaryForUi } from '@/lib/ingestion/gscDiagnostics';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -29,7 +30,7 @@ export default function RunActions() {
       let message = 'Unified pipeline run completed.';
       const gsc = typeof data.gscDiagnosticsSummary === 'string' ? data.gscDiagnosticsSummary.trim() : '';
       if (gsc.length > 0) {
-        message += ` GSC: ${gsc.length > 140 ? `${gsc.slice(0, 140)}…` : gsc}`;
+        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, 140)}`;
       }
       setPipeline({ running: false, message });
       router.refresh();

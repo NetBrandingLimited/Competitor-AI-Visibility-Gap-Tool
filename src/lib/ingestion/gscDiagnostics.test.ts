@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
   parseGscIngestionDiagnosticsRaw,
   type GscIngestionDiagnostics
@@ -40,5 +41,19 @@ describe('formatGscIngestionDiagnosticsSummary', () => {
     expect(s).toContain('attempt=filtered');
     expect(s).toContain('q:fetched=1');
     expect(s).toContain('cap=1');
+  });
+});
+
+describe('ellipsisGscDiagnosticsSummaryForUi', () => {
+  it('returns short strings unchanged', () => {
+    expect(ellipsisGscDiagnosticsSummaryForUi('abc', 10)).toBe('abc');
+  });
+
+  it('truncates with ellipsis', () => {
+    expect(ellipsisGscDiagnosticsSummaryForUi('0123456789', 4)).toBe('0123…');
+  });
+
+  it('trims whitespace before measuring', () => {
+    expect(ellipsisGscDiagnosticsSummaryForUi('  hi  ', 10)).toBe('hi');
   });
 });

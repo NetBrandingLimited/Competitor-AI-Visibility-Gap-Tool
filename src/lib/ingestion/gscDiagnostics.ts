@@ -40,6 +40,18 @@ export function parseGscIngestionDiagnosticsRaw(raw: string | null | undefined):
   }
 }
 
+/**
+ * Truncate a formatted diagnostics summary for dense UI (status lines, table cells).
+ * Prefer putting the full string in an element `title` for hover / accessibility.
+ */
+export function ellipsisGscDiagnosticsSummaryForUi(summary: string, maxChars = 56): string {
+  const t = summary.trim();
+  if (t.length <= maxChars) {
+    return t;
+  }
+  return `${t.slice(0, maxChars)}…`;
+}
+
 export function formatGscIngestionDiagnosticsSummary(d: GscIngestionDiagnostics): string {
   const q = d.query;
   const p = d.page;
