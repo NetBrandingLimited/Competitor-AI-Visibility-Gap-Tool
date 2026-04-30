@@ -74,6 +74,7 @@ export default async function DashboardPage() {
     readLatestWeeklyDigest(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
+  const dashboardLatestRunQueryParts = latestRun ? tableCellEllipsisParts(latestRun.query) : null;
   const previousRun = recentRuns[1] ?? null;
   const gapInsights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 
@@ -228,7 +229,9 @@ export default async function DashboardPage() {
             <code>{latestRun.id}</code>
           </Link>{' '}
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
-          <code>{latestRun.query}</code>
+          <code title={dashboardLatestRunQueryParts?.title}>
+            {dashboardLatestRunQueryParts?.display}
+          </code>
           {latestRun.ingestionSource ? <> · ingestion: {pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}</> : null}
           {latestRun.gscIngestionDiagnostics ? (
             <>
@@ -239,10 +242,12 @@ export default async function DashboardPage() {
                 className="text-priority-muted"
                 title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
               >
-                {ellipsisGscDiagnosticsSummaryForUi(
-                  formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
-                  GSC_SUMMARY_UI_PARAGRAPH_MAX
-                )}
+                {
+                  tableCellEllipsisParts(
+                    formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
+                    GSC_SUMMARY_UI_PARAGRAPH_MAX
+                  ).display
+                }
               </Link>
             </>
           ) : null}

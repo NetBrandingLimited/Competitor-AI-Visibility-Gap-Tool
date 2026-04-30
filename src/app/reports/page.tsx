@@ -13,12 +13,7 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import {
-  ellipsisGscDiagnosticsSummaryForUi,
-  formatGscIngestionDiagnosticsSummary,
-  GSC_SUMMARY_UI_TABLE_MAX,
-  tableCellEllipsisParts
-} from '@/lib/ingestion/gscDiagnostics';
+import { formatGscIngestionDiagnosticsSummary, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -187,10 +182,7 @@ export default async function ReportsPage() {
                 title={visibility.inputs.pipelineGscDiagnosticsSummary}
               >
                 GSC:{' '}
-                {ellipsisGscDiagnosticsSummaryForUi(
-                  visibility.inputs.pipelineGscDiagnosticsSummary,
-                  GSC_SUMMARY_UI_TABLE_MAX
-                )}
+                {tableCellEllipsisParts(visibility.inputs.pipelineGscDiagnosticsSummary).display}
               </Link>
             </>
           ) : null}
