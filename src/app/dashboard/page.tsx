@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
@@ -92,8 +93,8 @@ export default async function DashboardPage() {
     <section>
       <h1>Dashboard v1</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong> · Signed in as{' '}
-        <strong>{active.user.email}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} /> · Signed in as{' '}
+        <EllipsisStrong text={active.user.email} />
       </p>
       <VisibilityScoreCard
         organizationId={active.organizationId}

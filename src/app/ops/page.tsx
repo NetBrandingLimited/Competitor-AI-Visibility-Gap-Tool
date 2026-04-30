@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunSchedulerAction from './RunSchedulerAction';
 import StatusFreshnessItem from './StatusFreshnessItem';
@@ -113,7 +114,7 @@ export default async function OpsPage() {
     <section>
       <h1>Ops Monitor (Baseline)</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p>
         Scheduler runs in this workspace only. Default pipeline query comes from your brand settings; optional{' '}

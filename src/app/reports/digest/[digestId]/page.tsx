@@ -2,11 +2,12 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
-import CopyDigestSummary from '../CopyDigestSummary';
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
+import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
@@ -64,7 +65,7 @@ export default async function WeeklyDigestDetailPage({
       </p>
       <h1>Weekly digest</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p className="mt-8">
         Digest id: <code>{digest.id}</code>{' '}

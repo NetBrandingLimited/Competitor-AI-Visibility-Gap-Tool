@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatGscIngestionDiagnosticsSummary, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
@@ -61,7 +62,7 @@ export default async function PipelineRunDetailPage({
     <section>
       <h1>Pipeline Run Detail</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p>
         Run id: <code>{run.id}</code>{' '}

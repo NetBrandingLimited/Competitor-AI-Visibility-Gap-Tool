@@ -1,8 +1,8 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import type { Metadata } from 'next';
-
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
 import {
@@ -116,7 +116,8 @@ export default async function DebugIngestionPage({
         <div style={{ marginTop: 18 }}>
           <h2>Result</h2>
           <p>
-            Ingestion source: <strong>{pipelineIngestionProvenanceLabel(run.ingestionSource)}</strong>
+            Ingestion source:{' '}
+            <EllipsisStrong text={pipelineIngestionProvenanceLabel(run.ingestionSource)} />
           </p>
           <p>
             Documents produced: <strong>{run.result.documents.length}</strong>

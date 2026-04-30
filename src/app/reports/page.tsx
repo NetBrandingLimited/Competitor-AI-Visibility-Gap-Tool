@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisStrong from '@/app/components/EllipsisStrong';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
@@ -76,7 +77,7 @@ export default async function ReportsPage() {
     <section>
       <h1>Report Builder (Baseline)</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p>
         Daily snapshots and pipeline runs use your organization&apos;s brand and competitors from{' '}
