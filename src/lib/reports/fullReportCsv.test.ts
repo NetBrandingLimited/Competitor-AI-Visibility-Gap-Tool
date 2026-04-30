@@ -22,7 +22,8 @@ describe('buildVisibilityReportCsv', () => {
             id: 'gap-1',
             title: 'Win comparisons',
             detail: 'Build pages',
-            priority: 'high'
+            priority: 'high',
+            pipelineRunIdForGsc: 'run-gap-csv'
           }
         ],
         topics: [
@@ -61,6 +62,7 @@ describe('buildVisibilityReportCsv', () => {
     expect(csv).toContain('Search Console');
     expect(csv).toContain('live_gsc_queries');
     expect(csv).toContain('visibilityScore');
+    expect(csv).toContain('run-gap-csv');
   });
 
   it('adds visibility_score row when latest visibility snapshot exists', () => {

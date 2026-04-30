@@ -117,7 +117,8 @@ export default async function ReportsPage() {
           <li>
             <code>full report CSV</code>: trends + gap opportunities + topic recommendations + latest weekly digest
             provenance + a <code>visibility_score</code> row (score, pipeline source, GSC summary, run id) when a snapshot
-            exists.
+            exists. For <code>gap_opportunity</code> rows with a pipeline GSC line, <code>visibilityPipelineRunId</code>{' '}
+            holds the linked run id (other trailing visibility columns stay empty on those rows).
           </li>
           <li>
             <code>trends-only CSV</code>: legacy trend schema for existing imports/dashboards.

@@ -74,8 +74,10 @@ export function buildVisibilityReportCsv(
     ]
   );
 
-  const opportunityRows = gapInsights.opportunities.map((item) =>
-    [
+  const opportunityRows = gapInsights.opportunities.map((item) => {
+    const gscRunId = item.pipelineRunIdForGsc?.trim() ?? '';
+    const opportunityVisTail = ['', '', '', '', gscRunId] as const;
+    return [
       'gap_opportunity',
       '',
       gapInsights.generatedAt,
@@ -99,9 +101,9 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ...VIS_COLS_TAIL
-    ]
-  );
+      ...opportunityVisTail
+    ];
+  });
 
   const topicRows = gapInsights.topics.map((topic) =>
     [
