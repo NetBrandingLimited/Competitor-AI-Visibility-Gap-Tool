@@ -533,14 +533,18 @@ export default function ConnectorsStatusPanel() {
           const cardDetailParts = c.detail
             ? tableCellEllipsisParts(c.detail, GSC_SUMMARY_UI_STATUS_MAX)
             : null;
+          const displayNameParts = tableCellEllipsisParts(c.displayName, GSC_SUMMARY_UI_STATUS_MAX);
+          const connectorIdParts = tableCellEllipsisParts(c.id, GSC_SUMMARY_UI_TABLE_MAX);
           return (
             <article key={c.id} className="connector-card">
-              <h2>{c.displayName}</h2>
+              <h2 title={displayNameParts.title}>{displayNameParts.display}</h2>
               <p className="connector-meta">
                 <span className={c.configured ? 'badge badge-ok' : 'badge badge-warn'}>
                   {c.configured ? 'Configured' : 'Not configured'}
                 </span>
-                <code className="connector-id">{c.id}</code>
+                <code className="connector-id" title={connectorIdParts.title}>
+                  {connectorIdParts.display}
+                </code>
               </p>
               {cardDetailParts ? (
                 <p className="connector-detail" title={cardDetailParts.title}>

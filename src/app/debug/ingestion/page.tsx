@@ -78,8 +78,8 @@ export default async function DebugIngestionPage({
     <section>
       <h1>Debug Ingestion</h1>
       <p>
-        Workspace: <strong>{active.organizationName}</strong> · Signed in as{' '}
-        <strong>{active.user.email}</strong>
+        Workspace: <EllipsisStrong text={active.organizationName} /> · Signed in as{' '}
+        <EllipsisStrong text={active.user.email} />
       </p>
       <p>
         This runs the same hybrid ingestion as the unified pipeline, but returns extra{' '}
