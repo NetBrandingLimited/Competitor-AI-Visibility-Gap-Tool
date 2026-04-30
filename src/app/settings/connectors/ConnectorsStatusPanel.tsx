@@ -4,6 +4,12 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
+import {
+  GSC_SUMMARY_UI_NARROW_MAX,
+  GSC_SUMMARY_UI_STATUS_MAX,
+  GSC_SUMMARY_UI_TABLE_MAX,
+  tableCellEllipsisParts
+} from '@/lib/ingestion/gscDiagnostics';
 
 type Org = {
   id: string;
@@ -480,16 +486,20 @@ export default function ConnectorsStatusPanel() {
       ) : null}
       {testResults.length > 0 ? (
         <div className="mt-12">
-          {testResults.map((t) => (
-            <p
-              key={t.id}
-              className={`${t.ok ? 'success' : 'error'} my-6-0`}
-              role="status"
-              aria-live="polite"
-            >
-              {t.ok ? 'PASS' : 'FAIL'} {t.id}: {t.detail}
-            </p>
-          ))}
+          {testResults.map((t) => {
+            const detailParts = tableCellEllipsisParts(t.detail, GSC_SUMMARY_UI_STATUS_MAX);
+            return (
+              <p
+                key={t.id}
+                className={`${t.ok ? 'success' : 'error'} my-6-0`}
+                role="status"
+                aria-live="polite"
+              >
+                {t.ok ? 'PASS' : 'FAIL'} {t.id}:{' '}
+                <span title={detailParts.title}>{detailParts.display}</span>
+              </p>
+            );
+          })}
         </div>
       ) : null}
       {signalsFetchedAt ? (
@@ -504,28 +514,42 @@ export default function ConnectorsStatusPanel() {
       ) : null}
       {liveSignals.length > 0 ? (
         <div className="mt-10">
-          {liveSignals.map((s) => (
-            <p key={`${s.source}-${s.metric}-${s.asOf}`} className="text-metric-line">
-              <strong>{s.source}</strong> · <code>{s.metric}</code> = {s.value}
-              {s.unit ? ` ${s.unit}` : ''} · asOf {s.asOf}
-            </p>
-          ))}
+          {liveSignals.map((s) => {
+            const sourceParts = tableCellEllipsisParts(s.source, GSC_SUMMARY_UI_NARROW_MAX);
+            const metricParts = tableCellEllipsisParts(s.metric, GSC_SUMMARY_UI_TABLE_MAX);
+            return (
+              <p key={`${s.source}-${s.metric}-${s.asOf}`} className="text-metric-line">
+                <strong title={sourceParts.title}>{sourceParts.display}</strong> ·{' '}
+                <code title={metricParts.title}>{metricParts.display}</code> = {s.value}
+                {s.unit ? ` ${s.unit}` : ''} · asOf {s.asOf}
+              </p>
+            );
+          })}
         </div>
       ) : null}
 
       <div className="connector-list">
-        {connectors.map((c) => (
-          <article key={c.id} className="connector-card">
-            <h2>{c.displayName}</h2>
-            <p className="connector-meta">
-              <span className={c.configured ? 'badge badge-ok' : 'badge badge-warn'}>
-                {c.configured ? 'Configured' : 'Not configured'}
-              </span>
-              <code className="connector-id">{c.id}</code>
-            </p>
-            {c.detail ? <p className="connector-detail">{c.detail}</p> : null}
-          </article>
-        ))}
+        {connectors.map((c) => {
+          const cardDetailParts = c.detail
+            ? tableCellEllipsisParts(c.detail, GSC_SUMMARY_UI_STATUS_MAX)
+            : null;
+          return (
+            <article key={c.id} className="connector-card">
+              <h2>{c.displayName}</h2>
+              <p className="connector-meta">
+                <span className={c.configured ? 'badge badge-ok' : 'badge badge-warn'}>
+                  {c.configured ? 'Configured' : 'Not configured'}
+                </span>
+                <code className="connector-id">{c.id}</code>
+              </p>
+              {cardDetailParts ? (
+                <p className="connector-detail" title={cardDetailParts.title}>
+                  {cardDetailParts.display}
+                </p>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </div>
   );

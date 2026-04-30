@@ -135,6 +135,7 @@ export default async function PipelineRunDetailPage({
                 {run.documents.map((doc, index) => {
                   const titleCell = tableCellEllipsisParts(doc.title);
                   const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(doc.source));
+                  const idCell = tableCellEllipsisParts(doc.id);
                   return (
                   <tr key={`${doc.id}-${index}`}>
                     <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
@@ -147,7 +148,7 @@ export default async function PipelineRunDetailPage({
                       <DocumentUrlCell url={doc.url} />
                     </td>
                     <td className="data-table-td">
-                      <code>{doc.id}</code>
+                      <code title={idCell.title}>{idCell.display}</code>
                     </td>
                     <td className="data-table-td-nowrap">{new Date(doc.publishedAt).toLocaleString()}</td>
                   </tr>
