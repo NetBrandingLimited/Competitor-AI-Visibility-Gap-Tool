@@ -11,9 +11,9 @@ import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/l
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import {
-  ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
-  GSC_SUMMARY_UI_NARROW_MAX
+  GSC_SUMMARY_UI_NARROW_MAX,
+  tableCellEllipsisParts
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
@@ -87,6 +87,7 @@ export default async function OpsPage() {
       )
     : {};
   const latestJob = jobs[0] ?? null;
+  const latestJobQueryCell = latestJob ? tableCellEllipsisParts(latestJob.query) : null;
   const [latestRun, latestDigest, trendSnapshots, latestVisibility] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
     readLatestWeeklyDigest(active.organizationId),
@@ -154,7 +155,10 @@ export default async function OpsPage() {
           missingText="Not completed yet"
         >
           <>
-            <code>{latestJob?.id}</code> ({latestJob?.status}) · <code>{latestJob?.query}</code>
+            <code>{latestJob?.id}</code> ({latestJob?.status}) ·{' '}
+            {latestJobQueryCell ? (
+              <code title={latestJobQueryCell.title}>{latestJobQueryCell.display}</code>
+            ) : null}
           </>
         </StatusFreshnessItem>
         <StatusFreshnessItem
@@ -181,10 +185,12 @@ export default async function OpsPage() {
                   className="text-priority-muted"
                   title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
                 >
-                  {ellipsisGscDiagnosticsSummaryForUi(
-                    formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
-                    44
-                  )}
+                  {
+                    tableCellEllipsisParts(
+                      formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
+                      GSC_SUMMARY_UI_NARROW_MAX
+                    ).display
+                  }
                 </Link>
               </>
             ) : null}
@@ -219,10 +225,12 @@ export default async function OpsPage() {
                       title={latestVisibility.inputs.pipelineGscDiagnosticsSummary}
                     >
                       GSC:{' '}
-                      {ellipsisGscDiagnosticsSummaryForUi(
-                        latestVisibility.inputs.pipelineGscDiagnosticsSummary,
-                        GSC_SUMMARY_UI_NARROW_MAX
-                      )}
+                      {
+                        tableCellEllipsisParts(
+                          latestVisibility.inputs.pipelineGscDiagnosticsSummary,
+                          GSC_SUMMARY_UI_NARROW_MAX
+                        ).display
+                      }
                     </Link>
                   </>
                 ) : null}
@@ -298,7 +306,10 @@ export default async function OpsPage() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map((job) => (
+                {jobs.map((job) => {
+                  const detailsCell = tableCellEllipsisParts(describeSchedulerJob(job));
+                  const queryCell = tableCellEllipsisParts(job.query);
+                  return (
                   <tr key={job.id}>
                     <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                       <div className="id-cell-stack">
@@ -318,8 +329,12 @@ export default async function OpsPage() {
                       {new Date(job.completedAt).toLocaleString()}
                     </td>
                     <td className="data-table-td">{job.status}</td>
-                    <td className="data-table-td data-table-td-wrap-break">{describeSchedulerJob(job)}</td>
-                    <td className="data-table-td data-table-td-wrap-break">{job.query}</td>
+                    <td className="data-table-td data-table-td-wrap-break" title={detailsCell.title}>
+                      {detailsCell.display}
+                    </td>
+                    <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
+                      {queryCell.display}
+                    </td>
                     <td className="data-table-td data-table-td-break-all">
                       {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
                     </td>
@@ -362,7 +377,8 @@ export default async function OpsPage() {
                       )}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

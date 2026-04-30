@@ -51,6 +51,8 @@ export default async function PipelineRunDetailPage({
     );
   }
 
+  const queryHeader = tableCellEllipsisParts(run.query);
+
   return (
     <section>
       <h1>Pipeline Run Detail</h1>
@@ -67,7 +69,9 @@ export default async function PipelineRunDetailPage({
         />
       </p>
       <p>
-        Query: <code>{run.query}</code> | Docs: {run.documentCount} | Triggers: {run.triggerCount} | Clusters:{' '}
+        Query:{' '}
+        <code title={queryHeader.title}>{queryHeader.display}</code> | Docs: {run.documentCount} | Triggers:{' '}
+        {run.triggerCount} | Clusters:{' '}
         {run.clusterCount}
         {run.ingestionSource ? ` | Ingestion: ${pipelineIngestionProvenanceLabel(run.ingestionSource)}` : null}
       </p>
