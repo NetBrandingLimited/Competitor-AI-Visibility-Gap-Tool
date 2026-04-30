@@ -9,7 +9,9 @@ export function buildSchedulerJobsCsv(
   digestSignalLabels: Record<string, string>,
   pipelineIngestionSources: Record<string, PipelineIngestionSource | undefined>,
   /** Pre-formatted GSC ingestion summary per pipeline run id (same string as pipeline runs CSV). */
-  pipelineRunGscDiagnosticsSummaries: Record<string, string> = {}
+  pipelineRunGscDiagnosticsSummaries: Record<string, string> = {},
+  /** Frozen `pipelineGscDiagnosticsSummary` from weekly digest JSON when the job linked a digest. */
+  weeklyDigestGscDiagnosticsSummaries: Record<string, string> = {}
 ): string {
   const header = [
     'id',
@@ -23,6 +25,7 @@ export function buildSchedulerJobsCsv(
     'pipelineRunGscDiagnosticsSummary',
     'weeklyDigestId',
     'digestSignals',
+    'weeklyDigestGscDiagnosticsSummary',
     'errorMessage'
   ];
 
@@ -38,6 +41,7 @@ export function buildSchedulerJobsCsv(
     job.pipelineRunId ? pipelineRunGscDiagnosticsSummaries[job.pipelineRunId] ?? '' : '',
     job.weeklyDigestId ?? '',
     job.weeklyDigestId ? digestSignalLabels[job.weeklyDigestId] ?? '' : '',
+    job.weeklyDigestId ? weeklyDigestGscDiagnosticsSummaries[job.weeklyDigestId] ?? '' : '',
     job.errorMessage ?? ''
   ]);
 

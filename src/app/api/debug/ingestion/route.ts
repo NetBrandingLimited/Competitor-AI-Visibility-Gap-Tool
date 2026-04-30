@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForRequest } from '@/lib/active-org';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
@@ -48,5 +49,10 @@ export async function GET(request: NextRequest) {
     contentVariant: simpleHash(`${active.organizationId}-${Date.now()}`)
   });
 
-  return NextResponse.json({ ...result, ingestionSource, gscDiagnostics });
+  return NextResponse.json({
+    ...result,
+    ingestionSource,
+    gscDiagnostics,
+    gscDiagnosticsSummary: gscDiagnostics ? formatGscIngestionDiagnosticsSummary(gscDiagnostics) : null
+  });
 }

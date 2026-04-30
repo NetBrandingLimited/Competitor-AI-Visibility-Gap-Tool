@@ -18,11 +18,13 @@ describe('buildSchedulerJobsCsv', () => {
       ],
       { 'dg-1': 'live' },
       { 'run-1': 'live_gsc_queries' },
-      { 'run-1': 'stub-gsc-summary' }
+      { 'run-1': 'stub-gsc-summary' },
+      { 'dg-1': 'frozen-digest-gsc' }
     );
 
     expect(csv.startsWith('\uFEFFid,startedAt,completedAt,status')).toBe(true);
     expect(csv).toContain('pipelineRunGscDiagnosticsSummary');
+    expect(csv).toContain('weeklyDigestGscDiagnosticsSummary');
     expect(csv).toContain('job-1');
     expect(csv).toContain('run-1');
     expect(csv).toContain('Search Console');
@@ -30,6 +32,7 @@ describe('buildSchedulerJobsCsv', () => {
     expect(csv).toContain('dg-1');
     expect(csv).toContain('live');
     expect(csv).toContain('stub-gsc-summary');
+    expect(csv).toContain('frozen-digest-gsc');
   });
 
   it('leaves GSC summary column empty when map is omitted', () => {

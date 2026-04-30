@@ -17,16 +17,23 @@ export async function GET() {
   const digestIds = Array.from(
     new Set(jobs.map((job) => job.weeklyDigestId).filter((id): id is string => Boolean(id)))
   );
-  const digestSignalLabels = digestIds.length
-    ? Object.fromEntries(
-        (
-          await prisma.weeklyDigest.findMany({
-            where: { organizationId: active.organizationId, id: { in: digestIds } },
-            select: { id: true, summaryJson: true }
-          })
-        ).map((row) => [row.id, weeklyDigestSignalsLabel(parseWeeklyDigestSummaryJson(row.summaryJson))])
-      )
-    : {};
+  const digestRows = digestIds.length
+    ? await prisma.weeklyDigest.findMany({
+        where: { organizationId: active.organizationId, id: { in: digestIds } },
+        select: { id: true, summaryJson: true }
+      })
+    : [];
+
+  const digestSignalLabels: Record<string, string> = {};
+  const weeklyDigestGscDiagnosticsSummaries: Record<string, string> = {};
+  for (const row of digestRows) {
+    const summary = parseWeeklyDigestSummaryJson(row.summaryJson);
+    digestSignalLabels[row.id] = weeklyDigestSignalsLabel(summary);
+    const gscDigest = summary.pipelineGscDiagnosticsSummary?.trim();
+    if (gscDigest) {
+      weeklyDigestGscDiagnosticsSummaries[row.id] = gscDigest;
+    }
+  }
 
   const pipelineRunIds = Array.from(
     new Set(jobs.map((job) => job.pipelineRunId).filter((id): id is string => Boolean(id)))
@@ -59,7 +66,8 @@ export async function GET() {
     jobs,
     digestSignalLabels,
     pipelineIngestionSources,
-    pipelineRunGscDiagnosticsSummaries
+    pipelineRunGscDiagnosticsSummaries,
+    weeklyDigestGscDiagnosticsSummaries
   );
 
   return new Response(csv, {
