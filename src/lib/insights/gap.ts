@@ -1,4 +1,8 @@
-import { ellipsisGscDiagnosticsSummaryForUi, GSC_SUMMARY_UI_PARAGRAPH_MAX } from '@/lib/ingestion/gscDiagnostics';
+import {
+  ellipsisGscDiagnosticsSummaryForUi,
+  formatGscIngestionDiagnosticsSummary,
+  GSC_SUMMARY_UI_PARAGRAPH_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
@@ -57,6 +61,29 @@ function gapPipelineProvenancePhrase(run: UnifiedPipelineRun | null): string {
   return pipelineIngestionProvenanceDescription(run.ingestionSource).replace(/\.\s*$/, '');
 }
 
+function ellipsisPipelineGscForGapDetail(
+  latestRun: UnifiedPipelineRun | null,
+  visibility: GapVisibilityInput
+): string | null {
+  const raw =
+    latestRun?.gscIngestionDiagnostics != null
+      ? formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)
+      : visibility?.inputs.pipelineGscDiagnosticsSummary?.trim() || null;
+  if (!raw) {
+    return null;
+  }
+  return ellipsisGscDiagnosticsSummaryForUi(raw, GSC_SUMMARY_UI_PARAGRAPH_MAX);
+}
+
+function appendPipelineGscToDetail(
+  detail: string,
+  latestRun: UnifiedPipelineRun | null,
+  visibility: GapVisibilityInput
+): string {
+  const gsc = ellipsisPipelineGscForGapDetail(latestRun, visibility);
+  return gsc ? `${detail} Pipeline GSC: ${gsc}` : detail;
+}
+
 export async function readGapLatestDataForOrg(organizationId: string): Promise<GapLatestData> {
   const [org, latestRun, latestTrend, visibility] = await Promise.all([
     prisma.organization.findUnique({
@@ -106,22 +133,25 @@ export function buildGapInsightsFromLatestData(
       opportunities.push({
         id: 'trend-leader-gap',
         title: 'Top-of-mentions leadership gap',
-        detail: `${latestTrend.topBrand} is currently leading in mentions. Prioritize comparison/replacement content focused on ${brandName} vs top rival claims.`,
+        detail: appendPipelineGscToDetail(
+          `${latestTrend.topBrand} is currently leading in mentions. Prioritize comparison/replacement content focused on ${brandName} vs top rival claims.`,
+          latestRun,
+          visibility
+        ),
         priority: 'high'
       });
     }
   }
 
   if (visibility && visibility.score < 55) {
-    let detail = `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`;
-    const gsc = visibility.inputs.pipelineGscDiagnosticsSummary?.trim();
-    if (gsc) {
-      detail += ` Pipeline GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, GSC_SUMMARY_UI_PARAGRAPH_MAX)}`;
-    }
     opportunities.push({
       id: 'score-under-threshold',
       title: 'Visibility score below target',
-      detail,
+      detail: appendPipelineGscToDetail(
+        `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`,
+        latestRun,
+        visibility
+      ),
       priority: 'high'
     });
   }
@@ -136,7 +166,11 @@ export function buildGapInsightsFromLatestData(
       opportunities.push({
         id: 'trigger-coverage-gap',
         title: 'High-intent trigger coverage gap',
-        detail: `Low trigger depth in ${sparse.join(', ')}. Add pages/FAQ blocks targeting these query intents versus ${competitors.join(', ') || 'competitors'}.`,
+        detail: appendPipelineGscToDetail(
+          `Low trigger depth in ${sparse.join(', ')}. Add pages/FAQ blocks targeting these query intents versus ${competitors.join(', ') || 'competitors'}.`,
+          latestRun,
+          visibility
+        ),
         priority: 'medium'
       });
     }
