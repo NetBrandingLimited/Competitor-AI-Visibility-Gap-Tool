@@ -8,6 +8,7 @@ import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListI
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import {
   ingestionSourceDisplayLabel,
   pipelineIngestionProvenanceDescription,
@@ -203,6 +204,15 @@ export default async function DashboardPage() {
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
           <code>{latestRun.query}</code>
           {latestRun.ingestionSource ? <> · ingestion: {pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}</> : null}
+          {latestRun.gscIngestionDiagnostics ? (
+            <>
+              {' '}
+              · GSC:{' '}
+              <span className="text-priority-muted" title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}>
+                {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+              </span>
+            </>
+          ) : null}
         </p>
       ) : (
         <p>

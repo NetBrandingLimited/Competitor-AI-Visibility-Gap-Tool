@@ -1,3 +1,4 @@
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
 import { buildCsvDocument } from './csv';
 
@@ -7,6 +8,7 @@ export function buildPipelineRunsCsv(runs: UnifiedPipelineRun[]): string {
     'createdAt',
     'query',
     'ingestionSource',
+    'gscDiagnosticsSummary',
     'limitPerConnector',
     'documentCount',
     'triggerCount',
@@ -18,6 +20,7 @@ export function buildPipelineRunsCsv(runs: UnifiedPipelineRun[]): string {
       run.createdAt,
       run.query,
       run.ingestionSource ?? '',
+      run.gscIngestionDiagnostics ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics) : '',
       run.limitPerConnector,
       run.documentCount,
       run.triggerCount,

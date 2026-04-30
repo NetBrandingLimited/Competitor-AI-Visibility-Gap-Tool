@@ -1,3 +1,5 @@
+import type { GscIngestionDiagnostics } from '@/lib/ingestion/gscDiagnostics';
+
 import type { PipelineIngestionSource, UnifiedPipelineRun } from './types';
 import { prisma } from '@/lib/prisma';
 
@@ -22,6 +24,7 @@ function rowToRun(row: {
   triggerCount: number;
   clusterCount: number;
   ingestionSource: string | null;
+  gscIngestionDiagnosticsRaw: string | null;
   ingestionEventsRaw: string;
   documentsRaw: string;
   triggersRaw: string;
@@ -39,6 +42,11 @@ function rowToRun(row: {
       ? row.ingestionSource
       : undefined;
 
+  const gscIngestionDiagnostics =
+    row.gscIngestionDiagnosticsRaw && row.gscIngestionDiagnosticsRaw.trim().length > 0
+      ? tryParseJson<GscIngestionDiagnostics>(row.gscIngestionDiagnosticsRaw) ?? undefined
+      : undefined;
+
   return {
     id: row.id,
     createdAt: row.createdAt.toISOString(),
@@ -48,6 +56,7 @@ function rowToRun(row: {
     triggerCount: row.triggerCount,
     clusterCount: row.clusterCount,
     ingestionSource,
+    gscIngestionDiagnostics,
     ingestionEvents,
     documents,
     triggers,
@@ -78,6 +87,7 @@ export async function savePipelineRun(
       triggerCount: run.triggerCount,
       clusterCount: run.clusterCount,
       ingestionSource: run.ingestionSource ?? null,
+      gscIngestionDiagnosticsRaw: run.gscIngestionDiagnostics ? stringify(run.gscIngestionDiagnostics) : null,
       ingestionEventsRaw: stringify(run.ingestionEvents),
       documentsRaw: stringify(run.documents),
       triggersRaw: stringify(run.triggers),

@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -70,6 +71,20 @@ export default async function PipelineRunDetailPage({
         {run.clusterCount}
         {run.ingestionSource ? ` | Ingestion: ${pipelineIngestionProvenanceLabel(run.ingestionSource)}` : null}
       </p>
+      {run.gscIngestionDiagnostics ? (
+        <div className="panel-box mb-20">
+          <h2 className="heading-panel">Search Console ingestion diagnostics</h2>
+          <p className="text-muted-note">
+            One-line summary (also included in pipeline runs CSV as <code>gscDiagnosticsSummary</code>):
+          </p>
+          <p>
+            <code>{formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}</code>
+          </p>
+          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {JSON.stringify(run.gscIngestionDiagnostics, null, 2)}
+          </pre>
+        </div>
+      ) : null}
       <p>
         <Link href="/reports">Back to reports</Link>
       </p>

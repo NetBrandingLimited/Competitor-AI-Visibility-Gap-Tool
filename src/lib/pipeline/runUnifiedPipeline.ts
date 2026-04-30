@@ -61,7 +61,7 @@ export async function runUnifiedPipeline(input: {
   const query =
     trimmed && trimmed.length > 0 ? trimmed : defaultPipelineQueryFromOrg(brandFields);
 
-  const { result: ingestion, ingestionSource } = await runOrgIngestion({
+  const { result: ingestion, ingestionSource, gscDiagnostics } = await runOrgIngestion({
     organizationId: input.organizationId,
     query,
     limitPerConnector: input.limitPerConnector,
@@ -84,6 +84,7 @@ export async function runUnifiedPipeline(input: {
     triggerCount: triggers.length,
     clusterCount: clusters.length,
     ingestionSource,
+    gscIngestionDiagnostics: ingestionSource === 'live_gsc_queries' && gscDiagnostics ? gscDiagnostics : undefined,
     ingestionEvents: ingestion.events.map((event) => event.type),
     documents: ingestion.documents,
     triggers,

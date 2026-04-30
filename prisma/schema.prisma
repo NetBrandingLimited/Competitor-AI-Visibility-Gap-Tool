@@ -74,6 +74,8 @@ model PipelineRun {
   clusterCount       Int
   /// live_gsc_queries | mock_ingestion — how documents were sourced for this run
   ingestionSource    String?
+  /// JSON diagnostics for Search Console ingestion (only for live_gsc_queries runs)
+  gscIngestionDiagnosticsRaw String?
   ingestionEventsRaw String
   documentsRaw       String
   triggersRaw        String

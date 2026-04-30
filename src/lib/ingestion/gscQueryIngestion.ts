@@ -5,6 +5,7 @@ import { rollingGscWindowDays } from '@/lib/connectors/gsc-date-range';
 import { createGoogleAuth } from '@/lib/connectors/google-service-account-auth';
 import { readOrgConnectorSettings, resolveGscSiteUrl } from '@/lib/connectors/org-settings';
 
+import type { GscIngestionDiagnostics } from './gscDiagnostics';
 import type { SourceDocument } from './types';
 
 const GSC_SCOPE_READONLY = 'https://www.googleapis.com/auth/webmasters.readonly';
@@ -244,35 +245,7 @@ type GscSearchAnalyticsClient = {
   asOf: string;
 };
 
-export type GscIngestionDiagnostics = {
-  queryAttempt: {
-    usedFiltered: boolean;
-    usedUnfiltered: boolean;
-    filteredRows: number;
-    unfilteredRows: number;
-  };
-  query: {
-    fetched: number;
-    filteredZeroEngagement: number;
-    filteredLowSignal: number;
-    docsCreated: number;
-  };
-  page: {
-    fetched: number;
-    filteredZeroEngagement: number;
-    filteredLowSignal: number;
-    docsCreated: number;
-  };
-  qp: {
-    fetched: number;
-    filteredZeroEngagement: number;
-    filteredLowSignal: number;
-    docsCreated: number;
-  };
-  mergedDocsBeforeDedupe: number;
-  dedupedDocs: number;
-  cappedDocs: number;
-};
+export type { GscIngestionDiagnostics } from './gscDiagnostics';
 
 async function gscSearchAnalyticsClient(organizationId: string): Promise<GscSearchAnalyticsClient | null> {
   const ctx = await gscAuthAndSite(organizationId);

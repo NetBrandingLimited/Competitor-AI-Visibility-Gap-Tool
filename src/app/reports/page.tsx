@@ -10,6 +10,7 @@ import RunActions from './RunActions';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
@@ -364,7 +365,14 @@ export default async function ReportsPage() {
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
                 <td className="data-table-td">{run.query}</td>
-                <td className="data-table-td">{pipelineIngestionProvenanceLabel(run.ingestionSource)}</td>
+                <td className="data-table-td data-table-td-wrap-break">
+                  <div>{pipelineIngestionProvenanceLabel(run.ingestionSource)}</div>
+                  {run.gscIngestionDiagnostics ? (
+                    <div className="text-priority-muted mt-4" title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}>
+                      GSC: {formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                    </div>
+                  ) : null}
+                </td>
                 <td className="data-table-td-right">{run.documentCount}</td>
                 <td className="data-table-td-right">{run.triggerCount}</td>
                 <td className="data-table-td-right">{run.clusterCount}</td>

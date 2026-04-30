@@ -21,7 +21,7 @@ describe('buildPipelineRunsCsv', () => {
       }
     ]);
 
-    expect(csv.startsWith('\uFEFFid,createdAt,query,ingestionSource')).toBe(true);
+    expect(csv.startsWith('\uFEFFid,createdAt,query,ingestionSource,gscDiagnosticsSummary')).toBe(true);
     expect(csv).toContain('run-1');
     expect(csv).toContain('crm alternatives');
     expect(csv).toContain('live_gsc_queries');

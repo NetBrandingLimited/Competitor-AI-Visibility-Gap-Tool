@@ -10,6 +10,7 @@ import WeeklyDigestScheduleForm from './WeeklyDigestScheduleForm';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
@@ -157,6 +158,18 @@ export default async function OpsPage() {
           <>
             <code>{latestRun?.id}</code>
             {latestRun ? ` · ${pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}` : ''}
+            {latestRun?.gscIngestionDiagnostics ? (
+              <>
+                {' '}
+                · GSC:{' '}
+                <span
+                  className="text-priority-muted"
+                  title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                >
+                  {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                </span>
+              </>
+            ) : null}
           </>
         </StatusFreshnessItem>
         <StatusFreshnessItem

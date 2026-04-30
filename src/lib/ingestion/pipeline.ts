@@ -2,11 +2,7 @@ import { enrichDocumentsWithOrgContext } from '@/lib/org-visibility-mock';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 
 import { MOCK_CONNECTORS } from './connectors';
-import {
-  fetchGscQueryDocuments,
-  fetchGscQueryDocumentsWithDiagnostics,
-  type GscIngestionDiagnostics
-} from './gscQueryIngestion';
+import { fetchGscQueryDocumentsWithDiagnostics, type GscIngestionDiagnostics } from './gscQueryIngestion';
 import type {
   IngestionEvent,
   IngestionRunInput,
@@ -93,39 +89,6 @@ export type OrgIngestionInput = IngestionRunInput & { organizationId: string };
  */
 export async function runOrgIngestion(
   input: OrgIngestionInput
-): Promise<{ result: IngestionRunResult; ingestionSource: PipelineIngestionSource }> {
-  const normalized = normalizeIngestionInput(input);
-  const rowLimit = Math.min(250, Math.max(10, normalized.limitPerConnector * 25));
-  const gscDocs = await fetchGscQueryDocuments({
-    organizationId: input.organizationId,
-    pipelineQuery: normalized.query,
-    rowLimit
-  });
-
-  if (gscDocs.length === 0) {
-    const result = await runMockIngestion(input);
-    return { result, ingestionSource: 'mock_ingestion' };
-  }
-
-  const preBrand = dedupeDocuments(gscDocs);
-  let deduped = preBrand;
-  if (normalized.brandContext) {
-    deduped = enrichDocumentsWithOrgContext(preBrand, normalized.brandContext);
-  }
-
-  return {
-    result: ingestionResultFromGscDocuments(
-      normalized,
-      gscDocs.length,
-      preBrand.length,
-      deduped
-    ),
-    ingestionSource: 'live_gsc_queries'
-  };
-}
-
-export async function runOrgIngestionDebug(
-  input: OrgIngestionInput
 ): Promise<{
   result: IngestionRunResult;
   ingestionSource: PipelineIngestionSource;
@@ -133,7 +96,6 @@ export async function runOrgIngestionDebug(
 }> {
   const normalized = normalizeIngestionInput(input);
   const rowLimit = Math.min(250, Math.max(10, normalized.limitPerConnector * 25));
-
   const { docs: gscDocs, diagnostics } = await fetchGscQueryDocumentsWithDiagnostics({
     organizationId: input.organizationId,
     pipelineQuery: normalized.query,
@@ -161,6 +123,16 @@ export async function runOrgIngestionDebug(
     ingestionSource: 'live_gsc_queries',
     gscDiagnostics: diagnostics
   };
+}
+
+export async function runOrgIngestionDebug(
+  input: OrgIngestionInput
+): Promise<{
+  result: IngestionRunResult;
+  ingestionSource: PipelineIngestionSource;
+  gscDiagnostics: GscIngestionDiagnostics | null;
+}> {
+  return runOrgIngestion(input);
 }
 
 export async function runMockIngestion(input: IngestionRunInput): Promise<IngestionRunResult> {
