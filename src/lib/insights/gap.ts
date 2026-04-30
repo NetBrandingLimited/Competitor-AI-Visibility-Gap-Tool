@@ -35,7 +35,7 @@ export type GapInsights = {
   topics: TopicGap[];
 };
 
-/** List rows use the native `title` tooltip when detail text is at least this long (e.g. appended pipeline GSC). */
+/** Opportunity list rows: max detail characters before ellipsis; full text appears in `title` when truncated. */
 export const GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS = 160;
 
 /** Topic gap tables set `title` on recommendation cells when text is at least this long. */

@@ -251,8 +251,32 @@ export default async function OpsPage() {
           missingText="Not generated yet"
         >
           <>
-            <code>{latestDigest?.id}</code>
+            {latestDigest ? (
+              <Link href={`/reports/digest/${latestDigest.id}`}>
+                <code>{latestDigest.id}</code>
+              </Link>
+            ) : (
+              <code />
+            )}
             {latestDigest ? ` · ${weeklyDigestSignalsLabel(latestDigest.summary)}` : ''}
+            {latestDigest?.summary.pipelineGscDiagnosticsSummary ? (
+              <>
+                {' '}
+                · GSC:{' '}
+                <Link
+                  href={`/reports/digest/${latestDigest.id}#gsc-digest-pipeline`}
+                  className="text-priority-muted"
+                  title={latestDigest.summary.pipelineGscDiagnosticsSummary}
+                >
+                  {
+                    tableCellEllipsisParts(
+                      latestDigest.summary.pipelineGscDiagnosticsSummary,
+                      GSC_SUMMARY_UI_NARROW_MAX
+                    ).display
+                  }
+                </Link>
+              </>
+            ) : null}
           </>
         </StatusFreshnessItem>
       </ul>
