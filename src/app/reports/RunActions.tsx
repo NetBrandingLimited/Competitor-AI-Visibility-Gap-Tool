@@ -25,7 +25,13 @@ export default function RunActions() {
       if (!response.ok) {
         throw new Error(`Run failed (${response.status})`);
       }
-      setPipeline({ running: false, message: 'Unified pipeline run completed.' });
+      const data = (await response.json()) as { gscDiagnosticsSummary?: string | null };
+      let message = 'Unified pipeline run completed.';
+      const gsc = typeof data.gscDiagnosticsSummary === 'string' ? data.gscDiagnosticsSummary.trim() : '';
+      if (gsc.length > 0) {
+        message += ` GSC: ${gsc.length > 140 ? `${gsc.slice(0, 140)}…` : gsc}`;
+      }
+      setPipeline({ running: false, message });
       router.refresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Pipeline run failed.';

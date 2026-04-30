@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForRequest } from '@/lib/active-org';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { readLatestPipelineRun, readPipelineRuns } from '@/lib/pipeline/store';
 import { runUnifiedPipeline } from '@/lib/pipeline/runUnifiedPipeline';
 
@@ -22,7 +23,12 @@ export async function POST(request: NextRequest) {
     query: queryParam && queryParam.length > 0 ? queryParam : undefined,
     limitPerConnector: Number.isFinite(limit) ? limit : undefined
   });
-  return NextResponse.json({ run });
+  return NextResponse.json({
+    run,
+    gscDiagnosticsSummary: run.gscIngestionDiagnostics
+      ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+      : null
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -32,5 +38,11 @@ export async function GET(request: NextRequest) {
   }
   const latest = await readLatestPipelineRun(active.organizationId);
   const runs = await readPipelineRuns(active.organizationId);
-  return NextResponse.json({ latest, count: runs.length });
+  return NextResponse.json({
+    latest,
+    latestGscDiagnosticsSummary: latest?.gscIngestionDiagnostics
+      ? formatGscIngestionDiagnosticsSummary(latest.gscIngestionDiagnostics)
+      : null,
+    count: runs.length
+  });
 }
