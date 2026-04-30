@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
-import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
+import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
@@ -18,10 +18,7 @@ import {
   GSC_SUMMARY_UI_TABLE_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
-import {
-  buildGapInsightsFromLatestData,
-  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
-} from '@/lib/insights/gap';
+import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
@@ -221,10 +218,7 @@ export default async function ReportsPage() {
       />
       <ul>
         {gapInsights.opportunities.map((item) => (
-          <li key={item.id} title={item.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? item.detail : undefined}>
-            <strong>{item.title}</strong> [{item.priority}] — {item.detail}
-            <GapOpportunityGscRunLink opportunity={item} />
-          </li>
+          <GapOpportunityListItem key={item.id} opportunity={item} priorityStyle="brackets" />
         ))}
       </ul>
       <h3>Topic-level gap breakdown</h3>
