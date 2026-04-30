@@ -18,6 +18,7 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
+import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 
 export const metadata: Metadata = {
   title: 'Ops'
@@ -82,10 +83,11 @@ export default async function OpsPage() {
       )
     : {};
   const latestJob = jobs[0] ?? null;
-  const [latestRun, latestDigest, trendSnapshots] = await Promise.all([
+  const [latestRun, latestDigest, trendSnapshots, latestVisibility] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
     readLatestWeeklyDigest(active.organizationId),
-    readTrendSnapshots(active.organizationId)
+    readTrendSnapshots(active.organizationId),
+    getLatestVisibilityScore(active.organizationId)
   ]);
   const latestTrend = trendSnapshots.at(-1) ?? null;
   const {
@@ -188,6 +190,43 @@ export default async function OpsPage() {
           missingText="Not generated yet"
         >
           <code>{latestTrend?.date}</code>
+        </StatusFreshnessItem>
+        <StatusFreshnessItem
+          label="Latest visibility score"
+          iso={latestVisibility?.createdAt ?? null}
+          thresholds={freshnessThresholds}
+          missingText="Not calculated yet"
+        >
+          <>
+            {latestVisibility ? (
+              <>
+                <strong>{Math.round(latestVisibility.score)}</strong>/100 ·{' '}
+                {pipelineIngestionProvenanceLabel(latestVisibility.inputs.pipelineIngestionSource)}
+                {latestVisibility.inputs.pipelineGscDiagnosticsSummary &&
+                latestVisibility.inputs.pipelineRunId ? (
+                  <>
+                    {' · '}
+                    <Link
+                      href={`/reports/runs/${latestVisibility.inputs.pipelineRunId}#gsc-diagnostics`}
+                      className="text-priority-muted"
+                      title={latestVisibility.inputs.pipelineGscDiagnosticsSummary}
+                    >
+                      GSC:{' '}
+                      {latestVisibility.inputs.pipelineGscDiagnosticsSummary.length > 44
+                        ? `${latestVisibility.inputs.pipelineGscDiagnosticsSummary.slice(0, 44)}…`
+                        : latestVisibility.inputs.pipelineGscDiagnosticsSummary}
+                    </Link>
+                  </>
+                ) : null}
+                {' · '}
+                <Link href={`/api/orgs/${active.organizationId}/visibility`}>JSON</Link>
+                {' · '}
+                <Link href="/dashboard">Dashboard</Link>
+              </>
+            ) : (
+              <span className="text-priority-muted">—</span>
+            )}
+          </>
         </StatusFreshnessItem>
         <StatusFreshnessItem
           label="Latest weekly digest"

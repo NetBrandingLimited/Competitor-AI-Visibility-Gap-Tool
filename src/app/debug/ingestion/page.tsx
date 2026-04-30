@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { prisma } from '@/lib/prisma';
@@ -121,6 +122,10 @@ export default async function DebugIngestionPage({
           <h3>GSC diagnostics</h3>
           {gscDiagnostics ? (
             <>
+              <p className="text-muted-note">
+                <strong>Summary</strong> (same string as API <code>gscDiagnosticsSummary</code> and pipeline CSV):{' '}
+                <code>{formatGscIngestionDiagnosticsSummary(gscDiagnostics)}</code>
+              </p>
               <dl
                 style={{
                   margin: '8px 0 16px 0',
