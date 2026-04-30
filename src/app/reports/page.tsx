@@ -28,6 +28,11 @@ function display(value: string | null | undefined): string {
   return t && t.length > 0 ? t : '—';
 }
 
+/** Short label for digest table cells; full string in title / digest detail. */
+function ellipsisPipelineGscSummary(s: string, maxChars = 56): string {
+  return s.length > maxChars ? `${s.slice(0, maxChars)}…` : s;
+}
+
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
@@ -227,7 +232,7 @@ export default async function ReportsPage() {
             <table className="data-table data-table-mb-16 data-table-min-reports-scroll">
           <caption className="sr-only">
             Weekly visibility digests: digest id (open detail or copy id), generated time, period, score, connector signals
-            label, pipeline document source, and top opportunities.
+            label, pipeline document source, frozen GSC ingestion summary when present, and top opportunities.
           </caption>
           <thead>
             <tr>
@@ -239,6 +244,7 @@ export default async function ReportsPage() {
               <th scope="col" className="data-table-th-right">Score</th>
               <th scope="col" className="data-table-th-left">Connector signals</th>
               <th scope="col" className="data-table-th-left">Pipeline docs</th>
+              <th scope="col" className="data-table-th-left">GSC (pipeline)</th>
               <th scope="col" className="data-table-th-left">Top opportunities</th>
             </tr>
           </thead>
@@ -268,6 +274,19 @@ export default async function ReportsPage() {
                 <td className="data-table-td-right">{d.summary.score ?? '—'}</td>
                 <td className="data-table-td">{weeklyDigestSignalsLabel(d.summary)}</td>
                 <td className="data-table-td">{weeklyDigestPipelineLabel(d.summary)}</td>
+                <td className="data-table-td data-table-td-wrap-break">
+                  {d.summary.pipelineGscDiagnosticsSummary ? (
+                    <Link
+                      href={`/reports/digest/${d.id}#gsc-digest-pipeline`}
+                      className="text-priority-muted"
+                      title={d.summary.pipelineGscDiagnosticsSummary}
+                    >
+                      {ellipsisPipelineGscSummary(d.summary.pipelineGscDiagnosticsSummary)}
+                    </Link>
+                  ) : (
+                    '—'
+                  )}
+                </td>
                 <td className="data-table-td">{d.summary.topOpportunities.join(', ') || '—'}</td>
               </tr>
             ))}

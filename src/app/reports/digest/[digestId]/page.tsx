@@ -81,7 +81,7 @@ export default async function WeeklyDigestDetailPage({
           <strong>Pipeline documents:</strong> {weeklyDigestPipelineLabel(digest.summary)}
         </li>
         {digest.summary.pipelineGscDiagnosticsSummary ? (
-          <li>
+          <li id="gsc-digest-pipeline">
             <strong>GSC ingestion (latest pipeline):</strong>{' '}
             <code className="text-priority-muted">{digest.summary.pipelineGscDiagnosticsSummary}</code>
           </li>

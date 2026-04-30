@@ -116,6 +116,21 @@ export default async function DashboardPage() {
             <a href={`/api/orgs/${active.organizationId}/digest/weekly/${latestDigest.id}/export-md`}>
               Download .md
             </a>
+            {latestDigest.summary.pipelineGscDiagnosticsSummary ? (
+              <>
+                {' '}
+                · GSC:{' '}
+                <Link
+                  href={`/reports/digest/${latestDigest.id}#gsc-digest-pipeline`}
+                  className="text-priority-muted"
+                  title={latestDigest.summary.pipelineGscDiagnosticsSummary}
+                >
+                  {latestDigest.summary.pipelineGscDiagnosticsSummary.length > 48
+                    ? `${latestDigest.summary.pipelineGscDiagnosticsSummary.slice(0, 48)}…`
+                    : latestDigest.summary.pipelineGscDiagnosticsSummary}
+                </Link>
+              </>
+            ) : null}
           </span>
         </p>
       ) : (
