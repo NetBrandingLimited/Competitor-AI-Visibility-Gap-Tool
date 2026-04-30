@@ -1,6 +1,6 @@
 'use client';
 
-import { ellipsisGscDiagnosticsSummaryForUi, GSC_SUMMARY_UI_STATUS_MAX } from '@/lib/ingestion/gscDiagnostics';
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,7 +30,7 @@ export default function RunActions() {
       let message = 'Unified pipeline run completed.';
       const gsc = typeof data.gscDiagnosticsSummary === 'string' ? data.gscDiagnosticsSummary.trim() : '';
       if (gsc.length > 0) {
-        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(gsc, GSC_SUMMARY_UI_STATUS_MAX)}`;
+        message += ` GSC: ${tableCellEllipsisParts(gsc, GSC_SUMMARY_UI_STATUS_MAX).display}`;
       }
       setPipeline({ running: false, message });
       router.refresh();
@@ -77,7 +77,7 @@ export default function RunActions() {
       }
       const digestGsc = data.digest?.summary?.pipelineGscDiagnosticsSummary?.trim();
       if (digestGsc) {
-        message += ` GSC: ${ellipsisGscDiagnosticsSummaryForUi(digestGsc, GSC_SUMMARY_UI_STATUS_MAX)}`;
+        message += ` GSC: ${tableCellEllipsisParts(digestGsc, GSC_SUMMARY_UI_STATUS_MAX).display}`;
       }
       setDigest({ running: false, message });
       router.refresh();

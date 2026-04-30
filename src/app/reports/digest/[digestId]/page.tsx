@@ -10,6 +10,7 @@ import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationC
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
+import { tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -41,6 +42,10 @@ export default async function WeeklyDigestDetailPage({
   if (!digest) {
     notFound();
   }
+
+  const digestGscSummaryParts = digest.summary.pipelineGscDiagnosticsSummary
+    ? tableCellEllipsisParts(digest.summary.pipelineGscDiagnosticsSummary)
+    : null;
 
   const generatedLabel = new Date(digest.generatedAt).toLocaleString();
   const md = formatWeeklyDigestMarkdown({
@@ -86,7 +91,9 @@ export default async function WeeklyDigestDetailPage({
         {digest.summary.pipelineGscDiagnosticsSummary ? (
           <li id="gsc-digest-pipeline">
             <strong>GSC ingestion (latest pipeline):</strong>{' '}
-            <code className="text-priority-muted">{digest.summary.pipelineGscDiagnosticsSummary}</code>{' '}
+            <code className="text-priority-muted" title={digestGscSummaryParts?.title}>
+              {digestGscSummaryParts?.display}
+            </code>{' '}
             <CopyTextButton
               text={digest.summary.pipelineGscDiagnosticsSummary}
               label="Copy summary"

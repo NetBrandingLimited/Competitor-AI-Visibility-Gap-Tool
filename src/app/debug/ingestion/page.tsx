@@ -5,7 +5,10 @@ import type { Metadata } from 'next';
 
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
-import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
+import {
+  formatGscIngestionDiagnosticsSummary,
+  tableCellEllipsisParts
+} from '@/lib/ingestion/gscDiagnostics';
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { prisma } from '@/lib/prisma';
@@ -124,7 +127,12 @@ export default async function DebugIngestionPage({
             <>
               <p className="text-muted-note">
                 <strong>Summary</strong> (same string as API <code>gscDiagnosticsSummary</code> and pipeline CSV):{' '}
-                <code>{formatGscIngestionDiagnosticsSummary(gscDiagnostics)}</code>
+                {(() => {
+                  const parts = tableCellEllipsisParts(formatGscIngestionDiagnosticsSummary(gscDiagnostics));
+                  return (
+                    <code title={parts.title}>{parts.display}</code>
+                  );
+                })()}
               </p>
               <dl
                 style={{
