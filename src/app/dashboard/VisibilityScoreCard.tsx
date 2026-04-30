@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import RecalculateVisibilityForm from './RecalculateVisibilityForm';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
 import {
   GSC_SUMMARY_UI_NARROW_MAX,
-  GSC_SUMMARY_UI_STATUS_MAX,
   tableCellEllipsisParts
 } from '@/lib/ingestion/gscDiagnostics';
 import type { VisibilityReasonV1 } from '@/lib/visibility/scoreV1';
@@ -111,14 +111,11 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
           ) : null}
           <h3 className="subheading-sm">Why it changed (last run)</h3>
           <ul className="list-indent">
-            {latest.reasons.map((r, index) => {
-              const reasonParts = tableCellEllipsisParts(r.message, GSC_SUMMARY_UI_STATUS_MAX);
-              return (
-                <li key={`${r.code}-${index}`} className="li-tight">
-                  <span title={reasonParts.title}>{reasonParts.display}</span>
-                </li>
-              );
-            })}
+            {latest.reasons.map((r, index) => (
+              <li key={`${r.code}-${index}`} className="li-tight">
+                <EllipsisStatusText text={r.message} />
+              </li>
+            ))}
           </ul>
         </>
       )}

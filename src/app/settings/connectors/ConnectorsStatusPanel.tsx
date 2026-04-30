@@ -487,20 +487,16 @@ export default function ConnectorsStatusPanel() {
       ) : null}
       {testResults.length > 0 ? (
         <div className="mt-12">
-          {testResults.map((t) => {
-            const detailParts = tableCellEllipsisParts(t.detail, GSC_SUMMARY_UI_STATUS_MAX);
-            return (
-              <p
-                key={t.id}
-                className={`${t.ok ? 'success' : 'error'} my-6-0`}
-                role="status"
-                aria-live="polite"
-              >
-                {t.ok ? 'PASS' : 'FAIL'} {t.id}:{' '}
-                <span title={detailParts.title}>{detailParts.display}</span>
-              </p>
-            );
-          })}
+          {testResults.map((t) => (
+            <p
+              key={t.id}
+              className={`${t.ok ? 'success' : 'error'} my-6-0`}
+              role="status"
+              aria-live="polite"
+            >
+              {t.ok ? 'PASS' : 'FAIL'} {t.id}: <EllipsisStatusText text={t.detail} />
+            </p>
+          ))}
         </div>
       ) : null}
       {signalsFetchedAt ? (
