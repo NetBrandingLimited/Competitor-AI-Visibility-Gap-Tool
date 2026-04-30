@@ -422,6 +422,9 @@ export default async function ReportsPage() {
           <tbody>
             {pipelineRuns.map((run) => {
               const queryCell = tableCellEllipsisParts(run.query);
+              const ingestionProvCell = tableCellEllipsisParts(
+                pipelineIngestionProvenanceLabel(run.ingestionSource)
+              );
               return (
               <tr key={run.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -445,7 +448,7 @@ export default async function ReportsPage() {
                   {queryCell.display}
                 </td>
                 <td className="data-table-td data-table-td-wrap-break">
-                  <div>{pipelineIngestionProvenanceLabel(run.ingestionSource)}</div>
+                  <div title={ingestionProvCell.title}>{ingestionProvCell.display}</div>
                   {run.gscIngestionDiagnostics ? (
                     <div className="mt-4">
                       <Link
