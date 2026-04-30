@@ -72,13 +72,19 @@ export default async function PipelineRunDetailPage({
         {run.ingestionSource ? ` | Ingestion: ${pipelineIngestionProvenanceLabel(run.ingestionSource)}` : null}
       </p>
       {run.gscIngestionDiagnostics ? (
-        <div className="panel-box mb-20">
+        <div className="panel-box mb-20" id="gsc-diagnostics">
           <h2 className="heading-panel">Search Console ingestion diagnostics</h2>
           <p className="text-muted-note">
             One-line summary (also included in pipeline runs CSV as <code>gscDiagnosticsSummary</code>):
           </p>
           <p>
-            <code>{formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}</code>
+            <code>{formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}</code>{' '}
+            <CopyTextButton
+              text={JSON.stringify(run.gscIngestionDiagnostics, null, 2)}
+              label="Copy JSON"
+              ariaLabel="Copy GSC ingestion diagnostics JSON"
+              className="btn-compact-inline btn-compact-inline-secondary"
+            />
           </p>
           <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {JSON.stringify(run.gscIngestionDiagnostics, null, 2)}

@@ -368,8 +368,14 @@ export default async function ReportsPage() {
                 <td className="data-table-td data-table-td-wrap-break">
                   <div>{pipelineIngestionProvenanceLabel(run.ingestionSource)}</div>
                   {run.gscIngestionDiagnostics ? (
-                    <div className="text-priority-muted mt-4" title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}>
-                      GSC: {formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                    <div className="mt-4">
+                      <Link
+                        href={`/reports/runs/${run.id}#gsc-diagnostics`}
+                        className="text-priority-muted"
+                        title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                      >
+                        GSC: {formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                      </Link>
                     </div>
                   ) : null}
                 </td>

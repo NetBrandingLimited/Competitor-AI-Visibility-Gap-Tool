@@ -156,18 +156,25 @@ export default async function OpsPage() {
           missingText="Not run yet"
         >
           <>
-            <code>{latestRun?.id}</code>
+            {latestRun ? (
+              <Link href={`/reports/runs/${latestRun.id}`}>
+                <code>{latestRun.id}</code>
+              </Link>
+            ) : (
+              <span className="text-priority-muted">—</span>
+            )}
             {latestRun ? ` · ${pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}` : ''}
             {latestRun?.gscIngestionDiagnostics ? (
               <>
                 {' '}
                 · GSC:{' '}
-                <span
+                <Link
+                  href={`/reports/runs/${latestRun.id}#gsc-diagnostics`}
                   className="text-priority-muted"
                   title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
                 >
                   {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
-                </span>
+                </Link>
               </>
             ) : null}
           </>

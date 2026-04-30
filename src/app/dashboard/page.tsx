@@ -208,9 +208,13 @@ export default async function DashboardPage() {
             <>
               {' '}
               · GSC:{' '}
-              <span className="text-priority-muted" title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}>
+              <Link
+                href={`/reports/runs/${latestRun.id}#gsc-diagnostics`}
+                className="text-priority-muted"
+                title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+              >
                 {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
-              </span>
+              </Link>
             </>
           ) : null}
         </p>
