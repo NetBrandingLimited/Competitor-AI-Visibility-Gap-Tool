@@ -333,6 +333,15 @@ export default async function OpsPage() {
                 {jobs.map((job) => {
                   const detailsCell = tableCellEllipsisParts(describeSchedulerJob(job));
                   const queryCell = tableCellEllipsisParts(job.query);
+                  const pipelineDocsLabel = job.pipelineRunId
+                    ? (pipelineIngestionLabels[job.pipelineRunId] ?? 'Not recorded')
+                    : '-';
+                  const digestSignalsLabel = job.weeklyDigestId
+                    ? (digestSignalLabels[job.weeklyDigestId] ?? '—')
+                    : '-';
+                  const pipelineDocsCell = tableCellEllipsisParts(pipelineDocsLabel);
+                  const digestSignalsCell = tableCellEllipsisParts(digestSignalsLabel);
+                  const statusCell = tableCellEllipsisParts(job.status);
                   return (
                   <tr key={job.id}>
                     <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -352,7 +361,9 @@ export default async function OpsPage() {
                     >
                       {new Date(job.completedAt).toLocaleString()}
                     </td>
-                    <td className="data-table-td">{job.status}</td>
+                    <td className="data-table-td" title={statusCell.title}>
+                      {statusCell.display}
+                    </td>
                     <td className="data-table-td data-table-td-wrap-break" title={detailsCell.title}>
                       {detailsCell.display}
                     </td>
@@ -369,11 +380,11 @@ export default async function OpsPage() {
                         '-'
                       )}
                     </td>
-                    <td className="data-table-td">
-                      {job.pipelineRunId ? (pipelineIngestionLabels[job.pipelineRunId] ?? 'Not recorded') : '-'}
+                    <td className="data-table-td data-table-td-wrap-break" title={pipelineDocsCell.title}>
+                      {pipelineDocsCell.display}
                     </td>
-                    <td className="data-table-td">
-                      {job.weeklyDigestId ? (digestSignalLabels[job.weeklyDigestId] ?? '—') : '-'}
+                    <td className="data-table-td data-table-td-wrap-break" title={digestSignalsCell.title}>
+                      {digestSignalsCell.display}
                     </td>
                     <td className="data-table-td">
                       {job.pipelineRunId || job.weeklyDigestId ? (

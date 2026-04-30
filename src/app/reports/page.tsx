@@ -287,6 +287,9 @@ export default async function ReportsPage() {
                   : tableCellEllipsisParts(topOpportunitiesJoined);
               const gscSummary = d.summary.pipelineGscDiagnosticsSummary;
               const gscCell = gscSummary ? tableCellEllipsisParts(gscSummary) : null;
+              const periodCell = tableCellEllipsisParts(`${d.periodStart} → ${d.periodEnd}`);
+              const signalsCell = tableCellEllipsisParts(weeklyDigestSignalsLabel(d.summary));
+              const pipelineDocsCell = tableCellEllipsisParts(weeklyDigestPipelineLabel(d.summary));
               return (
               <tr key={d.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -306,12 +309,16 @@ export default async function ReportsPage() {
                   </div>
                 </td>
                 <td className="data-table-td">{new Date(d.generatedAt).toLocaleString()}</td>
-                <td className="data-table-td">
-                  {d.periodStart} → {d.periodEnd}
+                <td className="data-table-td data-table-td-wrap-break" title={periodCell.title}>
+                  {periodCell.display}
                 </td>
                 <td className="data-table-td-right">{d.summary.score ?? '—'}</td>
-                <td className="data-table-td">{weeklyDigestSignalsLabel(d.summary)}</td>
-                <td className="data-table-td">{weeklyDigestPipelineLabel(d.summary)}</td>
+                <td className="data-table-td data-table-td-wrap-break" title={signalsCell.title}>
+                  {signalsCell.display}
+                </td>
+                <td className="data-table-td data-table-td-wrap-break" title={pipelineDocsCell.title}>
+                  {pipelineDocsCell.display}
+                </td>
                 <td className="data-table-td data-table-td-wrap-break">
                   {gscCell ? (
                     <Link
@@ -360,9 +367,12 @@ export default async function ReportsPage() {
           <tbody>
             {snapshots.map((row) => {
               const brandCell = tableCellEllipsisParts(row.topBrand);
+              const dateCell = tableCellEllipsisParts(row.date);
               return (
               <tr key={row.date}>
-                <td className="data-table-td data-table-sticky-col">{row.date}</td>
+                <td className="data-table-td data-table-sticky-col" title={dateCell.title}>
+                  {dateCell.display}
+                </td>
                 <td className="data-table-td-right">{row.totalMentions}</td>
                 <td className="data-table-td data-table-td-wrap-break" title={brandCell.title}>
                   {brandCell.display}
