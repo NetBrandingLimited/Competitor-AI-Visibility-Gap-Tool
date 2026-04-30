@@ -74,6 +74,7 @@ export default async function DashboardPage() {
     readLatestWeeklyDigest(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
+  const dashboardLatestRunIdParts = latestRun ? tableCellEllipsisParts(latestRun.id, 24) : null;
   const dashboardLatestRunQueryParts = latestRun ? tableCellEllipsisParts(latestRun.query) : null;
   const dashboardTrendTopBrandParts = latestTrend ? tableCellEllipsisParts(latestTrend.topBrand) : null;
   const previousRun = recentRuns[1] ?? null;
@@ -229,7 +230,7 @@ export default async function DashboardPage() {
         <p>
           Latest unified run:{' '}
           <Link href={`/reports/runs/${latestRun.id}`}>
-            <code>{latestRun.id}</code>
+            <code title={dashboardLatestRunIdParts?.title}>{dashboardLatestRunIdParts?.display}</code>
           </Link>{' '}
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
           <code title={dashboardLatestRunQueryParts?.title}>
