@@ -16,7 +16,8 @@ import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel 
 import {
   ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
-  GSC_SUMMARY_UI_TABLE_MAX
+  GSC_SUMMARY_UI_TABLE_MAX,
+  tableCellEllipsisParts
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
@@ -288,6 +289,12 @@ export default async function ReportsPage() {
           <tbody>
             {weeklyDigests.map((d) => {
               const topOpportunitiesJoined = d.summary.topOpportunities.join(', ');
+              const topCell =
+                d.summary.topOpportunities.length === 0
+                  ? { display: '—' as const, title: undefined as string | undefined }
+                  : tableCellEllipsisParts(topOpportunitiesJoined);
+              const gscSummary = d.summary.pipelineGscDiagnosticsSummary;
+              const gscCell = gscSummary ? tableCellEllipsisParts(gscSummary) : null;
               return (
               <tr key={d.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -314,36 +321,20 @@ export default async function ReportsPage() {
                 <td className="data-table-td">{weeklyDigestSignalsLabel(d.summary)}</td>
                 <td className="data-table-td">{weeklyDigestPipelineLabel(d.summary)}</td>
                 <td className="data-table-td data-table-td-wrap-break">
-                  {d.summary.pipelineGscDiagnosticsSummary ? (
+                  {gscCell ? (
                     <Link
                       href={`/reports/digest/${d.id}#gsc-digest-pipeline`}
                       className="text-priority-muted"
-                      title={d.summary.pipelineGscDiagnosticsSummary}
+                      title={gscSummary ?? undefined}
                     >
-                      {ellipsisGscDiagnosticsSummaryForUi(
-                        d.summary.pipelineGscDiagnosticsSummary,
-                        GSC_SUMMARY_UI_TABLE_MAX
-                      )}
+                      {gscCell.display}
                     </Link>
                   ) : (
                     '—'
                   )}
                 </td>
-                <td
-                  className="data-table-td data-table-td-wrap-break"
-                  title={
-                    d.summary.topOpportunities.length > 0 &&
-                    topOpportunitiesJoined.length > GSC_SUMMARY_UI_TABLE_MAX
-                      ? topOpportunitiesJoined
-                      : undefined
-                  }
-                >
-                  {d.summary.topOpportunities.length === 0
-                    ? '—'
-                    : ellipsisGscDiagnosticsSummaryForUi(
-                        topOpportunitiesJoined,
-                        GSC_SUMMARY_UI_TABLE_MAX
-                      )}
+                <td className="data-table-td data-table-td-wrap-break" title={topCell.title}>
+                  {topCell.display}
                 </td>
               </tr>
               );
@@ -375,14 +366,19 @@ export default async function ReportsPage() {
             </tr>
           </thead>
           <tbody>
-            {snapshots.map((row) => (
+            {snapshots.map((row) => {
+              const brandCell = tableCellEllipsisParts(row.topBrand);
+              return (
               <tr key={row.date}>
                 <td className="data-table-td data-table-sticky-col">{row.date}</td>
                 <td className="data-table-td-right">{row.totalMentions}</td>
-                <td className="data-table-td">{row.topBrand}</td>
+                <td className="data-table-td data-table-td-wrap-break" title={brandCell.title}>
+                  {brandCell.display}
+                </td>
                 <td className="data-table-td-right">{row.topBrandMentions}</td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
             </table>
           </div>
@@ -422,7 +418,9 @@ export default async function ReportsPage() {
             </tr>
           </thead>
           <tbody>
-            {pipelineRuns.map((run) => (
+            {pipelineRuns.map((run) => {
+              const queryCell = tableCellEllipsisParts(run.query);
+              return (
               <tr key={run.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                   <div className="inline-run-id-cell">
@@ -441,7 +439,9 @@ export default async function ReportsPage() {
                   </div>
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
-                <td className="data-table-td">{run.query}</td>
+                <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
+                  {queryCell.display}
+                </td>
                 <td className="data-table-td data-table-td-wrap-break">
                   <div>{pipelineIngestionProvenanceLabel(run.ingestionSource)}</div>
                   {run.gscIngestionDiagnostics ? (
@@ -452,10 +452,9 @@ export default async function ReportsPage() {
                         title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
                       >
                         GSC:{' '}
-                        {ellipsisGscDiagnosticsSummaryForUi(
-                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics),
-                          GSC_SUMMARY_UI_TABLE_MAX
-                        )}
+                        {tableCellEllipsisParts(
+                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+                        ).display}
                       </Link>
                     </div>
                   ) : null}
@@ -464,7 +463,8 @@ export default async function ReportsPage() {
                 <td className="data-table-td-right">{run.triggerCount}</td>
                 <td className="data-table-td-right">{run.clusterCount}</td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
             </table>
           </div>

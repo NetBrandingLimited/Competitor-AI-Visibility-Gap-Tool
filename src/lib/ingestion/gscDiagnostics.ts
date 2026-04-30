@@ -64,6 +64,21 @@ export function ellipsisGscDiagnosticsSummaryForUi(summary: string, maxChars: nu
   return `${t.slice(0, maxChars)}…`;
 }
 
+/** Dense table cells: trimmed display plus `title` only when the value is truncated. */
+export function tableCellEllipsisParts(
+  value: string,
+  maxChars: number = GSC_SUMMARY_UI_TABLE_MAX
+): { display: string; title: string | undefined } {
+  const t = value.trim();
+  if (t.length === 0) {
+    return { display: '', title: undefined };
+  }
+  if (t.length <= maxChars) {
+    return { display: t, title: undefined };
+  }
+  return { display: ellipsisGscDiagnosticsSummaryForUi(t, maxChars), title: t };
+}
+
 export function formatGscIngestionDiagnosticsSummary(d: GscIngestionDiagnostics): string {
   const q = d.query;
   const p = d.page;

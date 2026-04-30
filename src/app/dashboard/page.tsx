@@ -14,7 +14,8 @@ import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot
 import {
   ellipsisGscDiagnosticsSummaryForUi,
   formatGscIngestionDiagnosticsSummary,
-  GSC_SUMMARY_UI_PARAGRAPH_MAX
+  GSC_SUMMARY_UI_PARAGRAPH_MAX,
+  tableCellEllipsisParts
 } from '@/lib/ingestion/gscDiagnostics';
 import {
   ingestionSourceDisplayLabel,
@@ -358,16 +359,24 @@ export default async function DashboardPage() {
           </tr>
         </thead>
         <tbody>
-          {snapshot.recent.map((row, index) => (
+          {snapshot.recent.map((row, index) => {
+            const queryCell = tableCellEllipsisParts(row.query);
+            const brandCell = tableCellEllipsisParts(row.topBrand);
+            return (
             <tr key={`${row.source}-${row.publishedAt}-${index}`}>
               <td className="data-table-td data-table-sticky-col">
                 {ingestionSourceDisplayLabel(row.source)}
               </td>
-              <td className="data-table-td">{row.query}</td>
-              <td className="data-table-td">{row.topBrand}</td>
+              <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
+                {queryCell.display}
+              </td>
+              <td className="data-table-td data-table-td-wrap-break" title={brandCell.title}>
+                {brandCell.display}
+              </td>
               <td className="data-table-td">{new Date(row.publishedAt).toLocaleString()}</td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
           </table>
         </div>

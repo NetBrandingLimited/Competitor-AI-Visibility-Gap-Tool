@@ -5,11 +5,7 @@ import { redirect } from 'next/navigation';
 import CopyTextButton from '@/app/components/CopyTextButton';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import {
-  ellipsisGscDiagnosticsSummaryForUi,
-  formatGscIngestionDiagnosticsSummary,
-  GSC_SUMMARY_UI_TABLE_MAX
-} from '@/lib/ingestion/gscDiagnostics';
+import { formatGscIngestionDiagnosticsSummary, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -123,20 +119,14 @@ export default async function PipelineRunDetailPage({
               </thead>
               <tbody>
                 {run.documents.map((doc, index) => {
-                  const docTitle = doc.title;
-                  const docTitleLong = docTitle.length > GSC_SUMMARY_UI_TABLE_MAX;
+                  const titleCell = tableCellEllipsisParts(doc.title);
                   return (
                   <tr key={`${doc.id}-${index}`}>
                     <td className="data-table-td data-table-sticky-col">
                       {ingestionSourceDisplayLabel(doc.source)}
                     </td>
-                    <td
-                      className="data-table-td data-table-td-wrap-break"
-                      title={docTitleLong ? docTitle : undefined}
-                    >
-                      {docTitleLong
-                        ? ellipsisGscDiagnosticsSummaryForUi(docTitle, GSC_SUMMARY_UI_TABLE_MAX)
-                        : docTitle}
+                    <td className="data-table-td data-table-td-wrap-break" title={titleCell.title}>
+                      {titleCell.display}
                     </td>
                     <td className="data-table-td">
                       <DocumentUrlCell url={doc.url} />
@@ -174,17 +164,14 @@ export default async function PipelineRunDetailPage({
           </thead>
           <tbody>
             {run.triggers.map((trigger) => {
-              const phrase = trigger.phrase;
-              const phraseLong = phrase.length > GSC_SUMMARY_UI_TABLE_MAX;
+              const phraseCell = tableCellEllipsisParts(trigger.phrase);
               return (
                 <tr key={`${trigger.phrase}-${trigger.category}`}>
                   <td
                     className="data-table-td data-table-sticky-col data-table-td-wrap-break"
-                    title={phraseLong ? phrase : undefined}
+                    title={phraseCell.title}
                   >
-                    {phraseLong
-                      ? ellipsisGscDiagnosticsSummaryForUi(phrase, GSC_SUMMARY_UI_TABLE_MAX)
-                      : phrase}
+                    {phraseCell.display}
                   </td>
                   <td className="data-table-td">{trigger.category}</td>
                   <td className="data-table-td-right">{trigger.score}</td>
@@ -217,26 +204,18 @@ export default async function PipelineRunDetailPage({
           </thead>
           <tbody>
             {run.clusters.map((cluster) => {
-              const kwJoined = cluster.keywords.join(', ');
-              const kwLong = kwJoined.length > GSC_SUMMARY_UI_TABLE_MAX;
-              const labelLong = cluster.label.length > GSC_SUMMARY_UI_TABLE_MAX;
+              const labelCell = tableCellEllipsisParts(cluster.label);
+              const kwCell = tableCellEllipsisParts(cluster.keywords.join(', '));
               return (
               <tr key={cluster.id}>
                 <td
                   className="data-table-td data-table-sticky-col data-table-td-wrap-break"
-                  title={labelLong ? cluster.label : undefined}
+                  title={labelCell.title}
                 >
-                  {labelLong
-                    ? ellipsisGscDiagnosticsSummaryForUi(cluster.label, GSC_SUMMARY_UI_TABLE_MAX)
-                    : cluster.label}
+                  {labelCell.display}
                 </td>
-                <td
-                  className="data-table-td data-table-td-wrap-break"
-                  title={kwLong ? kwJoined : undefined}
-                >
-                  {kwLong
-                    ? ellipsisGscDiagnosticsSummaryForUi(kwJoined, GSC_SUMMARY_UI_TABLE_MAX)
-                    : kwJoined}
+                <td className="data-table-td data-table-td-wrap-break" title={kwCell.title}>
+                  {kwCell.display}
                 </td>
                 <td className="data-table-td-right">{cluster.itemCount}</td>
               </tr>

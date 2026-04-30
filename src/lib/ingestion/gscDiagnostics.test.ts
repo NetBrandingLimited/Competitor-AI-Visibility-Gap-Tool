@@ -5,6 +5,7 @@ import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_TABLE_MAX,
   parseGscIngestionDiagnosticsRaw,
+  tableCellEllipsisParts,
   type GscIngestionDiagnostics
 } from '@/lib/ingestion/gscDiagnostics';
 
@@ -42,6 +43,22 @@ describe('formatGscIngestionDiagnosticsSummary', () => {
     expect(s).toContain('attempt=filtered');
     expect(s).toContain('q:fetched=1');
     expect(s).toContain('cap=1');
+  });
+});
+
+describe('tableCellEllipsisParts', () => {
+  it('returns empty display without title for blank input', () => {
+    expect(tableCellEllipsisParts('   ')).toEqual({ display: '', title: undefined });
+  });
+
+  it('returns same text without title when under max', () => {
+    expect(tableCellEllipsisParts('short', 10)).toEqual({ display: 'short', title: undefined });
+  });
+
+  it('truncates display and sets title when over max', () => {
+    const { display, title } = tableCellEllipsisParts('0123456789', 4);
+    expect(display).toBe('0123…');
+    expect(title).toBe('0123456789');
   });
 });
 
