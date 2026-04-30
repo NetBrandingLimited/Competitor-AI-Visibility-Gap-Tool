@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 
 export default function RunSchedulerAction() {
   const router = useRouter();
@@ -85,10 +85,7 @@ export default function RunSchedulerAction() {
       </button>
       {message ? (
         <p className="mt-8" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={message} />
         </p>
       ) : null}
     </div>

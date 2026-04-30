@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
 import {
   GSC_SUMMARY_UI_NARROW_MAX,
@@ -470,18 +471,12 @@ export default function ConnectorsStatusPanel() {
 
       {error ? (
         <p className="error" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(error, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={error} />
         </p>
       ) : null}
       {saveMessage ? (
         <p className="success" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(saveMessage, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={saveMessage} />
         </p>
       ) : null}
       {lastTestedAt ? (

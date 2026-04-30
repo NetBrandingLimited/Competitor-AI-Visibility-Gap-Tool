@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
+
 type DebugConfigActionsProps = {
   className?: string;
 };
@@ -137,7 +139,7 @@ export default function DebugConfigActions({ className }: DebugConfigActionsProp
           aria-live="polite"
           className={`debug-config-status ${statusOk ? 'text-debug-success' : 'text-debug-error'}`}
         >
-          {message}
+          <EllipsisStatusText text={message} />
           {actionAt ? <span className="text-timestamp-muted ml-6">at {actionAt}</span> : null}
         </span>
       ) : null}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 
 import { refreshVisibilityScoreAction } from './visibility-actions';
 
@@ -46,10 +46,7 @@ export default function RecalculateVisibilityForm({ organizationId }: Props) {
           role="status"
           aria-live="polite"
         >
-          {(() => {
-            const m = tableCellEllipsisParts(feedback.text, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={feedback.text} />
         </p>
       ) : null}
     </form>

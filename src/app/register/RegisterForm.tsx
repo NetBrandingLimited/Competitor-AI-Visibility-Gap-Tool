@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -88,10 +88,7 @@ export default function RegisterForm() {
       </button>
       {message ? (
         <p className="error" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={message} />
         </p>
       ) : null}
       <p className="hint">

@@ -1,5 +1,6 @@
 'use client';
 
+import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -117,26 +118,17 @@ export default function RunActions() {
       </button>
       {pipeline.message ? (
         <p className="mt-8" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(pipeline.message, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={pipeline.message} />
         </p>
       ) : null}
       {trends.message ? (
         <p className="mt-4" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(trends.message, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={trends.message} />
         </p>
       ) : null}
       {digest.message ? (
         <p className="mt-4" role="status" aria-live="polite">
-          {(() => {
-            const m = tableCellEllipsisParts(digest.message, GSC_SUMMARY_UI_STATUS_MAX);
-            return <span title={m.title}>{m.display}</span>;
-          })()}
+          <EllipsisStatusText text={digest.message} />
         </p>
       ) : null}
     </div>
