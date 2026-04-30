@@ -124,7 +124,8 @@ export default async function ReportsPage() {
           </li>
           <li>
             <code>weekly digests CSV</code>: per-digest summary rows (score, connector signal mode, pipeline
-            document provenance label + raw source, and top opportunity headlines).
+            document provenance label + raw source, frozen <code>pipelineGscDiagnosticsSummary</code> when present, and
+            top opportunity headlines).
           </li>
         </ul>
       </div>
@@ -167,6 +168,36 @@ export default async function ReportsPage() {
           />
         </ul>
       </FreshnessSectionCard>
+      {visibility ? (
+        <p className="text-muted-note mb-8">
+          Latest visibility score: <strong>{Math.round(visibility.score)}</strong> (updated{' '}
+          {new Date(visibility.createdAt).toLocaleString()}) ·{' '}
+          {pipelineIngestionProvenanceLabel(visibility.inputs.pipelineIngestionSource)}
+          {visibility.inputs.pipelineGscDiagnosticsSummary && visibility.inputs.pipelineRunId ? (
+            <>
+              {' · '}
+              <Link
+                href={`/reports/runs/${visibility.inputs.pipelineRunId}#gsc-diagnostics`}
+                className="text-priority-muted"
+                title={visibility.inputs.pipelineGscDiagnosticsSummary}
+              >
+                GSC: {ellipsisPipelineGscSummary(visibility.inputs.pipelineGscDiagnosticsSummary)}
+              </Link>
+            </>
+          ) : null}
+          {' · '}
+          <Link href={`/api/orgs/${active.organizationId}/visibility`} target="_blank" rel="noopener noreferrer">
+            Visibility JSON
+          </Link>
+          {' · '}
+          <Link href="/dashboard">Recalculate on dashboard</Link>
+        </p>
+      ) : (
+        <p className="text-muted-note mb-8">
+          No visibility score yet. Run the pipeline and trend snapshot from the buttons below, then{' '}
+          <Link href="/dashboard">open the dashboard</Link> to recalculate the score.
+        </p>
+      )}
       <RunActions />
 
       <h2>Competitor gap insights (v1)</h2>
