@@ -16,7 +16,10 @@ import {
   GSC_SUMMARY_UI_TABLE_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
-import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
+import {
+  buildGapInsightsFromLatestData,
+  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
+} from '@/lib/insights/gap';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
@@ -215,7 +218,7 @@ export default async function ReportsPage() {
       />
       <ul>
         {gapInsights.opportunities.map((item) => (
-          <li key={item.id}>
+          <li key={item.id} title={item.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? item.detail : undefined}>
             <strong>{item.title}</strong> [{item.priority}] — {item.detail}
           </li>
         ))}

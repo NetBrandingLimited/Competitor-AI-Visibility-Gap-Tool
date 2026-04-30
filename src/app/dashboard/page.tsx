@@ -19,7 +19,10 @@ import {
   pipelineIngestionProvenanceLabel
 } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestWeeklyDigest } from '@/lib/digest/weekly';
-import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
+import {
+  buildGapInsightsFromLatestData,
+  GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
+} from '@/lib/insights/gap';
 import { getDashboardSnapshotForOrganization } from '@/lib/org-visibility-mock';
 import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
@@ -266,7 +269,7 @@ export default async function DashboardPage() {
       />
       <ul className="mt-8 mb-20">
         {gapInsights.opportunities.slice(0, 3).map((op) => (
-          <li key={op.id} className="mb-8">
+          <li key={op.id} className="mb-8" title={op.detail.length > GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS ? op.detail : undefined}>
             <strong>{op.title}</strong> ({op.priority}) — {op.detail}
           </li>
         ))}
