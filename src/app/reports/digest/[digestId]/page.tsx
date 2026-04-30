@@ -83,7 +83,13 @@ export default async function WeeklyDigestDetailPage({
         {digest.summary.pipelineGscDiagnosticsSummary ? (
           <li id="gsc-digest-pipeline">
             <strong>GSC ingestion (latest pipeline):</strong>{' '}
-            <code className="text-priority-muted">{digest.summary.pipelineGscDiagnosticsSummary}</code>
+            <code className="text-priority-muted">{digest.summary.pipelineGscDiagnosticsSummary}</code>{' '}
+            <CopyTextButton
+              text={digest.summary.pipelineGscDiagnosticsSummary}
+              label="Copy summary"
+              ariaLabel="Copy frozen GSC ingestion diagnostics summary"
+              className="btn-compact-inline btn-compact-inline-secondary"
+            />
           </li>
         ) : null}
         <li>

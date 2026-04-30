@@ -177,7 +177,10 @@ export default async function OpsPage() {
                   className="text-priority-muted"
                   title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
                 >
-                  {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                  {ellipsisGscDiagnosticsSummaryForUi(
+                    formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
+                    44
+                  )}
                 </Link>
               </>
             ) : null}

@@ -228,7 +228,10 @@ export default async function DashboardPage() {
                 className="text-priority-muted"
                 title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
               >
-                {formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                {ellipsisGscDiagnosticsSummaryForUi(
+                  formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
+                  48
+                )}
               </Link>
             </>
           ) : null}

@@ -419,7 +419,10 @@ export default async function ReportsPage() {
                         className="text-priority-muted"
                         title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
                       >
-                        GSC: {formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                        GSC:{' '}
+                        {ellipsisGscDiagnosticsSummaryForUi(
+                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
+                        )}
                       </Link>
                     </div>
                   ) : null}
