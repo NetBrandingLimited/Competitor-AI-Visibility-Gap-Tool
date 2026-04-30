@@ -332,17 +332,22 @@ export default async function DashboardPage() {
           </tr>
         </thead>
         <tbody>
-          {snapshot.leaderboard.map((row) => (
-            <tr key={row.brand}>
-              <td className="data-table-td data-table-sticky-col">{row.brand}</td>
-              <td className="data-table-td-right">{row.mentions}</td>
-              <td className="data-table-td-right">{formatPercent(row.shareOfVoice)}</td>
-              <td className="data-table-td-right">
-                {row.delta7d >= 0 ? '+' : ''}
-                {formatPercent(row.delta7d)}
-              </td>
-            </tr>
-          ))}
+          {snapshot.leaderboard.map((row) => {
+            const brandCell = tableCellEllipsisParts(row.brand);
+            return (
+              <tr key={row.brand}>
+                <td className="data-table-td data-table-sticky-col" title={brandCell.title}>
+                  {brandCell.display}
+                </td>
+                <td className="data-table-td-right">{row.mentions}</td>
+                <td className="data-table-td-right">{formatPercent(row.shareOfVoice)}</td>
+                <td className="data-table-td-right">
+                  {row.delta7d >= 0 ? '+' : ''}
+                  {formatPercent(row.delta7d)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
           </table>
         </div>

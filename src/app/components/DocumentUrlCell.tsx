@@ -7,6 +7,10 @@ export function truncateUrlForDisplay(url: string, maxLen: number): string {
   return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
 }
 
+function truncatedUriTitle(full: string, display: string): string | undefined {
+  return display.length < full.length ? full : undefined;
+}
+
 type Props = {
   url: string;
   /** Max characters shown in the cell (full value still in link `title` for http(s)). */
@@ -24,5 +28,6 @@ export default function DocumentUrlCell({ url, maxDisplayLength = 72 }: Props) {
       </a>
     );
   }
-  return <code>{truncateUrlForDisplay(trimmed, maxDisplayLength)}</code>;
+  const codeLabel = truncateUrlForDisplay(trimmed, maxDisplayLength);
+  return <code title={truncatedUriTitle(trimmed, codeLabel)}>{codeLabel}</code>;
 }
