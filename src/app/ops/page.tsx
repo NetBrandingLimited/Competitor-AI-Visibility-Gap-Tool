@@ -88,6 +88,7 @@ export default async function OpsPage() {
       )
     : {};
   const latestJob = jobs[0] ?? null;
+  const latestJobIdCell = latestJob ? tableCellEllipsisParts(latestJob.id, 24) : null;
   const latestJobQueryCell = latestJob ? tableCellEllipsisParts(latestJob.query) : null;
   const [latestRun, latestDigest, trendSnapshots, latestVisibility] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
@@ -96,6 +97,8 @@ export default async function OpsPage() {
     getLatestVisibilityScore(active.organizationId)
   ]);
   const latestTrend = trendSnapshots.at(-1) ?? null;
+  const latestRunIdCell = latestRun ? tableCellEllipsisParts(latestRun.id, 24) : null;
+  const latestDigestIdCell = latestDigest ? tableCellEllipsisParts(latestDigest.id, 24) : null;
   const {
     thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
     input: freshnessThresholds
@@ -156,7 +159,7 @@ export default async function OpsPage() {
           missingText="Not completed yet"
         >
           <>
-            <code>{latestJob?.id}</code> ({latestJob?.status}) ·{' '}
+            <code title={latestJobIdCell?.title}>{latestJobIdCell?.display}</code> ({latestJob?.status}) ·{' '}
             {latestJobQueryCell ? (
               <code title={latestJobQueryCell.title}>{latestJobQueryCell.display}</code>
             ) : null}
@@ -171,7 +174,7 @@ export default async function OpsPage() {
           <>
             {latestRun ? (
               <Link href={`/reports/runs/${latestRun.id}`}>
-                <code>{latestRun.id}</code>
+                <code title={latestRunIdCell?.title}>{latestRunIdCell?.display}</code>
               </Link>
             ) : (
               <span className="text-priority-muted">—</span>
@@ -254,7 +257,7 @@ export default async function OpsPage() {
           <>
             {latestDigest ? (
               <Link href={`/reports/digest/${latestDigest.id}`}>
-                <code>{latestDigest.id}</code>
+                <code title={latestDigestIdCell?.title}>{latestDigestIdCell?.display}</code>
               </Link>
             ) : (
               <code />

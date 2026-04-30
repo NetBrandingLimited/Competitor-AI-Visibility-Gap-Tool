@@ -47,6 +47,7 @@ export default async function WeeklyDigestDetailPage({
   const digestGscSummaryParts = digest.summary.pipelineGscDiagnosticsSummary
     ? tableCellEllipsisParts(digest.summary.pipelineGscDiagnosticsSummary)
     : null;
+  const digestIdParts = tableCellEllipsisParts(digest.id, 24);
 
   const generatedLabel = new Date(digest.generatedAt).toLocaleString();
   const md = formatWeeklyDigestMarkdown({
@@ -68,7 +69,7 @@ export default async function WeeklyDigestDetailPage({
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p className="mt-8">
-        Digest id: <code>{digest.id}</code>{' '}
+        Digest id: <code title={digestIdParts.title}>{digestIdParts.display}</code>{' '}
         <CopyTextButton
           text={digest.id}
           label="Copy digest id"

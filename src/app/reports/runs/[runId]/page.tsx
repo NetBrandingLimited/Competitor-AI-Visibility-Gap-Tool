@@ -53,6 +53,7 @@ export default async function PipelineRunDetailPage({
   }
 
   const queryHeader = tableCellEllipsisParts(run.query);
+  const runIdHeader = tableCellEllipsisParts(run.id, 24);
   const gscSummaryText = run.gscIngestionDiagnostics
     ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
     : '';
@@ -65,7 +66,7 @@ export default async function PipelineRunDetailPage({
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p>
-        Run id: <code>{run.id}</code>{' '}
+        Run id: <code title={runIdHeader.title}>{runIdHeader.display}</code>{' '}
         <CopyTextButton
           text={run.id}
           label="Copy run id"
