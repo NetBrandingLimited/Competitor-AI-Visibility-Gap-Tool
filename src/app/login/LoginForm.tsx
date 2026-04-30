@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+
 type Props = {
   nextPath?: string;
 };
@@ -75,7 +77,10 @@ export default function LoginForm({ nextPath }: Props) {
       </button>
       {message ? (
         <p className="error" role="status" aria-live="polite">
-          {message}
+          {(() => {
+            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       <p className="hint">

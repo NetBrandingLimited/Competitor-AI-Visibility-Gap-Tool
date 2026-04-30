@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+
 export default function RunSchedulerAction() {
   const router = useRouter();
   const [running, setRunning] = useState(false);
@@ -83,7 +85,10 @@ export default function RunSchedulerAction() {
       </button>
       {message ? (
         <p className="mt-8" role="status" aria-live="polite">
-          {message}
+          {(() => {
+            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
     </div>

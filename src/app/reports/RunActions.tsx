@@ -117,17 +117,26 @@ export default function RunActions() {
       </button>
       {pipeline.message ? (
         <p className="mt-8" role="status" aria-live="polite">
-          {pipeline.message}
+          {(() => {
+            const m = tableCellEllipsisParts(pipeline.message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       {trends.message ? (
         <p className="mt-4" role="status" aria-live="polite">
-          {trends.message}
+          {(() => {
+            const m = tableCellEllipsisParts(trends.message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       {digest.message ? (
         <p className="mt-4" role="status" aria-live="polite">
-          {digest.message}
+          {(() => {
+            const m = tableCellEllipsisParts(digest.message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
     </div>

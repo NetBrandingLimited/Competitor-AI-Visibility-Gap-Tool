@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+
 type Props = {
   organizationId: string;
   canEdit: boolean;
@@ -113,7 +115,10 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
       </div>
       {message ? (
         <p className="mt-10" role="status" aria-live="polite">
-          {message}
+          {(() => {
+            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       {!canEdit ? <p className="text-muted-small mt-8">Viewer role: schedule is read-only.</p> : null}

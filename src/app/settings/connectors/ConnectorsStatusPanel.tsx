@@ -470,12 +470,18 @@ export default function ConnectorsStatusPanel() {
 
       {error ? (
         <p className="error" role="status" aria-live="polite">
-          {error}
+          {(() => {
+            const m = tableCellEllipsisParts(error, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       {saveMessage ? (
         <p className="success" role="status" aria-live="polite">
-          {saveMessage}
+          {(() => {
+            const m = tableCellEllipsisParts(saveMessage, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
       {lastTestedAt ? (

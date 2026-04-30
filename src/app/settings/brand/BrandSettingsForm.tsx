@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { startTransition, useEffect, useState, type FormEvent } from 'react';
 
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
+import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
 
 type Org = {
   id: string;
@@ -226,7 +227,10 @@ export default function BrandSettingsForm() {
           role="status"
           aria-live="polite"
         >
-          {message}
+          {(() => {
+            const m = tableCellEllipsisParts(message, GSC_SUMMARY_UI_STATUS_MAX);
+            return <span title={m.title}>{m.display}</span>;
+          })()}
         </p>
       ) : null}
     </form>
