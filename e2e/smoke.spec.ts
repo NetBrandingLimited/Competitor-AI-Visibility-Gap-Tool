@@ -66,6 +66,16 @@ test.describe('public pages', () => {
   }
 });
 
+test.describe('public API', () => {
+  test('GET /api/health returns ok', async ({ request }) => {
+    const response = await request.get('/api/health');
+    expect(response.ok()).toBe(true);
+    const body = (await response.json()) as { ok?: boolean; service?: string };
+    expect(body.ok).toBe(true);
+    expect(body.service).toBe('health');
+  });
+});
+
 const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.skip;
 
 authSuite('authenticated smoke (E2E_AUTH=1)', () => {
