@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-/** Avoid racing the dev server and give client components time to hydrate before interacting. */
+/**
+ * Public tests always run. Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
+ * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
+ *
+ * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
+ * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
+ */
+/** Serial: one test at a time in this file to reduce load on `next dev` and hydration races. */
 test.describe.configure({ mode: 'serial' });
 
 test.describe('public pages', () => {
@@ -81,12 +88,13 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page.getByRole('button', { name: /Run scheduled job now/i })).toBeVisible();
   });
 
-  test('viewer can open dashboard but does not see recalculate', async ({ page }) => {
+  test('viewer has read-only brand/connectors and no editor-only job controls', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
     const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
 
     await page.goto('/login');
+    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
     const userField = page.locator('#login-username');
     const passField = page.locator('#login-password');
     await userField.click();

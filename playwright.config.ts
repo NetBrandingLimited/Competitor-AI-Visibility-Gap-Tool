@@ -3,8 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000';
 
 /**
- * Public smoke tests run by default (home + login shell).
- * Set `E2E_AUTH=1` with a migrated DB and `npx prisma db seed` to run sign-in → reports as well.
+ * Public smoke tests run by default (home, login/register shells).
+ * Set `E2E_AUTH=1` with a migrated DB and `npm run db:seed` to run admin + viewer signed-in flows
+ * (brand, reports, dashboard, connectors, ops). See `e2e/smoke.spec.ts` for env vars.
  */
 export default defineConfig({
   testDir: './e2e',
