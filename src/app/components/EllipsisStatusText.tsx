@@ -11,5 +11,13 @@ type Props = {
 /** Status / form feedback: ellipsis with full string in `title` when truncated. */
 export default function EllipsisStatusText({ text, maxChars = GSC_SUMMARY_UI_STATUS_MAX }: Props) {
   const m = tableCellEllipsisParts(text, maxChars);
-  return <span title={m.title}>{m.display}</span>;
+  if (!m.title) {
+    return <span>{m.display}</span>;
+  }
+  return (
+    <span title={m.title}>
+      <span aria-hidden="true">{m.display}</span>
+      <span className="sr-only">{m.title}</span>
+    </span>
+  );
 }
