@@ -62,6 +62,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
     await expect(page.getByRole('heading', { level: 1, name: /Brand & competitors/i })).toBeVisible();
     await expect(page.locator('#brand-brandName')).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('#brand-brandName')).toBeEnabled();
 
     await page.goto('/reports');
     await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
@@ -73,6 +74,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     await page.goto('/settings/connectors');
     await expect(page.getByRole('heading', { level: 1, name: /Data connectors/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Save connector settings/i })).toBeEnabled();
 
     await page.goto('/ops');
     await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
@@ -93,6 +95,15 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await passField.pressSequentially(pass, { delay: 15 });
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+    await expect(page.locator('#brand-brandName')).toBeDisabled();
+    await expect(
+      page.getByText(/Viewer role: brand, competitors, and digest email are read-only/i)
+    ).toBeVisible();
+
+    await page.goto('/settings/connectors');
+    await expect(page.getByRole('heading', { level: 1, name: /Data connectors/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Save connector settings/i })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /Fetch live signals/i })).toBeEnabled();
 
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();

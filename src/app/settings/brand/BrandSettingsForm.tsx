@@ -5,6 +5,7 @@ import { startTransition, useEffect, useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
+import { membershipCanEdit } from '@/lib/roles';
 
 type Org = {
   id: string;
@@ -79,6 +80,10 @@ export default function BrandSettingsForm() {
       setMessage('No organization available.');
       return;
     }
+    const selected = orgs.find((o) => o.id === orgId);
+    if (!selected || !membershipCanEdit(selected.role)) {
+      return;
+    }
     setMessage('');
     setSaving(true);
     try {
@@ -129,6 +134,9 @@ export default function BrandSettingsForm() {
     );
   }
 
+  const selectedOrg = orgs.find((o) => o.id === orgId);
+  const canEdit = selectedOrg ? membershipCanEdit(selectedOrg.role) : false;
+
   return (
     <form method="post" className="brand-form" onSubmit={onSubmit}>
       {orgs.length > 1 ? (
@@ -175,6 +183,7 @@ export default function BrandSettingsForm() {
           value={brandName}
           onChange={(e) => setBrandName(e.target.value)}
           placeholder="Your brand"
+          disabled={!canEdit}
         />
       </label>
       <label className="field" htmlFor="brand-category">
@@ -186,6 +195,7 @@ export default function BrandSettingsForm() {
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           placeholder="e.g. SaaS, SEO"
+          disabled={!canEdit}
         />
       </label>
       <label className="field" htmlFor="brand-competitorA">
@@ -196,6 +206,7 @@ export default function BrandSettingsForm() {
           autoComplete="off"
           value={competitorA}
           onChange={(e) => setCompetitorA(e.target.value)}
+          disabled={!canEdit}
         />
       </label>
       <label className="field" htmlFor="brand-competitorB">
@@ -206,6 +217,7 @@ export default function BrandSettingsForm() {
           autoComplete="off"
           value={competitorB}
           onChange={(e) => setCompetitorB(e.target.value)}
+          disabled={!canEdit}
         />
       </label>
       <label className="field" htmlFor="brand-competitorC">
@@ -216,6 +228,7 @@ export default function BrandSettingsForm() {
           autoComplete="off"
           value={competitorC}
           onChange={(e) => setCompetitorC(e.target.value)}
+          disabled={!canEdit}
         />
       </label>
 
@@ -229,14 +242,21 @@ export default function BrandSettingsForm() {
           value={weeklyDigestNotifyEmail}
           onChange={(e) => setWeeklyDigestNotifyEmail(e.target.value)}
           placeholder="you@company.com"
+          disabled={!canEdit}
         />
         <small className="field-hint-small">
           When set, each new weekly digest is emailed here if the server has Resend or SMTP env vars (see .env.example).
         </small>
       </label>
 
+      {!canEdit ? (
+        <p className="text-muted-small mt-8">
+          Viewer role: brand, competitors, and digest email are read-only for this workspace.
+        </p>
+      ) : null}
+
       <div className="actions">
-        <button type="submit" className="primary" disabled={saving} aria-busy={saving}>
+        <button type="submit" className="primary" disabled={!canEdit || saving} aria-busy={saving}>
           {saving ? 'Saving…' : 'Save'}
         </button>
         <button type="button" className="secondary" onClick={logout}>

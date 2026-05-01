@@ -15,3 +15,8 @@ export function isOrgRole(value: string): value is OrgRole {
 export function roleSatisfies(role: OrgRole, minimum: OrgRole): boolean {
   return ROLE_RANK[role] >= ROLE_RANK[minimum];
 }
+
+/** True when the membership role may mutate org settings (matches API `requireOrgRole(..., 'EDITOR')`). */
+export function membershipCanEdit(role: string): boolean {
+  return isOrgRole(role) && roleSatisfies(role, 'EDITOR');
+}

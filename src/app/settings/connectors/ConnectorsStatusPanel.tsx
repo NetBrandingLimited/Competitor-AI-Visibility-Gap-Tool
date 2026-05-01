@@ -12,6 +12,7 @@ import {
   GSC_SUMMARY_UI_TABLE_MAX,
   UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
+import { membershipCanEdit } from '@/lib/roles';
 
 type Org = {
   id: string;
@@ -190,6 +191,10 @@ export default function ConnectorsStatusPanel() {
     if (!orgId) {
       return false;
     }
+    const role = orgs.find((o) => o.id === orgId)?.role;
+    if (!role || !membershipCanEdit(role)) {
+      return false;
+    }
     setError('');
     if (!opts?.preserveSaveMessage) {
       setSaveMessage('');
@@ -218,6 +223,10 @@ export default function ConnectorsStatusPanel() {
 
   async function saveSettings() {
     if (!orgId) {
+      return;
+    }
+    const role = orgs.find((o) => o.id === orgId)?.role;
+    if (!role || !membershipCanEdit(role)) {
       return;
     }
     setSaveMessage('');
@@ -287,6 +296,10 @@ export default function ConnectorsStatusPanel() {
     if (!orgId) {
       return;
     }
+    const role = orgs.find((o) => o.id === orgId)?.role;
+    if (!role || !membershipCanEdit(role)) {
+      return;
+    }
     setError('');
     setClearingSignals(true);
     try {
@@ -324,6 +337,8 @@ export default function ConnectorsStatusPanel() {
   }
 
   const lastCredentialsTestFreshness = lastTestedAt ? freshnessLabel(lastTestedAt) : null;
+  const selectedOrg = orgs.find((o) => o.id === orgId);
+  const canEdit = selectedOrg ? membershipCanEdit(selectedOrg.role) : false;
 
   return (
     <div className="brand-form">
@@ -344,6 +359,12 @@ export default function ConnectorsStatusPanel() {
         Connector credentials are read from server environment variables (see <code>.env.example</code>). This page
         only shows whether each adapter is configured, not secrets.
       </p>
+      {!canEdit ? (
+        <p className="text-muted-small mt-8">
+          Viewer role: connector overrides and stored credentials are read-only. You can still refresh status and fetch
+          live signals.
+        </p>
+      ) : null}
 
       <label className="field mt-16">
         <span>GSC site URL (org-specific override)</span>
@@ -354,6 +375,7 @@ export default function ConnectorsStatusPanel() {
           value={gscSiteUrl}
           onChange={(e) => setGscSiteUrl(e.target.value)}
           placeholder="sc-domain:example.com or https://www.example.com/"
+          disabled={!canEdit}
         />
       </label>
       <label className="field">
@@ -367,6 +389,7 @@ export default function ConnectorsStatusPanel() {
           value={ga4PropertyId}
           onChange={(e) => setGa4PropertyId(e.target.value)}
           placeholder="123456789"
+          disabled={!canEdit}
         />
       </label>
       <label className="field">
@@ -379,6 +402,7 @@ export default function ConnectorsStatusPanel() {
           onChange={(e) => setGscServiceAccountJson(e.target.value)}
           rows={4}
           placeholder='{"type":"service_account", ...}'
+          disabled={!canEdit}
         />
       </label>
       <p className="connector-hint-pull">
@@ -392,6 +416,7 @@ export default function ConnectorsStatusPanel() {
             checked={clearGscCredential}
             onChange={(e) => setClearGscCredential(e.target.checked)}
             className="mr-8"
+            disabled={!canEdit}
           />
           Clear stored GSC credential on save
         </span>
@@ -406,6 +431,7 @@ export default function ConnectorsStatusPanel() {
           onChange={(e) => setGa4ServiceAccountJson(e.target.value)}
           rows={4}
           placeholder='{"type":"service_account", ...}'
+          disabled={!canEdit}
         />
       </label>
       <p className="connector-hint-pull">
@@ -419,6 +445,7 @@ export default function ConnectorsStatusPanel() {
             checked={clearGa4Credential}
             onChange={(e) => setClearGa4Credential(e.target.checked)}
             className="mr-8"
+            disabled={!canEdit}
           />
           Clear stored GA4 credential on save
         </span>
@@ -428,7 +455,7 @@ export default function ConnectorsStatusPanel() {
         <button
           type="button"
           className="primary"
-          disabled={saving || !orgId}
+          disabled={saving || !orgId || !canEdit}
           aria-busy={saving}
           onClick={() => void saveSettings()}
         >
@@ -446,7 +473,7 @@ export default function ConnectorsStatusPanel() {
         <button
           type="button"
           className="secondary"
-          disabled={testing || !orgId}
+          disabled={testing || !orgId || !canEdit}
           aria-busy={testing}
           onClick={() => void testCredentials()}
         >
@@ -464,7 +491,7 @@ export default function ConnectorsStatusPanel() {
         <button
           type="button"
           className="secondary"
-          disabled={clearingSignals || !orgId}
+          disabled={clearingSignals || !orgId || !canEdit}
           aria-busy={clearingSignals}
           onClick={() => void clearSignalCache()}
         >
