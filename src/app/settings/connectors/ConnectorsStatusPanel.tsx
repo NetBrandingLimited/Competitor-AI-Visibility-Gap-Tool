@@ -323,6 +323,8 @@ export default function ConnectorsStatusPanel() {
     );
   }
 
+  const lastCredentialsTestFreshness = lastTestedAt ? freshnessLabel(lastTestedAt) : null;
+
   return (
     <div className="brand-form">
       {orgs.length > 1 ? (
@@ -483,7 +485,7 @@ export default function ConnectorsStatusPanel() {
       {lastTestedAt ? (
         <p className="connector-hint-meta" role="status" aria-live="polite">
           Last credentials test: {new Date(lastTestedAt).toLocaleString()}
-          {freshnessLabel(lastTestedAt) ? ` · ${freshnessLabel(lastTestedAt)}` : ''}
+          {lastCredentialsTestFreshness ? ` · ${lastCredentialsTestFreshness}` : ''}
         </p>
       ) : null}
       {testResults.length > 0 ? (

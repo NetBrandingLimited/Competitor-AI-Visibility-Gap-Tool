@@ -6,7 +6,11 @@ import { useRouter } from 'next/navigation';
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { tableCellEllipsisParts, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
 
-export default function RunSchedulerAction() {
+type Props = {
+  canEdit: boolean;
+};
+
+export default function RunSchedulerAction({ canEdit }: Props) {
   const router = useRouter();
   const [running, setRunning] = useState(false);
   const [message, setMessage] = useState('');
@@ -63,6 +67,14 @@ export default function RunSchedulerAction() {
     }
   }
 
+  if (!canEdit) {
+    return (
+      <p className="text-muted-note stack-y-actions">
+        Only editors and admins can run the scheduler from this page.
+      </p>
+    );
+  }
+
   return (
     <div className="stack-y-actions">
       <label className="block mb-8">
@@ -88,7 +100,7 @@ export default function RunSchedulerAction() {
         Run digest-only mode (skip full pipeline/trends unless digest refresh requires it)
       </label>
       <button type="button" onClick={runNow} disabled={running} aria-busy={running}>
-        {running ? 'Running scheduled job?' : 'Run scheduled job now'}
+        {running ? 'Running scheduled job…' : 'Run scheduled job now'}
       </button>
       {message ? (
         <p className="mt-8" role="status" aria-live="polite">

@@ -148,7 +148,7 @@ export default async function OpsPage() {
           refreshPipelineFirst: schedule?.weeklyDigestRefreshPipelineFirst ?? false
         }}
       />
-      <RunSchedulerAction />
+      <RunSchedulerAction canEdit={activeOrgCanEdit(active)} />
 
       <h2>Current status</h2>
       <ul>

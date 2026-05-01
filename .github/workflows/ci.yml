@@ -31,7 +31,7 @@ jobs:
       - name: Apply database migrations
         run: npx prisma migrate deploy
 
-      - name: Seed demo user (Playwright auth smoke)
+      - name: Seed demo + viewer users (Playwright auth smoke)
         run: npm run db:seed
 
       - name: Lint, typecheck, and unit tests

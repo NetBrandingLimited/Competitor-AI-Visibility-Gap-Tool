@@ -75,6 +75,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     await page.goto('/ops');
     await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Run scheduled job now/i })).toBeVisible();
   });
 
   test('viewer can open dashboard but does not see recalculate', async ({ page }) => {
@@ -95,5 +96,10 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Recalculate score/i })).toHaveCount(0);
+
+    await page.goto('/ops');
+    await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Run scheduled job now/i })).toHaveCount(0);
+    await expect(page.getByText(/Only editors and admins can run the scheduler/i)).toBeVisible();
   });
 });
