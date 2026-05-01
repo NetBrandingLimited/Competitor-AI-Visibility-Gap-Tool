@@ -56,7 +56,7 @@ test.describe('public pages', () => {
     await expect(page.getByRole('button', { name: /Create account/i })).toBeVisible();
   });
 
-  for (const path of ['/dashboard', '/reports', '/ops'] as const) {
+  for (const path of ['/dashboard', '/reports', '/ops', '/settings/brand', '/settings/connectors'] as const) {
     test(`protected ${path} redirects to login when signed out`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/);

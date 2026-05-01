@@ -1,13 +1,19 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import ConnectorsStatusPanel from './ConnectorsStatusPanel';
+import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 
 export const metadata: Metadata = {
   title: 'Connectors'
 };
 
-export default function ConnectorsSettingsPage() {
+export default async function ConnectorsSettingsPage() {
+  if (!(await resolveActiveOrgSessionForServerComponent())) {
+    redirect('/login');
+  }
+
   return (
     <section>
       <h1>Data connectors</h1>

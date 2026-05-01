@@ -1,13 +1,19 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import BrandSettingsForm from './BrandSettingsForm';
+import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 
 export const metadata: Metadata = {
   title: 'Brand settings'
 };
 
-export default function BrandSettingsPage() {
+export default async function BrandSettingsPage() {
+  if (!(await resolveActiveOrgSessionForServerComponent())) {
+    redirect('/login');
+  }
+
   return (
     <section>
       <h1>Brand &amp; competitors</h1>
