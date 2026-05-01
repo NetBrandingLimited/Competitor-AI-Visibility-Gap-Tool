@@ -66,20 +66,16 @@ test.describe('public pages', () => {
 const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.skip;
 
 authSuite('authenticated smoke (E2E_AUTH=1)', () => {
+  /** Serial auth tests: two full sign-ins; avoids hammering `next dev` and keeps traces readable. */
+  test.describe.configure({ mode: 'serial' });
+
   test('seed user can reach core app surfaces', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_USERNAME ?? 'demo';
     const pass = process.env.E2E_PASSWORD ?? 'demo123';
 
     await page.goto('/login');
-    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
-    const userField = page.locator('#login-username');
-    const passField = page.locator('#login-password');
-    await userField.click();
-    await userField.pressSequentially(user, { delay: 15 });
-    await passField.click();
-    await passField.pressSequentially(pass, { delay: 15 });
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    await submitLoginForm(page, user, pass);
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
     await expect(page.getByRole('heading', { level: 1, name: /Brand & competitors/i })).toBeVisible();
     await expect(page.locator('#brand-brandName')).toBeVisible({ timeout: 15_000 });

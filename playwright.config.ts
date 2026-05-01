@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000';
 
+const webServerEnv =
+  process.env.DATABASE_URL !== undefined ? { DATABASE_URL: process.env.DATABASE_URL } : undefined;
+
 /**
  * Public smoke tests run by default (home, login/register shells).
  * Set `E2E_AUTH=1` with a migrated DB and `npm run db:seed` to run admin + viewer signed-in flows
@@ -23,6 +26,7 @@ export default defineConfig({
     command: 'npm run dev',
     url: baseURL,
     timeout: 120_000,
-    reuseExistingServer: !process.env.CI
+    reuseExistingServer: !process.env.CI,
+    env: webServerEnv
   }
 });

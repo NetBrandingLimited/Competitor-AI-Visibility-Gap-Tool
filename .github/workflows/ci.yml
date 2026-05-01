@@ -54,3 +54,5 @@ jobs:
         env:
           CI: true
           E2E_AUTH: '1'
+          # Ensure dev server subprocess sees the same DB as migrate/seed (step env is explicit).
+          DATABASE_URL: file:./prisma/ci.db
