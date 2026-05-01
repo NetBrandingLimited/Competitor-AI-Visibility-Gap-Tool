@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+
+import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 
 import RegisterForm from './RegisterForm';
 
@@ -7,7 +10,11 @@ export const metadata: Metadata = {
   title: 'Register'
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  if (await resolveActiveOrgSessionForServerComponent()) {
+    redirect('/settings/brand');
+  }
+
   return (
     <div className="login-shell">
       <div className="login-card">
