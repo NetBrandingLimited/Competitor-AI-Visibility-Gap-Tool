@@ -104,4 +104,41 @@ describe('buildVisibilityReportCsv', () => {
     expect(csv).toContain('attempt=filtered; cap=9');
     expect(csv).toContain('61');
   });
+
+  it('does not truncate visibilityPipelineGscDiagnosticsSummary on the visibility row', () => {
+    const longVisGsc = `attempt=filtered; ${'z'.repeat(180)}`;
+    const csv = buildVisibilityReportCsv(
+      [],
+      {
+        generatedAt: '2026-04-29T00:05:00.000Z',
+        upstreamAsOf: '2026-04-29T00:00:00.000Z',
+        opportunities: [],
+        topics: []
+      },
+      null,
+      {
+        score: 50,
+        createdAt: '2026-04-29T00:20:00.000Z',
+        reasons: [],
+        inputs: {
+          pipelineRunId: 'run-vis',
+          pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: longVisGsc,
+          documentCount: 0,
+          triggerCount: 0,
+          clusterCount: 0,
+          trendDate: '2026-04-29',
+          totalMentions: 0,
+          topBrand: '',
+          topBrandMentions: 0,
+          brandName: 'Acme',
+          connectorSignalCount: 0,
+          connectorSignalSource: 'live',
+          connectorSignalCacheKind: null,
+          connectorSignalsAsOf: '2026-04-29'
+        }
+      }
+    );
+    expect(csv).toContain(longVisGsc);
+  });
 });

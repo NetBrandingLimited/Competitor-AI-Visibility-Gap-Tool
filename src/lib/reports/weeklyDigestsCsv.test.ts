@@ -28,4 +28,25 @@ describe('buildWeeklyDigestsCsv', () => {
     expect(csv).toContain('pipelineGscDiagnosticsSummary');
     expect(csv).toContain('attempt=filtered; cap=2');
   });
+
+  it('preserves full pipelineGscDiagnosticsSummary for long strings', () => {
+    const longGsc = `attempt=unfiltered; ${'y'.repeat(200)}`;
+    const csv = buildWeeklyDigestsCsv([
+      {
+        id: 'dg-long',
+        generatedAt: '2026-04-29T00:00:00.000Z',
+        periodStart: '2026-04-23',
+        periodEnd: '2026-04-29',
+        summary: {
+          score: 1,
+          signalSource: 'live',
+          pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: longGsc,
+          topOpportunities: []
+        }
+      }
+    ]);
+    expect(csv).toContain(longGsc);
+    expect(longGsc.endsWith('…')).toBe(false);
+  });
 });

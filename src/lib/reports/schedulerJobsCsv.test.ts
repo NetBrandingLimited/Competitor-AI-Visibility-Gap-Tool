@@ -35,6 +35,27 @@ describe('buildSchedulerJobsCsv', () => {
     expect(csv).toContain('frozen-digest-gsc');
   });
 
+  it('preserves long pipeline GSC summary strings without shortening', () => {
+    const longSummary = `attempt=filtered; ${'x'.repeat(160)}`;
+    const csv = buildSchedulerJobsCsv(
+      [
+        {
+          id: 'job-1',
+          startedAt: '2026-04-29T00:00:00.000Z',
+          completedAt: '2026-04-29T00:02:00.000Z',
+          status: 'success',
+          query: 'q',
+          pipelineRunId: 'run-1'
+        }
+      ],
+      {},
+      { 'run-1': 'live_gsc_queries' },
+      { 'run-1': longSummary }
+    );
+    expect(csv).toContain(longSummary);
+    expect(longSummary.endsWith('…')).toBe(false);
+  });
+
   it('leaves GSC summary column empty when map is omitted', () => {
     const csv = buildSchedulerJobsCsv(
       [
