@@ -1,10 +1,12 @@
-import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import type { NextRequest } from 'next/server';
+
+import { resolveActiveOrgSessionForRequest } from '@/lib/active-org';
 import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
 import { readPipelineRuns } from '@/lib/pipeline/store';
 import { buildPipelineRunsCsv } from '@/lib/reports/pipelineRunsCsv';
 
-export async function GET() {
-  const active = await resolveActiveOrgSessionForServerComponent();
+export async function GET(request: NextRequest) {
+  const active = await resolveActiveOrgSessionForRequest(request);
   if (!active) {
     return new Response('Unauthorized', { status: 401 });
   }

@@ -1,4 +1,6 @@
-import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import type { NextRequest } from 'next/server';
+
+import { resolveActiveOrgSessionForRequest } from '@/lib/active-org';
 import { parseWeeklyDigestSummaryJson, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import { formatGscIngestionDiagnosticsSummary, parseGscIngestionDiagnosticsRaw } from '@/lib/ingestion/gscDiagnostics';
 import { buildDownloadHeaders } from '@/lib/http/downloadHeaders';
@@ -7,8 +9,8 @@ import { prisma } from '@/lib/prisma';
 import { buildSchedulerJobsCsv } from '@/lib/reports/schedulerJobsCsv';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 
-export async function GET() {
-  const active = await resolveActiveOrgSessionForServerComponent();
+export async function GET(request: NextRequest) {
+  const active = await resolveActiveOrgSessionForRequest(request);
   if (!active) {
     return new Response('Unauthorized', { status: 401 });
   }
