@@ -29,4 +29,6 @@ export async function refreshVisibilityScoreAction(formData: FormData) {
 
   await computeAndPersistVisibilityScoreV1(organizationId);
   revalidatePath('/dashboard');
+  revalidatePath('/reports');
+  revalidatePath('/ops');
 }

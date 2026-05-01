@@ -55,6 +55,12 @@ test.describe('public pages', () => {
     await expect(page.locator('#register-password')).toBeVisible();
     await expect(page.getByRole('button', { name: /Create account/i })).toBeVisible();
   });
+
+  test('protected dashboard redirects to login when signed out', async ({ page }) => {
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  });
 });
 
 const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.skip;
