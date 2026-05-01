@@ -12,7 +12,7 @@ import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import ComputedSourceAsOfNote from '@/app/components/ComputedSourceAsOfNote';
 import FreshnessTimestampListItem from '@/app/components/FreshnessTimestampListItem';
 import RunActions from './RunActions';
-import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { getFreshnessConfig } from '@/lib/config/freshness';
 import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import {
@@ -209,11 +209,11 @@ export default async function ReportsPage() {
         </p>
       ) : (
         <p className="text-muted-note mb-8">
-          No visibility score yet. Run the pipeline and trend snapshot from the buttons below, then{' '}
+          No visibility score yet. Editors and admins can run the pipeline and trend snapshot in the actions below, then{' '}
           <Link href="/dashboard">open the dashboard</Link> to recalculate the score.
         </p>
       )}
-      <RunActions />
+      <RunActions canEdit={activeOrgCanEdit(active)} />
 
       <h2>Competitor gap insights (v1)</h2>
       <p className="text-muted-note">

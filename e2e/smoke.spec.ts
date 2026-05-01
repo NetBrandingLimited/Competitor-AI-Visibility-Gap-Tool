@@ -65,6 +65,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     await page.goto('/reports');
     await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Run unified pipeline/i })).toBeVisible();
 
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();
@@ -101,5 +102,12 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Run scheduled job now/i })).toHaveCount(0);
     await expect(page.getByText(/Only editors and admins can run the scheduler/i)).toBeVisible();
+
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Run unified pipeline/i })).toHaveCount(0);
+    await expect(
+      page.getByText(/Viewer role: pipeline, trend snapshot, and digest generation/i)
+    ).toBeVisible();
   });
 });

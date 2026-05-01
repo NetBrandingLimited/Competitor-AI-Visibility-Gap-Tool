@@ -15,7 +15,11 @@ type ActionState = {
   message: string;
 };
 
-export default function RunActions() {
+type Props = {
+  canEdit: boolean;
+};
+
+export default function RunActions({ canEdit }: Props) {
   const router = useRouter();
   const [pipeline, setPipeline] = useState<ActionState>({ running: false, message: '' });
   const [trends, setTrends] = useState<ActionState>({ running: false, message: '' });
@@ -99,27 +103,35 @@ export default function RunActions() {
         <Link href="/settings/connectors">Search Console</Link> configured, documents are live query rows; otherwise mock
         text is used. Set brand fields under <Link href="/settings/brand">Brand settings</Link>.
       </p>
-      <button
-        type="button"
-        onClick={runPipeline}
-        disabled={pipeline.running}
-        aria-busy={pipeline.running}
-        className="mr-8"
-      >
-        {pipeline.running ? 'Running pipeline?' : 'Run unified pipeline'}
-      </button>
-      <button type="button" onClick={runTrends} disabled={trends.running} aria-busy={trends.running}>
-        {trends.running ? 'Running snapshot job?' : 'Run trend snapshot'}
-      </button>
-      <button
-        type="button"
-        onClick={generateDigest}
-        disabled={digest.running}
-        aria-busy={digest.running}
-        className="ml-8"
-      >
-        {digest.running ? 'Generating digest?' : 'Generate weekly digest'}
-      </button>
+      {!canEdit ? (
+        <p className="text-muted-note">
+          Viewer role: pipeline, trend snapshot, and digest generation are available to editors and admins only.
+        </p>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={runPipeline}
+            disabled={pipeline.running}
+            aria-busy={pipeline.running}
+            className="mr-8"
+          >
+            {pipeline.running ? 'Running pipeline…' : 'Run unified pipeline'}
+          </button>
+          <button type="button" onClick={runTrends} disabled={trends.running} aria-busy={trends.running}>
+            {trends.running ? 'Running snapshot job…' : 'Run trend snapshot'}
+          </button>
+          <button
+            type="button"
+            onClick={generateDigest}
+            disabled={digest.running}
+            aria-busy={digest.running}
+            className="ml-8"
+          >
+            {digest.running ? 'Generating digest…' : 'Generate weekly digest'}
+          </button>
+        </>
+      )}
       {pipeline.message ? (
         <p className="mt-8" role="status" aria-live="polite">
           <EllipsisStatusText text={pipeline.message} />
