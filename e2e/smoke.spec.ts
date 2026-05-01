@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+/** Avoid racing the dev server and give client components time to hydrate before interacting. */
+test.describe.configure({ mode: 'serial' });
+
 test.describe('public pages', () => {
   test('home introduces the product', async ({ page }) => {
     await page.goto('/');
@@ -21,12 +24,18 @@ const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.s
 
 authSuite('authenticated smoke (E2E_AUTH=1)', () => {
   test('seed user can open reports', async ({ page }) => {
+    test.setTimeout(90_000);
     const user = process.env.E2E_USERNAME ?? 'demo';
     const pass = process.env.E2E_PASSWORD ?? 'demo123';
 
     await page.goto('/login');
-    await page.locator('input[name="username"]').fill(user);
-    await page.locator('input[name="password"]').fill(pass);
+    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    const userField = page.locator('input[name="username"]');
+    const passField = page.locator('input[name="password"]');
+    await userField.click();
+    await userField.pressSequentially(user, { delay: 15 });
+    await passField.click();
+    await passField.pressSequentially(pass, { delay: 15 });
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
 

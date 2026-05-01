@@ -47,7 +47,7 @@ export default function LoginForm({ nextPath }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="login-form">
+    <form method="post" className="login-form" onSubmit={onSubmit}>
       <label className="field">
         <span>Username</span>
         <input
