@@ -5,10 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
-import { DEFAULT_POST_LOGIN_PATH } from '@/lib/post-login-path';
+import { safeLoginNextQuery, safePostLoginPath } from '@/lib/post-login-path';
 
-export default function RegisterForm() {
+type Props = {
+  nextPath?: string;
+};
+
+export default function RegisterForm({ nextPath }: Props) {
   const router = useRouter();
+  const loginNext = safeLoginNextQuery(nextPath);
+  const loginHref = loginNext ? `/login?next=${encodeURIComponent(loginNext)}` : '/login';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [organizationName, setOrganizationName] = useState('');
@@ -39,7 +45,7 @@ export default function RegisterForm() {
         }
         return;
       }
-      router.push(DEFAULT_POST_LOGIN_PATH);
+      router.push(safePostLoginPath(nextPath));
       router.refresh();
     } finally {
       setLoading(false);
@@ -96,7 +102,7 @@ export default function RegisterForm() {
         </p>
       ) : null}
       <p className="hint">
-        Already have an account? <Link href="/login">Sign in</Link>
+        Already have an account? <Link href={loginHref}>Sign in</Link>
       </p>
     </form>
   );

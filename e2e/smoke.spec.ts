@@ -48,6 +48,14 @@ test.describe('public pages', () => {
     await expect(page.locator('#login-password')).toBeVisible();
   });
 
+  test('login page preserves safe next on create-account link', async ({ page }) => {
+    await page.goto('/login?next=%2Freports');
+    await expect(page.getByRole('link', { name: /^create account$/i })).toHaveAttribute(
+      'href',
+      '/register?next=%2Freports'
+    );
+  });
+
   test('/auth forwards safe next to login', async ({ page }) => {
     await page.goto('/auth?next=%2Freports');
     await expect(page).toHaveURL(/\/login/);
@@ -67,6 +75,14 @@ test.describe('public pages', () => {
     await expect(page.locator('#register-email')).toBeVisible();
     await expect(page.locator('#register-password')).toBeVisible();
     await expect(page.getByRole('button', { name: /Create account/i })).toBeVisible();
+  });
+
+  test('register page preserves safe next on sign-in link', async ({ page }) => {
+    await page.goto('/register?next=%2Freports');
+    await expect(page.getByRole('link', { name: /^sign in$/i })).toHaveAttribute(
+      'href',
+      '/login?next=%2Freports'
+    );
   });
 
   for (const path of ['/dashboard', '/reports', '/ops', '/settings/brand', '/settings/connectors'] as const) {

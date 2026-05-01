@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
-import { safePostLoginPath } from '@/lib/post-login-path';
+import { safeLoginNextQuery, safePostLoginPath } from '@/lib/post-login-path';
 
 type Props = {
   nextPath?: string;
@@ -13,6 +13,8 @@ type Props = {
 
 export default function LoginForm({ nextPath }: Props) {
   const router = useRouter();
+  const registerNext = safeLoginNextQuery(nextPath);
+  const registerHref = registerNext ? `/register?next=${encodeURIComponent(registerNext)}` : '/register';
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -83,7 +85,7 @@ export default function LoginForm({ nextPath }: Props) {
       ) : null}
       <p className="hint">
         After seed: username <code>demo</code>, password <code>demo123</code>. New workspace?{' '}
-        <Link href="/register">Register</Link>
+        <Link href={registerHref}>Register</Link>
       </p>
     </form>
   );
