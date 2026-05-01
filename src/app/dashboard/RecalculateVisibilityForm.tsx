@@ -34,8 +34,9 @@ export default function RecalculateVisibilityForm({ organizationId }: Props) {
     }
   }
 
+  // Omit method="post": with a function action, React 19 + Next may SSR method as null and set "post" on the client, which mismatches hydration if method is explicit.
   return (
-    <form method="post" action={submit} className="mt-14">
+    <form action={submit} className="mt-14">
       <input type="hidden" name="organizationId" value={organizationId} />
       <button type="submit" className="primary" disabled={pending} aria-busy={pending}>
         {pending ? 'Recalculating…' : 'Recalculate score'}
