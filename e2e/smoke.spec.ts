@@ -79,10 +79,12 @@ test.describe('public pages', () => {
 
   test('register page preserves safe next on sign-in link', async ({ page }) => {
     await page.goto('/register?next=%2Freports');
-    await expect(page.getByRole('link', { name: /^sign in$/i })).toHaveAttribute(
-      'href',
-      '/login?next=%2Freports'
-    );
+    const expectedHref = '/login?next=%2Freports';
+    const signInLinks = await page.getByRole('link', { name: /^sign in$/i }).all();
+    expect(signInLinks.length).toBeGreaterThanOrEqual(1);
+    for (const link of signInLinks) {
+      await expect(link).toHaveAttribute('href', expectedHref);
+    }
   });
 
   for (const path of ['/dashboard', '/reports', '/ops', '/settings/brand', '/settings/connectors'] as const) {
