@@ -132,6 +132,9 @@ export default async function OpsPage() {
       <p>
         <Link href="/api/ops/scheduler-jobs.csv">Download scheduler jobs CSV</Link>
       </p>
+      <p className="text-muted-note">
+        The CSV uses full text in each column; the scheduler jobs table below may truncate for layout.
+      </p>
       <p>
         <Link href="/reports">Go to reports</Link>
       </p>

@@ -107,6 +107,10 @@ export default async function ReportsPage() {
       </div>
 
       <p>Export CSV is scoped to this workspace only.</p>
+      <p className="text-muted-note">
+        Exports include full-length fields (ids, queries, GSC summaries). In-app tables and status lines may show shorter
+        versions of the same values.
+      </p>
       <p>
         <Link href="/api/reports/export.csv">Download full report CSV</Link>
         {' | '}
