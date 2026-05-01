@@ -60,6 +60,7 @@ test.describe('public pages', () => {
     test(`protected ${path} redirects to login when signed out`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/);
+      expect(new URL(page.url()).searchParams.get('next')).toBe(path);
       await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
     });
   }

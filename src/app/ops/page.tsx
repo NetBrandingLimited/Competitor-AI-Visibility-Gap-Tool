@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
 import EllipsisAccessible from '@/app/components/EllipsisAccessible';
@@ -25,6 +24,7 @@ import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
   title: 'Ops'
@@ -54,7 +54,7 @@ function describeSchedulerJob(job: {
 export default async function OpsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin('/ops');
   }
 
   const jobs = await readSchedulerJobs(active.organizationId);

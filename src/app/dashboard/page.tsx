@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
@@ -31,6 +30,7 @@ import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
 
@@ -45,7 +45,7 @@ function formatPercent(value: number): string {
 export default async function DashboardPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin('/dashboard');
   }
 
   const org = await prisma.organization.findUnique({

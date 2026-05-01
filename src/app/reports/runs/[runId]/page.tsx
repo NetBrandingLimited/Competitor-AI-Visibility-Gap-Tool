@@ -1,12 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-
 import CopyTextButton from '@/app/components/CopyTextButton';
 import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 import { formatGscIngestionDiagnosticsSummary, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
@@ -31,12 +30,11 @@ export default async function PipelineRunDetailPage({
 }: {
   params: Promise<{ runId: string }>;
 }) {
+  const { runId } = await params;
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin(`/reports/runs/${runId}`);
   }
-
-  const { runId } = await params;
   const run = await readPipelineRunById(active.organizationId, runId);
 
   if (!run) {

@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import BrandSettingsForm from './BrandSettingsForm';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
   title: 'Brand settings'
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function BrandSettingsPage() {
   if (!(await resolveActiveOrgSessionForServerComponent())) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin('/settings/brand');
   }
 
   return (

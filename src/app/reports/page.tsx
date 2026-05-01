@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
 import EllipsisAccessible from '@/app/components/EllipsisAccessible';
@@ -27,6 +26,7 @@ import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 import { prisma } from '@/lib/prisma';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
   title: 'Reports'
@@ -44,7 +44,7 @@ function profileFieldDisplay(value: string | null | undefined) {
 export default async function ReportsPage() {
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin('/reports');
   }
 
   const org = await prisma.organization.findUnique({

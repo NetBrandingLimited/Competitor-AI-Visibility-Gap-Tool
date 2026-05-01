@@ -10,6 +10,7 @@ import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnos
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { prisma } from '@/lib/prisma';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
   title: 'Debug Ingestion'
@@ -27,7 +28,7 @@ export default async function DebugIngestionPage({
   searchParams: { query?: string; limit?: string; run?: string };
 }) {
   const active = await resolveActiveOrgSessionForServerComponent();
-  if (!active) redirect('/login');
+  if (!active) redirectUnauthenticatedToLogin('/debug/ingestion');
   if (!activeOrgCanEdit(active)) redirect('/ops');
 
   const org = await prisma.organization.findUnique({

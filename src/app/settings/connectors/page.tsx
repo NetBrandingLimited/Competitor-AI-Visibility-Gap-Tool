@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 
 import ConnectorsStatusPanel from './ConnectorsStatusPanel';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
   title: 'Connectors'
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function ConnectorsSettingsPage() {
   if (!(await resolveActiveOrgSessionForServerComponent())) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin('/settings/connectors');
   }
 
   return (

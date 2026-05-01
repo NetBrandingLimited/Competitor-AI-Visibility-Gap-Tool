@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
 import EllipsisAccessible from '@/app/components/EllipsisAccessible';
@@ -10,6 +10,7 @@ import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
 import GapTopicRecommendationCell from '@/app/components/GapTopicRecommendationCell';
 import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
 import { GSC_SUMMARY_UI_STATUS_MAX, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
@@ -37,7 +38,7 @@ export default async function WeeklyDigestDetailPage({
   const { digestId } = await params;
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirect('/login');
+    redirectUnauthenticatedToLogin(`/reports/digest/${digestId}`);
   }
 
   const digest = await getWeeklyDigestForOrg(active.organizationId, digestId);
