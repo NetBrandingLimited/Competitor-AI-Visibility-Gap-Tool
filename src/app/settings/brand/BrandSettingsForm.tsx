@@ -132,9 +132,10 @@ export default function BrandSettingsForm() {
   return (
     <form method="post" className="brand-form" onSubmit={onSubmit}>
       {orgs.length > 1 ? (
-        <label className="field">
+        <label className="field" htmlFor="brand-organizationId">
           <span>Organization</span>
           <select
+            id="brand-organizationId"
             name="organizationId"
             value={orgId}
             onChange={async (e) => {
@@ -165,9 +166,10 @@ export default function BrandSettingsForm() {
         </label>
       ) : null}
 
-      <label className="field">
+      <label className="field" htmlFor="brand-brandName">
         <span>Brand name</span>
         <input
+          id="brand-brandName"
           name="brandName"
           autoComplete="off"
           value={brandName}
@@ -175,9 +177,10 @@ export default function BrandSettingsForm() {
           placeholder="Your brand"
         />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="brand-category">
         <span>Category</span>
         <input
+          id="brand-category"
           name="category"
           autoComplete="off"
           value={category}
@@ -185,22 +188,41 @@ export default function BrandSettingsForm() {
           placeholder="e.g. SaaS, SEO"
         />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="brand-competitorA">
         <span>Competitor A</span>
-        <input name="competitorA" autoComplete="off" value={competitorA} onChange={(e) => setCompetitorA(e.target.value)} />
+        <input
+          id="brand-competitorA"
+          name="competitorA"
+          autoComplete="off"
+          value={competitorA}
+          onChange={(e) => setCompetitorA(e.target.value)}
+        />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="brand-competitorB">
         <span>Competitor B</span>
-        <input name="competitorB" autoComplete="off" value={competitorB} onChange={(e) => setCompetitorB(e.target.value)} />
+        <input
+          id="brand-competitorB"
+          name="competitorB"
+          autoComplete="off"
+          value={competitorB}
+          onChange={(e) => setCompetitorB(e.target.value)}
+        />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="brand-competitorC">
         <span>Competitor C</span>
-        <input name="competitorC" autoComplete="off" value={competitorC} onChange={(e) => setCompetitorC(e.target.value)} />
+        <input
+          id="brand-competitorC"
+          name="competitorC"
+          autoComplete="off"
+          value={competitorC}
+          onChange={(e) => setCompetitorC(e.target.value)}
+        />
       </label>
 
-      <label className="field">
+      <label className="field" htmlFor="brand-weeklyDigestNotifyEmail">
         <span>Weekly digest email (optional)</span>
         <input
+          id="brand-weeklyDigestNotifyEmail"
           type="email"
           name="weeklyDigestNotifyEmail"
           autoComplete="email"

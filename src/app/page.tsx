@@ -16,6 +16,10 @@ export default function HomePage() {
         <li>
           Quality gate (lint + TypeScript + Vitest): <code>npm run check</code>
         </li>
+        <li>
+          Optional: <code>npm run test:all</code> runs <code>check</code> plus Playwright; use{' '}
+          <code>E2E_AUTH=1</code> with a seeded DB for the signed-in smoke paths.
+        </li>
         <li>npm run dev</li>
         <li>
           Phase 3 debug: <code>/api/debug/extract-cluster?text=best%20seo%20tool%20vs%20alternatives</code>
