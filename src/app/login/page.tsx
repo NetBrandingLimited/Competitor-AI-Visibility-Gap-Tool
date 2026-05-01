@@ -3,16 +3,13 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { safePostLoginPath } from '@/lib/post-login-path';
 
 import LoginForm from './LoginForm';
 
 export const metadata: Metadata = {
   title: 'Sign in'
 };
-
-function safeNextPath(next: string | undefined): string {
-  return next && next.startsWith('/') && !next.startsWith('//') ? next : '/settings/brand';
-}
 
 export default async function LoginPage({
   searchParams
@@ -21,7 +18,7 @@ export default async function LoginPage({
 }) {
   const { next } = await searchParams;
   if (await resolveActiveOrgSessionForServerComponent()) {
-    redirect(safeNextPath(next));
+    redirect(safePostLoginPath(next));
   }
 
   return (

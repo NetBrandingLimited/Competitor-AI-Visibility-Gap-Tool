@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
+import { safePostLoginPath } from '@/lib/post-login-path';
 
 type Props = {
   nextPath?: string;
@@ -37,9 +38,7 @@ export default function LoginForm({ nextPath }: Props) {
         );
         return;
       }
-      const dest =
-        nextPath && nextPath.startsWith('/') && !nextPath.startsWith('//') ? nextPath : '/settings/brand';
-      router.push(dest);
+      router.push(safePostLoginPath(nextPath));
       router.refresh();
     } finally {
       setLoading(false);
