@@ -38,7 +38,41 @@ async function main() {
     }
   });
 
-  console.log('Seed OK:', { userId: user.id, orgId: org.id, email: user.email, username: user.username });
+  const viewerEmail = 'viewer@example.com';
+  const viewerPasswordHash = bcrypt.hashSync('viewer123', 10);
+  const viewerUser = await prisma.user.upsert({
+    where: { email: viewerEmail },
+    update: { name: 'Viewer User', username: 'viewer', passwordHash: viewerPasswordHash },
+    create: {
+      email: viewerEmail,
+      name: 'Viewer User',
+      username: 'viewer',
+      passwordHash: viewerPasswordHash
+    }
+  });
+
+  await prisma.organizationMember.upsert({
+    where: {
+      userId_organizationId: {
+        userId: viewerUser.id,
+        organizationId: org.id
+      }
+    },
+    update: { role: 'VIEWER' },
+    create: {
+      userId: viewerUser.id,
+      organizationId: org.id,
+      role: 'VIEWER'
+    }
+  });
+
+  console.log('Seed OK:', {
+    userId: user.id,
+    orgId: org.id,
+    email: user.email,
+    username: user.username,
+    viewerUsername: viewerUser.username
+  });
 }
 
 main()

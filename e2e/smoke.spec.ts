@@ -19,6 +19,13 @@ test.describe('public pages', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Create your workspace/i })).toBeVisible();
   });
 
+  test('home sign in link opens login', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: /^sign in$/i }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  });
+
   test('login page shows credentials form', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
@@ -68,5 +75,25 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     await page.goto('/ops');
     await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
+  });
+
+  test('viewer can open dashboard but does not see recalculate', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    const userField = page.locator('#login-username');
+    const passField = page.locator('#login-password');
+    await userField.click();
+    await userField.pressSequentially(user, { delay: 15 });
+    await passField.click();
+    await passField.pressSequentially(pass, { delay: 15 });
+    await page.getByRole('button', { name: 'Sign in' }).click();
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Recalculate score/i })).toHaveCount(0);
   });
 });
