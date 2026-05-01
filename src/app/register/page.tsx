@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
+import { DEFAULT_POST_LOGIN_PATH } from '@/lib/post-login-path';
 
 import RegisterForm from './RegisterForm';
 
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 export default async function RegisterPage() {
   if (await resolveActiveOrgSessionForServerComponent()) {
-    redirect('/settings/brand');
+    redirect(DEFAULT_POST_LOGIN_PATH);
   }
 
   return (

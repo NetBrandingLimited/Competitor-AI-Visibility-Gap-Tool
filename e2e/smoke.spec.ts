@@ -72,6 +72,17 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
   /** Serial auth tests: two full sign-ins; avoids hammering `next dev` and keeps traces readable. */
   test.describe.configure({ mode: 'serial' });
 
+  test('login honors next query to return to reports', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login?next=%2Freports');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/reports/, { timeout: 30_000 });
+    await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
+  });
+
   test('seed user can reach core app surfaces', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_USERNAME ?? 'demo';

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
+import { DEFAULT_POST_LOGIN_PATH } from '@/lib/post-login-path';
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function RegisterForm() {
         }
         return;
       }
-      router.push('/settings/brand');
+      router.push(DEFAULT_POST_LOGIN_PATH);
       router.refresh();
     } finally {
       setLoading(false);
