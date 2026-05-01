@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
+import { tableCellEllipsisParts, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
 
 export default function RunSchedulerAction() {
   const router = useRouter();
@@ -37,11 +38,17 @@ export default function RunSchedulerAction() {
         pipelineRun?: { id: string } | null;
         digest?: { id: string } | null;
       };
+      const digestLabel = data.digest?.id
+        ? tableCellEllipsisParts(data.digest.id, UI_INLINE_ID_DISPLAY_MAX).display
+        : 'generated';
+      const pipelineRunLabel = data.pipelineRun?.id
+        ? tableCellEllipsisParts(data.pipelineRun.id, UI_INLINE_ID_DISPLAY_MAX).display
+        : null;
       const parts = [
         `Scheduler job completed (${data.mode ?? (digestOnly ? 'digest-only' : 'full')}).`,
-        data.digestGenerated ? `Digest: ${data.digest?.id ?? 'generated'}.` : 'Digest: skipped (not due).',
-        data.pipelineRun?.id
-          ? `Pipeline run: ${data.pipelineRun.id}.`
+        data.digestGenerated ? `Digest: ${digestLabel}.` : 'Digest: skipped (not due).',
+        pipelineRunLabel
+          ? `Pipeline run: ${pipelineRunLabel}.`
           : data.pipelineRefreshedForDigest
             ? 'Pipeline refreshed for digest.'
             : 'Pipeline: not executed.'

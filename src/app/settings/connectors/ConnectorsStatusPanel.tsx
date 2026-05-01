@@ -9,7 +9,8 @@ import {
   GSC_SUMMARY_UI_NARROW_MAX,
   GSC_SUMMARY_UI_STATUS_MAX,
   GSC_SUMMARY_UI_TABLE_MAX,
-  tableCellEllipsisParts
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 
 type Org = {
@@ -531,7 +532,7 @@ export default function ConnectorsStatusPanel() {
             ? tableCellEllipsisParts(c.detail, GSC_SUMMARY_UI_STATUS_MAX)
             : null;
           const displayNameParts = tableCellEllipsisParts(c.displayName, GSC_SUMMARY_UI_STATUS_MAX);
-          const connectorIdParts = tableCellEllipsisParts(c.id, GSC_SUMMARY_UI_TABLE_MAX);
+          const connectorIdParts = tableCellEllipsisParts(c.id, UI_INLINE_ID_DISPLAY_MAX);
           return (
             <article key={c.id} className="connector-card">
               <h2 title={displayNameParts.title}>{displayNameParts.display}</h2>

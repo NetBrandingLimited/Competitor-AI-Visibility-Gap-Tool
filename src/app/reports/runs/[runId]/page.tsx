@@ -43,11 +43,14 @@ export default async function PipelineRunDetailPage({
   const run = await readPipelineRunById(active.organizationId, runId);
 
   if (!run) {
+    const runIdNotFound = tableCellEllipsisParts(runId, UI_INLINE_ID_DISPLAY_MAX);
     return (
       <section>
         <h1>Pipeline Run Not Found</h1>
         <p>
-          Run <code>{runId}</code> is not available in this workspace.
+          Run{' '}
+          <code title={runIdNotFound.title ?? runId}>{runIdNotFound.display}</code> is not available in this
+          workspace.
         </p>
         <p>
           <Link href="/reports">Back to reports</Link>
