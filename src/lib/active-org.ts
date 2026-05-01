@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 
 import { prisma } from './prisma';
-import { isOrgRole, roleSatisfies, type OrgRole } from './roles';
+import { isOrgRole, membershipCanEdit, type OrgRole } from './roles';
 import { SESSION_ORG_ID_COOKIE, SESSION_USER_ID_COOKIE } from './session';
 
 export type ActiveOrgSession = {
@@ -63,5 +63,5 @@ export async function resolveActiveOrgSessionForServerComponent(): Promise<Activ
 }
 
 export function activeOrgCanEdit(active: ActiveOrgSession): boolean {
-  return roleSatisfies(active.role, 'EDITOR');
+  return membershipCanEdit(active.role);
 }
