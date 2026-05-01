@@ -1,7 +1,11 @@
 'use client';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import {
+  GSC_SUMMARY_UI_STATUS_MAX,
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -74,7 +78,7 @@ export default function RunActions() {
       };
       let message = 'Weekly digest generated.';
       if (data.digest?.id) {
-        message += ` Id: ${data.digest.id}.`;
+        message += ` Id: ${tableCellEllipsisParts(data.digest.id, UI_INLINE_ID_DISPLAY_MAX).display}.`;
       }
       const digestGsc = data.digest?.summary?.pipelineGscDiagnosticsSummary?.trim();
       if (digestGsc) {

@@ -141,7 +141,7 @@ export default async function PipelineRunDetailPage({
                 {run.documents.map((doc, index) => {
                   const titleCell = tableCellEllipsisParts(doc.title);
                   const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(doc.source));
-                  const idCell = tableCellEllipsisParts(doc.id);
+                  const idCell = tableCellEllipsisParts(doc.id, UI_INLINE_ID_DISPLAY_MAX);
                   return (
                   <tr key={`${doc.id}-${index}`}>
                     <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
