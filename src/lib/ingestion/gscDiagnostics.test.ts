@@ -6,6 +6,7 @@ import {
   GSC_SUMMARY_UI_TABLE_MAX,
   parseGscIngestionDiagnosticsRaw,
   tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX,
   type GscIngestionDiagnostics
 } from '@/lib/ingestion/gscDiagnostics';
 
@@ -59,6 +60,13 @@ describe('tableCellEllipsisParts', () => {
     const { display, title } = tableCellEllipsisParts('0123456789', 4);
     expect(display).toBe('0123…');
     expect(title).toBe('0123456789');
+  });
+
+  it('uses UI_INLINE_ID_DISPLAY_MAX for long stable ids (digest/run/job headers)', () => {
+    const id = `${'a'.repeat(UI_INLINE_ID_DISPLAY_MAX)}xyz`;
+    const { display, title } = tableCellEllipsisParts(id, UI_INLINE_ID_DISPLAY_MAX);
+    expect(display).toBe(`${'a'.repeat(UI_INLINE_ID_DISPLAY_MAX)}…`);
+    expect(title).toBe(id);
   });
 });
 

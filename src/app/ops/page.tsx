@@ -14,7 +14,8 @@ import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSigna
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_NARROW_MAX,
-  tableCellEllipsisParts
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
@@ -88,7 +89,7 @@ export default async function OpsPage() {
       )
     : {};
   const latestJob = jobs[0] ?? null;
-  const latestJobIdCell = latestJob ? tableCellEllipsisParts(latestJob.id, 24) : null;
+  const latestJobIdCell = latestJob ? tableCellEllipsisParts(latestJob.id, UI_INLINE_ID_DISPLAY_MAX) : null;
   const latestJobQueryCell = latestJob ? tableCellEllipsisParts(latestJob.query) : null;
   const [latestRun, latestDigest, trendSnapshots, latestVisibility] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
@@ -97,8 +98,8 @@ export default async function OpsPage() {
     getLatestVisibilityScore(active.organizationId)
   ]);
   const latestTrend = trendSnapshots.at(-1) ?? null;
-  const latestRunIdCell = latestRun ? tableCellEllipsisParts(latestRun.id, 24) : null;
-  const latestDigestIdCell = latestDigest ? tableCellEllipsisParts(latestDigest.id, 24) : null;
+  const latestRunIdCell = latestRun ? tableCellEllipsisParts(latestRun.id, UI_INLINE_ID_DISPLAY_MAX) : null;
+  const latestDigestIdCell = latestDigest ? tableCellEllipsisParts(latestDigest.id, UI_INLINE_ID_DISPLAY_MAX) : null;
   const {
     thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
     input: freshnessThresholds

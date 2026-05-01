@@ -40,6 +40,12 @@ export const GSC_SUMMARY_UI_TABLE_MAX = 56;
 /** Post-action status toasts after API runs. */
 export const GSC_SUMMARY_UI_STATUS_MAX = 140;
 
+/**
+ * Inline display for long stable ids (digest, pipeline run, scheduler job) in headers/status lines.
+ * Full id stays in `href`, copy targets, and native `title` when truncated via {@link tableCellEllipsisParts}.
+ */
+export const UI_INLINE_ID_DISPLAY_MAX = 24;
+
 /** Parse persisted `PipelineRun.gscIngestionDiagnosticsRaw` (shared by store, CSV routes, etc.). */
 export function parseGscIngestionDiagnosticsRaw(raw: string | null | undefined): GscIngestionDiagnostics | null {
   if (raw == null || String(raw).trim().length === 0) {

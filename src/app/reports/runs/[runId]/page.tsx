@@ -6,7 +6,11 @@ import CopyTextButton from '@/app/components/CopyTextButton';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import { formatGscIngestionDiagnosticsSummary, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import {
+  formatGscIngestionDiagnosticsSummary,
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -53,7 +57,7 @@ export default async function PipelineRunDetailPage({
   }
 
   const queryHeader = tableCellEllipsisParts(run.query);
-  const runIdHeader = tableCellEllipsisParts(run.id, 24);
+  const runIdHeader = tableCellEllipsisParts(run.id, UI_INLINE_ID_DISPLAY_MAX);
   const gscSummaryText = run.gscIngestionDiagnostics
     ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
     : '';

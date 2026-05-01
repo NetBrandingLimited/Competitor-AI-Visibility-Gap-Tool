@@ -11,7 +11,11 @@ import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import {
+  GSC_SUMMARY_UI_STATUS_MAX,
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
+} from '@/lib/ingestion/gscDiagnostics';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -47,7 +51,7 @@ export default async function WeeklyDigestDetailPage({
   const digestGscSummaryParts = digest.summary.pipelineGscDiagnosticsSummary
     ? tableCellEllipsisParts(digest.summary.pipelineGscDiagnosticsSummary)
     : null;
-  const digestIdParts = tableCellEllipsisParts(digest.id, 24);
+  const digestIdParts = tableCellEllipsisParts(digest.id, UI_INLINE_ID_DISPLAY_MAX);
 
   const generatedLabel = new Date(digest.generatedAt).toLocaleString();
   const md = formatWeeklyDigestMarkdown({

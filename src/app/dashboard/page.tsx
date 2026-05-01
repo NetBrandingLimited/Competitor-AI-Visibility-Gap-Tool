@@ -15,7 +15,8 @@ import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_PARAGRAPH_MAX,
-  tableCellEllipsisParts
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import {
   ingestionSourceDisplayLabel,
@@ -74,7 +75,7 @@ export default async function DashboardPage() {
     readLatestWeeklyDigest(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
-  const dashboardLatestRunIdParts = latestRun ? tableCellEllipsisParts(latestRun.id, 24) : null;
+  const dashboardLatestRunIdParts = latestRun ? tableCellEllipsisParts(latestRun.id, UI_INLINE_ID_DISPLAY_MAX) : null;
   const dashboardLatestRunQueryParts = latestRun ? tableCellEllipsisParts(latestRun.query) : null;
   const dashboardTrendTopBrandParts = latestTrend ? tableCellEllipsisParts(latestTrend.topBrand) : null;
   const previousRun = recentRuns[1] ?? null;
