@@ -24,6 +24,7 @@ import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
 import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { safeLoginNextQuery } from '@/lib/post-login-path';
 import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
@@ -51,10 +52,18 @@ function describeSchedulerJob(job: {
   return parts.join(' · ');
 }
 
-export default async function OpsPage() {
+export default async function OpsPage({
+  searchParams
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next: nextRaw } = await searchParams;
+  const continueTarget = typeof nextRaw === 'string' ? safeLoginNextQuery(nextRaw) : null;
   const active = await resolveActiveOrgSessionForServerComponent();
   if (!active) {
-    redirectUnauthenticatedToLogin('/ops');
+    redirectUnauthenticatedToLogin(
+      continueTarget ? `/ops?next=${encodeURIComponent(continueTarget)}` : '/ops'
+    );
   }
 
   const jobs = await readSchedulerJobs(active.organizationId);
@@ -113,6 +122,20 @@ export default async function OpsPage() {
   return (
     <section>
       <h1>Ops Monitor (Baseline)</h1>
+      {continueTarget ? (
+        <p className="text-muted-note" role="status">
+          {activeOrgCanEdit(active) ? (
+            <>
+              Continue to <Link href={continueTarget}>{continueTarget}</Link>
+            </>
+          ) : (
+            <>
+              That destination requires editor access in this workspace:{' '}
+              <EllipsisAccessible as="code" value={continueTarget} />
+            </>
+          )}
+        </p>
+      ) : null}
       <p>
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>

@@ -10,6 +10,7 @@ import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnos
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { prisma } from '@/lib/prisma';
+import { safeLoginNextQuery } from '@/lib/post-login-path';
 import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 export const metadata: Metadata = {
@@ -22,14 +23,30 @@ function toNumberOrUndefined(value: string | undefined): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+function debugIngestionPathFromSearch(sp: { query?: string; limit?: string; run?: string }): string {
+  const params = new URLSearchParams();
+  const q = sp.query?.trim();
+  if (q) params.set('query', q);
+  const lim = sp.limit?.trim();
+  if (lim) params.set('limit', lim);
+  if (sp.run === '1') params.set('run', '1');
+  const suffix = params.toString();
+  return suffix ? `/debug/ingestion?${suffix}` : '/debug/ingestion';
+}
+
 export default async function DebugIngestionPage({
   searchParams
 }: {
-  searchParams: { query?: string; limit?: string; run?: string };
+  searchParams: Promise<{ query?: string; limit?: string; run?: string }>;
 }) {
+  const sp = await searchParams;
+  const returnPath = debugIngestionPathFromSearch(sp);
   const active = await resolveActiveOrgSessionForServerComponent();
-  if (!active) redirectUnauthenticatedToLogin('/debug/ingestion');
-  if (!activeOrgCanEdit(active)) redirect('/ops');
+  if (!active) redirectUnauthenticatedToLogin(returnPath);
+  if (!activeOrgCanEdit(active)) {
+    const nextQ = safeLoginNextQuery(returnPath);
+    redirect(nextQ ? `/ops?next=${encodeURIComponent(nextQ)}` : '/ops');
+  }
 
   const org = await prisma.organization.findUnique({
     where: { id: active.organizationId },
@@ -51,11 +68,11 @@ export default async function DebugIngestionPage({
       }
     : {};
 
-  const q = searchParams.query?.trim();
+  const q = sp.query?.trim();
   const query = q && q.length > 0 ? q : defaultPipelineQueryFromOrg(brandContext);
-  const limitPerConnector = toNumberOrUndefined(searchParams.limit);
+  const limitPerConnector = toNumberOrUndefined(sp.limit);
 
-  const shouldRun = searchParams.run === '1';
+  const shouldRun = sp.run === '1';
   // Keep this deterministic to satisfy React's render purity checks.
   const contentVariant = simpleHash(
     `${active.organizationId}-${query}-${limitPerConnector ?? ''}-debug-ingestion`

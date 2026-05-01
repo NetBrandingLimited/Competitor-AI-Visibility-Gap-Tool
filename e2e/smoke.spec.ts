@@ -48,6 +48,19 @@ test.describe('public pages', () => {
     await expect(page.locator('#login-password')).toBeVisible();
   });
 
+  test('/auth forwards safe next to login', async ({ page }) => {
+    await page.goto('/auth?next=%2Freports');
+    await expect(page).toHaveURL(/\/login/);
+    expect(new URL(page.url()).searchParams.get('next')).toBe('/reports');
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  });
+
+  test('/auth drops unsafe next', async ({ page }) => {
+    await page.goto(`/auth?next=${encodeURIComponent('//evil.com')}`);
+    await expect(page).toHaveURL(/\/login$/);
+    expect(new URL(page.url()).searchParams.get('next')).toBeNull();
+  });
+
   test('register page shows workspace signup form', async ({ page }) => {
     await page.goto('/register');
     await expect(page.getByRole('heading', { level: 1, name: /Create your workspace/i })).toBeVisible();
