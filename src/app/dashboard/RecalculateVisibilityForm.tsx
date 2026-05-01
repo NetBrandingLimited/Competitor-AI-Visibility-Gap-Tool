@@ -38,7 +38,13 @@ export default function RecalculateVisibilityForm({ organizationId }: Props) {
   return (
     <form action={submit} className="mt-14">
       <input type="hidden" name="organizationId" value={organizationId} />
-      <button type="submit" className="primary" disabled={pending} aria-busy={pending}>
+      <button
+        type="submit"
+        className="primary"
+        disabled={pending}
+        aria-busy={pending}
+        title="Recompute the v1 visibility score from the latest pipeline, trends, and connector signals."
+      >
         {pending ? 'Recalculating…' : 'Recalculate score'}
       </button>
       {feedback ? (

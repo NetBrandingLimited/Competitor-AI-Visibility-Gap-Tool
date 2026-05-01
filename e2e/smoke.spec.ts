@@ -12,6 +12,13 @@ test.describe('public pages', () => {
     await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
   });
 
+  test('home register link opens signup', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: /^register$/i }).click();
+    await expect(page).toHaveURL(/\/register$/);
+    await expect(page.getByRole('heading', { level: 1, name: /Create your workspace/i })).toBeVisible();
+  });
+
   test('login page shows credentials form', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
