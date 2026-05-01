@@ -13,3 +13,7 @@ prisma/*.db
 prisma/*.db-journal
 prisma/**/*.db
 prisma/**/*.db-journal
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
