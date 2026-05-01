@@ -6,9 +6,9 @@ const webServerEnv =
   process.env.DATABASE_URL !== undefined ? { DATABASE_URL: process.env.DATABASE_URL } : undefined;
 
 /**
- * Public smoke tests run by default (home, login/register shells).
- * Set `E2E_AUTH=1` with a migrated DB and `npm run db:seed` to run admin + viewer signed-in flows
- * (brand, reports, dashboard, connectors, ops). See `e2e/smoke.spec.ts` for env vars.
+ * Public smoke: UI (home, auth shells, protected redirects) + `GET /api/health` via `request`.
+ * Set `E2E_AUTH=1` with a migrated DB and `npm run db:seed` for admin + viewer signed-in flows.
+ * See `e2e/smoke.spec.ts` for env vars.
  */
 export default defineConfig({
   testDir: './e2e',
