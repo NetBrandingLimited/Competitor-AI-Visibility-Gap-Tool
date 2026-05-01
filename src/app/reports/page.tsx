@@ -17,7 +17,8 @@ import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel 
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_STATUS_MAX,
-  tableCellEllipsisParts
+  tableCellEllipsisParts,
+  UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { buildGapInsightsFromLatestData } from '@/lib/insights/gap';
@@ -300,6 +301,7 @@ export default async function ReportsPage() {
               const periodCell = tableCellEllipsisParts(`${d.periodStart} → ${d.periodEnd}`);
               const signalsCell = tableCellEllipsisParts(weeklyDigestSignalsLabel(d.summary));
               const pipelineDocsCell = tableCellEllipsisParts(weeklyDigestPipelineLabel(d.summary));
+              const digestIdLinkCell = tableCellEllipsisParts(d.id, UI_INLINE_ID_DISPLAY_MAX);
               return (
               <tr key={d.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -307,8 +309,9 @@ export default async function ReportsPage() {
                     <Link
                       href={`/reports/digest/${d.id}`}
                       aria-label={`View weekly digest ${d.id} generated ${new Date(d.generatedAt).toLocaleString()} for period ${d.periodStart} to ${d.periodEnd}`}
+                      title={digestIdLinkCell.title}
                     >
-                      {d.id}
+                      {digestIdLinkCell.display}
                     </Link>
                     <CopyTextButton
                       text={d.id}
@@ -435,6 +438,7 @@ export default async function ReportsPage() {
               const ingestionProvCell = tableCellEllipsisParts(
                 pipelineIngestionProvenanceLabel(run.ingestionSource)
               );
+              const runIdLinkCell = tableCellEllipsisParts(run.id, UI_INLINE_ID_DISPLAY_MAX);
               return (
               <tr key={run.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -442,8 +446,9 @@ export default async function ReportsPage() {
                     <Link
                       href={`/reports/runs/${run.id}`}
                       aria-label={`Open pipeline run ${run.id} created ${new Date(run.createdAt).toLocaleString()}`}
+                      title={runIdLinkCell.title}
                     >
-                      {run.id}
+                      {runIdLinkCell.display}
                     </Link>
                     <CopyTextButton
                       text={run.id}
