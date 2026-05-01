@@ -1,14 +1,22 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Public tests always run. Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
+ * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
  */
-/** Serial: one test at a time in this file to reduce load on `next dev` and hydration races. */
-test.describe.configure({ mode: 'serial' });
+async function submitLoginForm(page: Page, username: string, password: string) {
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+  const userField = page.locator('#login-username');
+  const passField = page.locator('#login-password');
+  await userField.click();
+  await userField.pressSequentially(username, { delay: 15 });
+  await passField.click();
+  await passField.pressSequentially(password, { delay: 15 });
+  await page.getByRole('button', { name: 'Sign in' }).click();
+}
 
 test.describe('public pages', () => {
   test('home introduces the product', async ({ page }) => {
@@ -94,14 +102,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
 
     await page.goto('/login');
-    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
-    const userField = page.locator('#login-username');
-    const passField = page.locator('#login-password');
-    await userField.click();
-    await userField.pressSequentially(user, { delay: 15 });
-    await passField.click();
-    await passField.pressSequentially(pass, { delay: 15 });
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    await submitLoginForm(page, user, pass);
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
     await expect(page.locator('#brand-brandName')).toBeDisabled();
     await expect(

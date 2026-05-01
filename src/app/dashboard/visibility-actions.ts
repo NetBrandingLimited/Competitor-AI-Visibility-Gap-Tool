@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
 import { prisma } from '@/lib/prisma';
-import { isOrgRole, roleSatisfies, type OrgRole } from '@/lib/roles';
+import { membershipCanEdit } from '@/lib/roles';
 import { SESSION_USER_ID_COOKIE } from '@/lib/session';
 import { computeAndPersistVisibilityScoreV1 } from '@/lib/visibility/scoreV1';
 
@@ -23,7 +23,7 @@ export async function refreshVisibilityScoreAction(formData: FormData) {
   const membership = await prisma.organizationMember.findUnique({
     where: { userId_organizationId: { userId, organizationId } }
   });
-  if (!membership || !isOrgRole(membership.role) || !roleSatisfies(membership.role as OrgRole, 'EDITOR')) {
+  if (!membership || !membershipCanEdit(membership.role)) {
     throw new Error('Forbidden');
   }
 
