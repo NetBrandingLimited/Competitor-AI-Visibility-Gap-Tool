@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src e2e prisma/seed.ts scripts eslint.config.mjs next.config.js playwright.config.ts vitest.config.ts",
+    "check": "npm run lint && npm run typecheck && npm test",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",

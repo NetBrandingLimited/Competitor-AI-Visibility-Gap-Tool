@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
@@ -26,6 +26,11 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
   const [refreshPipelineFirst, setRefreshPipelineFirst] = useState(initial.refreshPipelineFirst);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    void save();
+  }
 
   async function save() {
     if (!canEdit) {
@@ -58,6 +63,7 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
       <p className="text-muted-note mt-0">
         Stored per workspace. Scheduler runs can use this as the standard digest cadence.
       </p>
+      <form method="post" onSubmit={onSubmit}>
       <label className="label-block-tight">
         <input
           type="checkbox"
@@ -109,10 +115,11 @@ export default function WeeklyDigestScheduleForm({ organizationId, canEdit, init
             className="input-narrow-num"
           />
         </label>
-        <button type="button" onClick={save} disabled={!canEdit || saving} aria-busy={saving}>
+        <button type="submit" disabled={!canEdit || saving} aria-busy={saving}>
           {saving ? 'Saving?' : 'Save schedule'}
         </button>
       </div>
+      </form>
       {message ? (
         <p className="mt-10" role="status" aria-live="polite">
           <EllipsisStatusText text={message} />

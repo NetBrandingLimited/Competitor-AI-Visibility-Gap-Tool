@@ -48,9 +48,10 @@ export default function LoginForm({ nextPath }: Props) {
 
   return (
     <form method="post" className="login-form" onSubmit={onSubmit}>
-      <label className="field">
+      <label className="field" htmlFor="login-username">
         <span>Username</span>
         <input
+          id="login-username"
           type="text"
           name="username"
           autoComplete="username"
@@ -60,9 +61,10 @@ export default function LoginForm({ nextPath }: Props) {
           required
         />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="login-password">
         <span>Password</span>
         <input
+          id="login-password"
           type="password"
           name="password"
           autoComplete="current-password"

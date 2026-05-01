@@ -23,26 +23,33 @@ test.describe('public pages', () => {
 const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.skip;
 
 authSuite('authenticated smoke (E2E_AUTH=1)', () => {
-  test('seed user can open reports', async ({ page }) => {
+  test('seed user can reach core app surfaces', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_USERNAME ?? 'demo';
     const pass = process.env.E2E_PASSWORD ?? 'demo123';
 
     await page.goto('/login');
     await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
-    const userField = page.locator('input[name="username"]');
-    const passField = page.locator('input[name="password"]');
+    const userField = page.locator('#login-username');
+    const passField = page.locator('#login-password');
     await userField.click();
     await userField.pressSequentially(user, { delay: 15 });
     await passField.click();
     await passField.pressSequentially(pass, { delay: 15 });
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+    await expect(page.getByRole('heading', { level: 1, name: /Brand & competitors/i })).toBeVisible();
 
     await page.goto('/reports');
     await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
 
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();
+
+    await page.goto('/settings/connectors');
+    await expect(page.getByRole('heading', { level: 1, name: /Data connectors/i })).toBeVisible();
+
+    await page.goto('/ops');
+    await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
   });
 });

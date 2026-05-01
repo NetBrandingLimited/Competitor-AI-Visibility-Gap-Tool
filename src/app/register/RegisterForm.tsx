@@ -47,9 +47,10 @@ export default function RegisterForm() {
 
   return (
     <form method="post" className="login-form" onSubmit={onSubmit}>
-      <label className="field">
+      <label className="field" htmlFor="register-email">
         <span>Work email</span>
         <input
+          id="register-email"
           type="email"
           name="email"
           autoComplete="email"
@@ -59,9 +60,10 @@ export default function RegisterForm() {
           required
         />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="register-password">
         <span>Password</span>
         <input
+          id="register-password"
           type="password"
           name="password"
           autoComplete="new-password"
@@ -72,9 +74,10 @@ export default function RegisterForm() {
           required
         />
       </label>
-      <label className="field">
+      <label className="field" htmlFor="register-organization">
         <span>Organization name</span>
         <input
+          id="register-organization"
           type="text"
           name="organizationName"
           autoComplete="organization"
