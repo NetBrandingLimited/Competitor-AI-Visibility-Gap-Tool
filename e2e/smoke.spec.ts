@@ -47,6 +47,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
     await expect(page.getByRole('heading', { level: 1, name: /Brand & competitors/i })).toBeVisible();
+    await expect(page.locator('#brand-brandName')).toBeVisible({ timeout: 15_000 });
 
     await page.goto('/reports');
     await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
