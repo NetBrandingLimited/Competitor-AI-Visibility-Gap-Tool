@@ -35,7 +35,7 @@ export default function RecalculateVisibilityForm({ organizationId }: Props) {
   }
 
   return (
-    <form action={submit} className="mt-14">
+    <form method="post" action={submit} className="mt-14">
       <input type="hidden" name="organizationId" value={organizationId} />
       <button type="submit" className="primary" disabled={pending} aria-busy={pending}>
         {pending ? 'Recalculating…' : 'Recalculate score'}

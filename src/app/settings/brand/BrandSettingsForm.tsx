@@ -130,7 +130,7 @@ export default function BrandSettingsForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="brand-form">
+    <form method="post" className="brand-form" onSubmit={onSubmit}>
       {orgs.length > 1 ? (
         <label className="field">
           <span>Organization</span>
