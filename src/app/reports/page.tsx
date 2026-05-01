@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
@@ -17,7 +18,6 @@ import { listWeeklyDigests, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel 
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_STATUS_MAX,
-  tableCellEllipsisParts,
   UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
@@ -38,8 +38,7 @@ function display(value: string | null | undefined): string {
 }
 
 function profileFieldDisplay(value: string | null | undefined) {
-  const parts = tableCellEllipsisParts(display(value), GSC_SUMMARY_UI_STATUS_MAX);
-  return <span title={parts.title}>{parts.display}</span>;
+  return <EllipsisAccessible value={display(value)} maxChars={GSC_SUMMARY_UI_STATUS_MAX} />;
 }
 
 export default async function ReportsPage() {
@@ -193,7 +192,7 @@ export default async function ReportsPage() {
                 title={visibility.inputs.pipelineGscDiagnosticsSummary}
               >
                 GSC:{' '}
-                {tableCellEllipsisParts(visibility.inputs.pipelineGscDiagnosticsSummary).display}
+                <EllipsisAccessible value={visibility.inputs.pipelineGscDiagnosticsSummary} />
               </Link>
             </>
           ) : null}
@@ -292,16 +291,12 @@ export default async function ReportsPage() {
           <tbody>
             {weeklyDigests.map((d) => {
               const topOpportunitiesJoined = d.summary.topOpportunities.join(', ');
-              const topCell =
-                d.summary.topOpportunities.length === 0
-                  ? { display: '—' as const, title: undefined as string | undefined }
-                  : tableCellEllipsisParts(topOpportunitiesJoined);
+              const topOpportunitiesValue =
+                d.summary.topOpportunities.length === 0 ? '—' : topOpportunitiesJoined;
               const gscSummary = d.summary.pipelineGscDiagnosticsSummary;
-              const gscCell = gscSummary ? tableCellEllipsisParts(gscSummary) : null;
-              const periodCell = tableCellEllipsisParts(`${d.periodStart} → ${d.periodEnd}`);
-              const signalsCell = tableCellEllipsisParts(weeklyDigestSignalsLabel(d.summary));
-              const pipelineDocsCell = tableCellEllipsisParts(weeklyDigestPipelineLabel(d.summary));
-              const digestIdLinkCell = tableCellEllipsisParts(d.id, UI_INLINE_ID_DISPLAY_MAX);
+              const digestIdTrim = d.id.trim();
+              const digestLinkTitle =
+                digestIdTrim.length > UI_INLINE_ID_DISPLAY_MAX ? digestIdTrim : undefined;
               return (
               <tr key={d.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -309,9 +304,9 @@ export default async function ReportsPage() {
                     <Link
                       href={`/reports/digest/${d.id}`}
                       aria-label={`View weekly digest ${d.id} generated ${new Date(d.generatedAt).toLocaleString()} for period ${d.periodStart} to ${d.periodEnd}`}
-                      title={digestIdLinkCell.title}
+                      title={digestLinkTitle}
                     >
-                      {digestIdLinkCell.display}
+                      <EllipsisAccessible value={d.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                     </Link>
                     <CopyTextButton
                       text={d.id}
@@ -322,31 +317,31 @@ export default async function ReportsPage() {
                   </div>
                 </td>
                 <td className="data-table-td">{new Date(d.generatedAt).toLocaleString()}</td>
-                <td className="data-table-td data-table-td-wrap-break" title={periodCell.title}>
-                  {periodCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={`${d.periodStart} → ${d.periodEnd}`} />
                 </td>
                 <td className="data-table-td-right">{d.summary.score ?? '—'}</td>
-                <td className="data-table-td data-table-td-wrap-break" title={signalsCell.title}>
-                  {signalsCell.display}
-                </td>
-                <td className="data-table-td data-table-td-wrap-break" title={pipelineDocsCell.title}>
-                  {pipelineDocsCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={weeklyDigestSignalsLabel(d.summary)} />
                 </td>
                 <td className="data-table-td data-table-td-wrap-break">
-                  {gscCell ? (
+                  <EllipsisAccessible value={weeklyDigestPipelineLabel(d.summary)} />
+                </td>
+                <td className="data-table-td data-table-td-wrap-break">
+                  {gscSummary ? (
                     <Link
                       href={`/reports/digest/${d.id}#gsc-digest-pipeline`}
                       className="text-priority-muted"
-                      title={gscSummary ?? undefined}
+                      title={gscSummary}
                     >
-                      {gscCell.display}
+                      <EllipsisAccessible value={gscSummary} />
                     </Link>
                   ) : (
                     '—'
                   )}
                 </td>
-                <td className="data-table-td data-table-td-wrap-break" title={topCell.title}>
-                  {topCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={topOpportunitiesValue} />
                 </td>
               </tr>
               );
@@ -379,16 +374,14 @@ export default async function ReportsPage() {
           </thead>
           <tbody>
             {snapshots.map((row) => {
-              const brandCell = tableCellEllipsisParts(row.topBrand);
-              const dateCell = tableCellEllipsisParts(row.date);
               return (
               <tr key={row.date}>
-                <td className="data-table-td data-table-sticky-col" title={dateCell.title}>
-                  {dateCell.display}
+                <td className="data-table-td data-table-sticky-col">
+                  <EllipsisAccessible value={row.date} />
                 </td>
                 <td className="data-table-td-right">{row.totalMentions}</td>
-                <td className="data-table-td data-table-td-wrap-break" title={brandCell.title}>
-                  {brandCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={row.topBrand} />
                 </td>
                 <td className="data-table-td-right">{row.topBrandMentions}</td>
               </tr>
@@ -434,11 +427,8 @@ export default async function ReportsPage() {
           </thead>
           <tbody>
             {pipelineRuns.map((run) => {
-              const queryCell = tableCellEllipsisParts(run.query);
-              const ingestionProvCell = tableCellEllipsisParts(
-                pipelineIngestionProvenanceLabel(run.ingestionSource)
-              );
-              const runIdLinkCell = tableCellEllipsisParts(run.id, UI_INLINE_ID_DISPLAY_MAX);
+              const runIdTrim = run.id.trim();
+              const runLinkTitle = runIdTrim.length > UI_INLINE_ID_DISPLAY_MAX ? runIdTrim : undefined;
               return (
               <tr key={run.id}>
                 <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
@@ -446,9 +436,9 @@ export default async function ReportsPage() {
                     <Link
                       href={`/reports/runs/${run.id}`}
                       aria-label={`Open pipeline run ${run.id} created ${new Date(run.createdAt).toLocaleString()}`}
-                      title={runIdLinkCell.title}
+                      title={runLinkTitle}
                     >
-                      {runIdLinkCell.display}
+                      <EllipsisAccessible value={run.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                     </Link>
                     <CopyTextButton
                       text={run.id}
@@ -459,11 +449,14 @@ export default async function ReportsPage() {
                   </div>
                 </td>
                 <td className="data-table-td-nowrap">{new Date(run.createdAt).toLocaleString()}</td>
-                <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
-                  {queryCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={run.query} />
                 </td>
                 <td className="data-table-td data-table-td-wrap-break">
-                  <div title={ingestionProvCell.title}>{ingestionProvCell.display}</div>
+                  <EllipsisAccessible
+                    as="div"
+                    value={pipelineIngestionProvenanceLabel(run.ingestionSource)}
+                  />
                   {run.gscIngestionDiagnostics ? (
                     <div className="mt-4">
                       <Link
@@ -472,9 +465,9 @@ export default async function ReportsPage() {
                         title={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
                       >
                         GSC:{' '}
-                        {tableCellEllipsisParts(
-                          formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
-                        ).display}
+                        <EllipsisAccessible
+                          value={formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)}
+                        />
                       </Link>
                     </div>
                   ) : null}

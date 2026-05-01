@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
 import GapTopicLabelCell from '@/app/components/GapTopicLabelCell';
@@ -11,11 +12,7 @@ import CopyDigestSummary from '../CopyDigestSummary';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { formatWeeklyDigestMarkdown } from '@/lib/digest/formatMarkdown';
 import { getWeeklyDigestForOrg, weeklyDigestPipelineLabel, weeklyDigestSignalsLabel } from '@/lib/digest/weekly';
-import {
-  GSC_SUMMARY_UI_STATUS_MAX,
-  tableCellEllipsisParts,
-  UI_INLINE_ID_DISPLAY_MAX
-} from '@/lib/ingestion/gscDiagnostics';
+import { GSC_SUMMARY_UI_STATUS_MAX, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
 
 function digestTitleSegment(digestId: string): string {
   const id = digestId.trim();
@@ -48,11 +45,6 @@ export default async function WeeklyDigestDetailPage({
     notFound();
   }
 
-  const digestGscSummaryParts = digest.summary.pipelineGscDiagnosticsSummary
-    ? tableCellEllipsisParts(digest.summary.pipelineGscDiagnosticsSummary)
-    : null;
-  const digestIdParts = tableCellEllipsisParts(digest.id, UI_INLINE_ID_DISPLAY_MAX);
-
   const generatedLabel = new Date(digest.generatedAt).toLocaleString();
   const md = formatWeeklyDigestMarkdown({
     orgName: active.organizationName,
@@ -73,7 +65,8 @@ export default async function WeeklyDigestDetailPage({
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p className="mt-8">
-        Digest id: <code title={digestIdParts.title}>{digestIdParts.display}</code>{' '}
+        Digest id:{' '}
+        <EllipsisAccessible as="code" value={digest.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />{' '}
         <CopyTextButton
           text={digest.id}
           label="Copy digest id"
@@ -97,9 +90,11 @@ export default async function WeeklyDigestDetailPage({
         {digest.summary.pipelineGscDiagnosticsSummary ? (
           <li id="gsc-digest-pipeline">
             <strong>GSC ingestion (latest pipeline):</strong>{' '}
-            <code className="text-priority-muted" title={digestGscSummaryParts?.title}>
-              {digestGscSummaryParts?.display}
-            </code>{' '}
+            <EllipsisAccessible
+              as="code"
+              className="text-priority-muted"
+              value={digest.summary.pipelineGscDiagnosticsSummary ?? ''}
+            />{' '}
             <CopyTextButton
               text={digest.summary.pipelineGscDiagnosticsSummary}
               label="Copy summary"
@@ -122,14 +117,11 @@ export default async function WeeklyDigestDetailPage({
         <p>None recorded for this digest.</p>
       ) : (
         <ul>
-          {digest.summary.topOpportunities.map((t) => {
-            const parts = tableCellEllipsisParts(t, GSC_SUMMARY_UI_STATUS_MAX);
-            return (
-              <li key={t}>
-                <span title={parts.title}>{parts.display}</span>
-              </li>
-            );
-          })}
+          {digest.summary.topOpportunities.map((t) => (
+            <li key={t}>
+              <EllipsisAccessible value={t} maxChars={GSC_SUMMARY_UI_STATUS_MAX} />
+            </li>
+          ))}
         </ul>
       )}
       {digest.summary.opportunities && digest.summary.opportunities.length > 0 ? (

@@ -1,13 +1,11 @@
 import Link from 'next/link';
 
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import RecalculateVisibilityForm from './RecalculateVisibilityForm';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import type { PipelineIngestionSource } from '@/lib/pipeline/types';
-import {
-  GSC_SUMMARY_UI_NARROW_MAX,
-  tableCellEllipsisParts
-} from '@/lib/ingestion/gscDiagnostics';
+import { GSC_SUMMARY_UI_NARROW_MAX } from '@/lib/ingestion/gscDiagnostics';
 import type { VisibilityReasonV1 } from '@/lib/visibility/scoreV1';
 
 type Props = {
@@ -90,7 +88,10 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
                   title={latest.pipelineGscDiagnosticsSummary}
                 >
                   GSC:{' '}
-                  {tableCellEllipsisParts(latest.pipelineGscDiagnosticsSummary, GSC_SUMMARY_UI_NARROW_MAX).display}
+                  <EllipsisAccessible
+                    value={latest.pipelineGscDiagnosticsSummary}
+                    maxChars={GSC_SUMMARY_UI_NARROW_MAX}
+                  />
                 </Link>
               </>
             ) : null}

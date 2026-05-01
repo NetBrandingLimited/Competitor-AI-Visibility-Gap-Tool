@@ -2,13 +2,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import { activeOrgCanEdit, resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
 import { defaultPipelineQueryFromOrg, simpleHash } from '@/lib/org-visibility-mock';
-import {
-  formatGscIngestionDiagnosticsSummary,
-  tableCellEllipsisParts
-} from '@/lib/ingestion/gscDiagnostics';
+import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { runOrgIngestionDebug } from '@/lib/ingestion/pipeline';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { prisma } from '@/lib/prisma';
@@ -128,12 +126,7 @@ export default async function DebugIngestionPage({
             <>
               <p className="text-muted-note">
                 <strong>Summary</strong> (same string as API <code>gscDiagnosticsSummary</code> and pipeline CSV):{' '}
-                {(() => {
-                  const parts = tableCellEllipsisParts(formatGscIngestionDiagnosticsSummary(gscDiagnostics));
-                  return (
-                    <code title={parts.title}>{parts.display}</code>
-                  );
-                })()}
+                <EllipsisAccessible as="code" value={formatGscIngestionDiagnosticsSummary(gscDiagnostics)} />
               </p>
               <dl
                 style={{

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import GapOpportunityListItem from '@/app/components/GapOpportunityListItem';
@@ -15,7 +16,6 @@ import { buildPipelineDashboardSnapshot } from '@/lib/dashboard/pipelineSnapshot
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_PARAGRAPH_MAX,
-  tableCellEllipsisParts,
   UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import {
@@ -75,9 +75,6 @@ export default async function DashboardPage() {
     readLatestWeeklyDigest(active.organizationId)
   ]);
   const latestRun = recentRuns[0] ?? null;
-  const dashboardLatestRunIdParts = latestRun ? tableCellEllipsisParts(latestRun.id, UI_INLINE_ID_DISPLAY_MAX) : null;
-  const dashboardLatestRunQueryParts = latestRun ? tableCellEllipsisParts(latestRun.query) : null;
-  const dashboardTrendTopBrandParts = latestTrend ? tableCellEllipsisParts(latestTrend.topBrand) : null;
   const previousRun = recentRuns[1] ?? null;
   const gapInsights = buildGapInsightsFromLatestData(org, latestRun, latestTrend, visibility);
 
@@ -139,12 +136,10 @@ export default async function DashboardPage() {
                   className="text-priority-muted"
                   title={latestDigest.summary.pipelineGscDiagnosticsSummary}
                 >
-                  {
-                    tableCellEllipsisParts(
-                      latestDigest.summary.pipelineGscDiagnosticsSummary,
-                      GSC_SUMMARY_UI_PARAGRAPH_MAX
-                    ).display
-                  }
+                  <EllipsisAccessible
+                    value={latestDigest.summary.pipelineGscDiagnosticsSummary}
+                    maxChars={GSC_SUMMARY_UI_PARAGRAPH_MAX}
+                  />
                 </Link>
               </>
             ) : null}
@@ -231,12 +226,10 @@ export default async function DashboardPage() {
         <p>
           Latest unified run:{' '}
           <Link href={`/reports/runs/${latestRun.id}`}>
-            <code title={dashboardLatestRunIdParts?.title}>{dashboardLatestRunIdParts?.display}</code>
+            <EllipsisAccessible as="code" value={latestRun.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
           </Link>{' '}
           ({latestRun.documentCount} docs, {latestRun.triggerCount} triggers, {latestRun.clusterCount} clusters) — query:{' '}
-          <code title={dashboardLatestRunQueryParts?.title}>
-            {dashboardLatestRunQueryParts?.display}
-          </code>
+          <EllipsisAccessible as="code" value={latestRun.query} />
           {latestRun.ingestionSource ? <> · ingestion: {pipelineIngestionProvenanceLabel(latestRun.ingestionSource)}</> : null}
           {latestRun.gscIngestionDiagnostics ? (
             <>
@@ -247,12 +240,10 @@ export default async function DashboardPage() {
                 className="text-priority-muted"
                 title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
               >
-                {
-                  tableCellEllipsisParts(
-                    formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
-                    GSC_SUMMARY_UI_PARAGRAPH_MAX
-                  ).display
-                }
+                <EllipsisAccessible
+                  value={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                  maxChars={GSC_SUMMARY_UI_PARAGRAPH_MAX}
+                />
               </Link>
             </>
           ) : null}
@@ -266,7 +257,7 @@ export default async function DashboardPage() {
       {latestTrend ? (
         <p>
           Latest trend snapshot: <code>{latestTrend.date}</code> ({latestTrend.totalMentions} mentions, top brand{' '}
-          <span title={dashboardTrendTopBrandParts?.title}>{dashboardTrendTopBrandParts?.display}</span>)
+          <EllipsisAccessible value={latestTrend.topBrand} />)
         </p>
       ) : (
         <p>No trend snapshots for this workspace yet. Run a snapshot from Reports.</p>
@@ -336,11 +327,10 @@ export default async function DashboardPage() {
         </thead>
         <tbody>
           {snapshot.leaderboard.map((row) => {
-            const brandCell = tableCellEllipsisParts(row.brand);
             return (
               <tr key={row.brand}>
-                <td className="data-table-td data-table-sticky-col" title={brandCell.title}>
-                  {brandCell.display}
+                <td className="data-table-td data-table-sticky-col">
+                  <EllipsisAccessible value={row.brand} />
                 </td>
                 <td className="data-table-td-right">{row.mentions}</td>
                 <td className="data-table-td-right">{formatPercent(row.shareOfVoice)}</td>
@@ -375,19 +365,16 @@ export default async function DashboardPage() {
         </thead>
         <tbody>
           {snapshot.recent.map((row, index) => {
-            const queryCell = tableCellEllipsisParts(row.query);
-            const brandCell = tableCellEllipsisParts(row.topBrand);
-            const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(row.source));
             return (
             <tr key={`${row.source}-${row.publishedAt}-${index}`}>
-              <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
-                {sourceCell.display}
+              <td className="data-table-td data-table-sticky-col">
+                <EllipsisAccessible value={ingestionSourceDisplayLabel(row.source)} />
               </td>
-              <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
-                {queryCell.display}
+              <td className="data-table-td data-table-td-wrap-break">
+                <EllipsisAccessible value={row.query} />
               </td>
-              <td className="data-table-td data-table-td-wrap-break" title={brandCell.title}>
-                {brandCell.display}
+              <td className="data-table-td data-table-td-wrap-break">
+                <EllipsisAccessible value={row.topBrand} />
               </td>
               <td className="data-table-td">{new Date(row.publishedAt).toLocaleString()}</td>
             </tr>

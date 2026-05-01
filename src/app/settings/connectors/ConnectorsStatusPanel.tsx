@@ -3,13 +3,13 @@
 import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
 import {
   GSC_SUMMARY_UI_NARROW_MAX,
   GSC_SUMMARY_UI_STATUS_MAX,
   GSC_SUMMARY_UI_TABLE_MAX,
-  tableCellEllipsisParts,
   UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 
@@ -513,12 +513,13 @@ export default function ConnectorsStatusPanel() {
       {liveSignals.length > 0 ? (
         <div className="mt-10">
           {liveSignals.map((s) => {
-            const sourceParts = tableCellEllipsisParts(s.source, GSC_SUMMARY_UI_NARROW_MAX);
-            const metricParts = tableCellEllipsisParts(s.metric, GSC_SUMMARY_UI_TABLE_MAX);
             return (
               <p key={`${s.source}-${s.metric}-${s.asOf}`} className="text-metric-line">
-                <strong title={sourceParts.title}>{sourceParts.display}</strong> ·{' '}
-                <code title={metricParts.title}>{metricParts.display}</code> = {s.value}
+                <strong>
+                  <EllipsisAccessible value={s.source} maxChars={GSC_SUMMARY_UI_NARROW_MAX} />
+                </strong>{' '}
+                ·{' '}
+                <EllipsisAccessible as="code" value={s.metric} maxChars={GSC_SUMMARY_UI_TABLE_MAX} /> = {s.value}
                 {s.unit ? ` ${s.unit}` : ''} · asOf {s.asOf}
               </p>
             );
@@ -528,25 +529,25 @@ export default function ConnectorsStatusPanel() {
 
       <div className="connector-list">
         {connectors.map((c) => {
-          const cardDetailParts = c.detail
-            ? tableCellEllipsisParts(c.detail, GSC_SUMMARY_UI_STATUS_MAX)
-            : null;
-          const displayNameParts = tableCellEllipsisParts(c.displayName, GSC_SUMMARY_UI_STATUS_MAX);
-          const connectorIdParts = tableCellEllipsisParts(c.id, UI_INLINE_ID_DISPLAY_MAX);
           return (
             <article key={c.id} className="connector-card">
-              <h2 title={displayNameParts.title}>{displayNameParts.display}</h2>
+              <h2>
+                <EllipsisAccessible value={c.displayName} maxChars={GSC_SUMMARY_UI_STATUS_MAX} />
+              </h2>
               <p className="connector-meta">
                 <span className={c.configured ? 'badge badge-ok' : 'badge badge-warn'}>
                   {c.configured ? 'Configured' : 'Not configured'}
                 </span>
-                <code className="connector-id" title={connectorIdParts.title}>
-                  {connectorIdParts.display}
-                </code>
+                <EllipsisAccessible
+                  as="code"
+                  className="connector-id"
+                  value={c.id}
+                  maxChars={UI_INLINE_ID_DISPLAY_MAX}
+                />
               </p>
-              {cardDetailParts ? (
-                <p className="connector-detail" title={cardDetailParts.title}>
-                  {cardDetailParts.display}
+              {c.detail ? (
+                <p className="connector-detail">
+                  <EllipsisAccessible value={c.detail} maxChars={GSC_SUMMARY_UI_STATUS_MAX} />
                 </p>
               ) : null}
             </article>

@@ -1,5 +1,6 @@
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import GapOpportunityGscRunLink from '@/app/components/GapOpportunityGscRunLink';
-import { GSC_SUMMARY_UI_STATUS_MAX, tableCellEllipsisParts } from '@/lib/ingestion/gscDiagnostics';
+import { GSC_SUMMARY_UI_STATUS_MAX } from '@/lib/ingestion/gscDiagnostics';
 import {
   GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS,
   type GapOpportunity
@@ -16,12 +17,6 @@ export default function GapOpportunityListItem({
   className?: string;
   priorityStyle: GapOpportunityListItemPriorityStyle;
 }) {
-  const titleParts = tableCellEllipsisParts(opportunity.title, GSC_SUMMARY_UI_STATUS_MAX);
-  const detailParts = tableCellEllipsisParts(
-    opportunity.detail,
-    GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS
-  );
-
   const priorityMark =
     priorityStyle === 'parens' ? (
       <> ({opportunity.priority})</>
@@ -36,10 +31,12 @@ export default function GapOpportunityListItem({
 
   return (
     <li className={className}>
-      <strong title={titleParts.title}>{titleParts.display}</strong>
+      <strong>
+        <EllipsisAccessible value={opportunity.title} maxChars={GSC_SUMMARY_UI_STATUS_MAX} />
+      </strong>
       {priorityMark}
       {' — '}
-      <span title={detailParts.title}>{detailParts.display}</span>
+      <EllipsisAccessible value={opportunity.detail} maxChars={GAP_OPPORTUNITY_DETAIL_TITLE_THRESHOLD_CHARS} />
       <GapOpportunityGscRunLink opportunity={opportunity} />
     </li>
   );

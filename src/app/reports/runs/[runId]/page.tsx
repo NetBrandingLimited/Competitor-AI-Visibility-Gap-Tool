@@ -3,14 +3,11 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import DocumentUrlCell from '@/app/components/DocumentUrlCell';
 import { resolveActiveOrgSessionForServerComponent } from '@/lib/active-org';
-import {
-  formatGscIngestionDiagnosticsSummary,
-  tableCellEllipsisParts,
-  UI_INLINE_ID_DISPLAY_MAX
-} from '@/lib/ingestion/gscDiagnostics';
+import { formatGscIngestionDiagnosticsSummary, UI_INLINE_ID_DISPLAY_MAX } from '@/lib/ingestion/gscDiagnostics';
 import { ingestionSourceDisplayLabel, pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
 import { readPipelineRunById } from '@/lib/pipeline/store';
 
@@ -43,13 +40,12 @@ export default async function PipelineRunDetailPage({
   const run = await readPipelineRunById(active.organizationId, runId);
 
   if (!run) {
-    const runIdNotFound = tableCellEllipsisParts(runId, UI_INLINE_ID_DISPLAY_MAX);
     return (
       <section>
         <h1>Pipeline Run Not Found</h1>
         <p>
           Run{' '}
-          <code title={runIdNotFound.title ?? runId}>{runIdNotFound.display}</code> is not available in this
+          <EllipsisAccessible as="code" value={runId} maxChars={UI_INLINE_ID_DISPLAY_MAX} /> is not available in this
           workspace.
         </p>
         <p>
@@ -59,12 +55,9 @@ export default async function PipelineRunDetailPage({
     );
   }
 
-  const queryHeader = tableCellEllipsisParts(run.query);
-  const runIdHeader = tableCellEllipsisParts(run.id, UI_INLINE_ID_DISPLAY_MAX);
   const gscSummaryText = run.gscIngestionDiagnostics
     ? formatGscIngestionDiagnosticsSummary(run.gscIngestionDiagnostics)
     : '';
-  const gscSummaryParts = gscSummaryText ? tableCellEllipsisParts(gscSummaryText) : null;
 
   return (
     <section>
@@ -73,7 +66,8 @@ export default async function PipelineRunDetailPage({
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
       <p>
-        Run id: <code title={runIdHeader.title}>{runIdHeader.display}</code>{' '}
+        Run id:{' '}
+        <EllipsisAccessible as="code" value={run.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />{' '}
         <CopyTextButton
           text={run.id}
           label="Copy run id"
@@ -82,8 +76,7 @@ export default async function PipelineRunDetailPage({
         />
       </p>
       <p>
-        Query:{' '}
-        <code title={queryHeader.title}>{queryHeader.display}</code> | Docs: {run.documentCount} | Triggers:{' '}
+        Query: <EllipsisAccessible as="code" value={run.query} /> | Docs: {run.documentCount} | Triggers:{' '}
         {run.triggerCount} | Clusters:{' '}
         {run.clusterCount}
         {run.ingestionSource ? ` | Ingestion: ${pipelineIngestionProvenanceLabel(run.ingestionSource)}` : null}
@@ -95,7 +88,7 @@ export default async function PipelineRunDetailPage({
             One-line summary (also included in pipeline runs CSV as <code>gscDiagnosticsSummary</code>):
           </p>
           <p>
-            <code title={gscSummaryParts?.title}>{gscSummaryParts?.display}</code>{' '}
+            <EllipsisAccessible as="code" value={gscSummaryText} />{' '}
             <CopyTextButton
               text={gscSummaryText}
               label="Copy summary"
@@ -142,22 +135,19 @@ export default async function PipelineRunDetailPage({
               </thead>
               <tbody>
                 {run.documents.map((doc, index) => {
-                  const titleCell = tableCellEllipsisParts(doc.title);
-                  const sourceCell = tableCellEllipsisParts(ingestionSourceDisplayLabel(doc.source));
-                  const idCell = tableCellEllipsisParts(doc.id, UI_INLINE_ID_DISPLAY_MAX);
                   return (
                   <tr key={`${doc.id}-${index}`}>
-                    <td className="data-table-td data-table-sticky-col" title={sourceCell.title}>
-                      {sourceCell.display}
+                    <td className="data-table-td data-table-sticky-col">
+                      <EllipsisAccessible value={ingestionSourceDisplayLabel(doc.source)} />
                     </td>
-                    <td className="data-table-td data-table-td-wrap-break" title={titleCell.title}>
-                      {titleCell.display}
+                    <td className="data-table-td data-table-td-wrap-break">
+                      <EllipsisAccessible value={doc.title} />
                     </td>
                     <td className="data-table-td">
                       <DocumentUrlCell url={doc.url} />
                     </td>
                     <td className="data-table-td">
-                      <code title={idCell.title}>{idCell.display}</code>
+                      <EllipsisAccessible as="code" value={doc.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                     </td>
                     <td className="data-table-td-nowrap">{new Date(doc.publishedAt).toLocaleString()}</td>
                   </tr>
@@ -189,18 +179,13 @@ export default async function PipelineRunDetailPage({
           </thead>
           <tbody>
             {run.triggers.map((trigger) => {
-              const phraseCell = tableCellEllipsisParts(trigger.phrase);
-              const categoryCell = tableCellEllipsisParts(trigger.category);
               return (
                 <tr key={`${trigger.phrase}-${trigger.category}`}>
-                  <td
-                    className="data-table-td data-table-sticky-col data-table-td-wrap-break"
-                    title={phraseCell.title}
-                  >
-                    {phraseCell.display}
+                  <td className="data-table-td data-table-sticky-col data-table-td-wrap-break">
+                    <EllipsisAccessible value={trigger.phrase} />
                   </td>
-                  <td className="data-table-td" title={categoryCell.title}>
-                    {categoryCell.display}
+                  <td className="data-table-td">
+                    <EllipsisAccessible value={trigger.category} />
                   </td>
                   <td className="data-table-td-right">{trigger.score}</td>
                 </tr>
@@ -232,18 +217,13 @@ export default async function PipelineRunDetailPage({
           </thead>
           <tbody>
             {run.clusters.map((cluster) => {
-              const labelCell = tableCellEllipsisParts(cluster.label);
-              const kwCell = tableCellEllipsisParts(cluster.keywords.join(', '));
               return (
               <tr key={cluster.id}>
-                <td
-                  className="data-table-td data-table-sticky-col data-table-td-wrap-break"
-                  title={labelCell.title}
-                >
-                  {labelCell.display}
+                <td className="data-table-td data-table-sticky-col data-table-td-wrap-break">
+                  <EllipsisAccessible value={cluster.label} />
                 </td>
-                <td className="data-table-td data-table-td-wrap-break" title={kwCell.title}>
-                  {kwCell.display}
+                <td className="data-table-td data-table-td-wrap-break">
+                  <EllipsisAccessible value={cluster.keywords.join(', ')} />
                 </td>
                 <td className="data-table-td-right">{cluster.itemCount}</td>
               </tr>

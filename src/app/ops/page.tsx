@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import CopyTextButton from '@/app/components/CopyTextButton';
+import EllipsisAccessible from '@/app/components/EllipsisAccessible';
 import EllipsisStrong from '@/app/components/EllipsisStrong';
 import FreshnessConfigInfo from '@/app/components/FreshnessConfigInfo';
 import RunSchedulerAction from './RunSchedulerAction';
@@ -14,7 +15,6 @@ import { parseWeeklyDigestSummaryJson, readLatestWeeklyDigest, weeklyDigestSigna
 import {
   formatGscIngestionDiagnosticsSummary,
   GSC_SUMMARY_UI_NARROW_MAX,
-  tableCellEllipsisParts,
   UI_INLINE_ID_DISPLAY_MAX
 } from '@/lib/ingestion/gscDiagnostics';
 import { pipelineIngestionProvenanceLabel } from '@/lib/ingestion/sourceDisplayLabel';
@@ -89,8 +89,6 @@ export default async function OpsPage() {
       )
     : {};
   const latestJob = jobs[0] ?? null;
-  const latestJobIdCell = latestJob ? tableCellEllipsisParts(latestJob.id, UI_INLINE_ID_DISPLAY_MAX) : null;
-  const latestJobQueryCell = latestJob ? tableCellEllipsisParts(latestJob.query) : null;
   const [latestRun, latestDigest, trendSnapshots, latestVisibility] = await Promise.all([
     readLatestPipelineRun(active.organizationId),
     readLatestWeeklyDigest(active.organizationId),
@@ -98,8 +96,6 @@ export default async function OpsPage() {
     getLatestVisibilityScore(active.organizationId)
   ]);
   const latestTrend = trendSnapshots.at(-1) ?? null;
-  const latestRunIdCell = latestRun ? tableCellEllipsisParts(latestRun.id, UI_INLINE_ID_DISPLAY_MAX) : null;
-  const latestDigestIdCell = latestDigest ? tableCellEllipsisParts(latestDigest.id, UI_INLINE_ID_DISPLAY_MAX) : null;
   const {
     thresholds: { freshHours, agingHours, misconfigured: thresholdsMisconfigured },
     input: freshnessThresholds
@@ -160,9 +156,11 @@ export default async function OpsPage() {
           missingText="Not completed yet"
         >
           <>
-            <code title={latestJobIdCell?.title}>{latestJobIdCell?.display}</code> ({latestJob?.status}) ·{' '}
-            {latestJobQueryCell ? (
-              <code title={latestJobQueryCell.title}>{latestJobQueryCell.display}</code>
+            {latestJob ? (
+              <>
+                <EllipsisAccessible as="code" value={latestJob.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} /> (
+                {latestJob.status}) · <EllipsisAccessible as="code" value={latestJob.query} />
+              </>
             ) : null}
           </>
         </StatusFreshnessItem>
@@ -175,7 +173,7 @@ export default async function OpsPage() {
           <>
             {latestRun ? (
               <Link href={`/reports/runs/${latestRun.id}`}>
-                <code title={latestRunIdCell?.title}>{latestRunIdCell?.display}</code>
+                <EllipsisAccessible as="code" value={latestRun.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
               </Link>
             ) : (
               <span className="text-priority-muted">—</span>
@@ -190,12 +188,10 @@ export default async function OpsPage() {
                   className="text-priority-muted"
                   title={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
                 >
-                  {
-                    tableCellEllipsisParts(
-                      formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics),
-                      GSC_SUMMARY_UI_NARROW_MAX
-                    ).display
-                  }
+                  <EllipsisAccessible
+                    value={formatGscIngestionDiagnosticsSummary(latestRun.gscIngestionDiagnostics)}
+                    maxChars={GSC_SUMMARY_UI_NARROW_MAX}
+                  />
                 </Link>
               </>
             ) : null}
@@ -230,12 +226,10 @@ export default async function OpsPage() {
                       title={latestVisibility.inputs.pipelineGscDiagnosticsSummary}
                     >
                       GSC:{' '}
-                      {
-                        tableCellEllipsisParts(
-                          latestVisibility.inputs.pipelineGscDiagnosticsSummary,
-                          GSC_SUMMARY_UI_NARROW_MAX
-                        ).display
-                      }
+                      <EllipsisAccessible
+                        value={latestVisibility.inputs.pipelineGscDiagnosticsSummary}
+                        maxChars={GSC_SUMMARY_UI_NARROW_MAX}
+                      />
                     </Link>
                   </>
                 ) : null}
@@ -258,7 +252,7 @@ export default async function OpsPage() {
           <>
             {latestDigest ? (
               <Link href={`/reports/digest/${latestDigest.id}`}>
-                <code title={latestDigestIdCell?.title}>{latestDigestIdCell?.display}</code>
+                <EllipsisAccessible as="code" value={latestDigest.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
               </Link>
             ) : (
               <code />
@@ -273,12 +267,10 @@ export default async function OpsPage() {
                   className="text-priority-muted"
                   title={latestDigest.summary.pipelineGscDiagnosticsSummary}
                 >
-                  {
-                    tableCellEllipsisParts(
-                      latestDigest.summary.pipelineGscDiagnosticsSummary,
-                      GSC_SUMMARY_UI_NARROW_MAX
-                    ).display
-                  }
+                  <EllipsisAccessible
+                    value={latestDigest.summary.pipelineGscDiagnosticsSummary}
+                    maxChars={GSC_SUMMARY_UI_NARROW_MAX}
+                  />
                 </Link>
               </>
             ) : null}
@@ -336,29 +328,22 @@ export default async function OpsPage() {
               </thead>
               <tbody>
                 {jobs.map((job) => {
-                  const jobIdCell = tableCellEllipsisParts(job.id, UI_INLINE_ID_DISPLAY_MAX);
-                  const pipelineRunIdCell = job.pipelineRunId
-                    ? tableCellEllipsisParts(job.pipelineRunId, UI_INLINE_ID_DISPLAY_MAX)
-                    : null;
-                  const weeklyDigestIdCell = job.weeklyDigestId
-                    ? tableCellEllipsisParts(job.weeklyDigestId, UI_INLINE_ID_DISPLAY_MAX)
-                    : null;
-                  const detailsCell = tableCellEllipsisParts(describeSchedulerJob(job));
-                  const queryCell = tableCellEllipsisParts(job.query);
                   const pipelineDocsLabel = job.pipelineRunId
                     ? (pipelineIngestionLabels[job.pipelineRunId] ?? 'Not recorded')
                     : '-';
                   const digestSignalsLabel = job.weeklyDigestId
                     ? (digestSignalLabels[job.weeklyDigestId] ?? '—')
                     : '-';
-                  const pipelineDocsCell = tableCellEllipsisParts(pipelineDocsLabel);
-                  const digestSignalsCell = tableCellEllipsisParts(digestSignalsLabel);
-                  const statusCell = tableCellEllipsisParts(job.status);
+                  const pipelineRunTrim = job.pipelineRunId?.trim() ?? '';
+                  const digestTrim = job.weeklyDigestId?.trim() ?? '';
+                  const pipelineRunLinkTitle =
+                    pipelineRunTrim.length > UI_INLINE_ID_DISPLAY_MAX ? pipelineRunTrim : undefined;
+                  const digestLinkTitle = digestTrim.length > UI_INLINE_ID_DISPLAY_MAX ? digestTrim : undefined;
                   return (
                   <tr key={job.id}>
                     <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                       <div className="id-cell-stack">
-                        <span title={jobIdCell.title}>{jobIdCell.display}</span>
+                        <EllipsisAccessible value={job.id} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                         <CopyTextButton
                           text={job.id}
                           label="Copy id"
@@ -373,19 +358,19 @@ export default async function OpsPage() {
                     >
                       {new Date(job.completedAt).toLocaleString()}
                     </td>
-                    <td className="data-table-td" title={statusCell.title}>
-                      {statusCell.display}
+                    <td className="data-table-td">
+                      <EllipsisAccessible value={job.status} />
                     </td>
-                    <td className="data-table-td data-table-td-wrap-break" title={detailsCell.title}>
-                      {detailsCell.display}
+                    <td className="data-table-td data-table-td-wrap-break">
+                      <EllipsisAccessible value={describeSchedulerJob(job)} />
                     </td>
-                    <td className="data-table-td data-table-td-wrap-break" title={queryCell.title}>
-                      {queryCell.display}
+                    <td className="data-table-td data-table-td-wrap-break">
+                      <EllipsisAccessible value={job.query} />
                     </td>
                     <td className="data-table-td data-table-td-break-all">
                       {job.pipelineRunId ? (
-                        <Link href={`/reports/runs/${job.pipelineRunId}`} title={pipelineRunIdCell?.title}>
-                          {pipelineRunIdCell?.display}
+                        <Link href={`/reports/runs/${job.pipelineRunId}`} title={pipelineRunLinkTitle}>
+                          <EllipsisAccessible value={job.pipelineRunId} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                         </Link>
                       ) : (
                         '-'
@@ -393,18 +378,18 @@ export default async function OpsPage() {
                     </td>
                     <td className="data-table-td data-table-td-break-all">
                       {job.weeklyDigestId ? (
-                        <Link href={`/reports/digest/${job.weeklyDigestId}`} title={weeklyDigestIdCell?.title}>
-                          {weeklyDigestIdCell?.display}
+                        <Link href={`/reports/digest/${job.weeklyDigestId}`} title={digestLinkTitle}>
+                          <EllipsisAccessible value={job.weeklyDigestId} maxChars={UI_INLINE_ID_DISPLAY_MAX} />
                         </Link>
                       ) : (
                         '-'
                       )}
                     </td>
-                    <td className="data-table-td data-table-td-wrap-break" title={pipelineDocsCell.title}>
-                      {pipelineDocsCell.display}
+                    <td className="data-table-td data-table-td-wrap-break">
+                      <EllipsisAccessible value={pipelineDocsLabel} />
                     </td>
-                    <td className="data-table-td data-table-td-wrap-break" title={digestSignalsCell.title}>
-                      {digestSignalsCell.display}
+                    <td className="data-table-td data-table-td-wrap-break">
+                      <EllipsisAccessible value={digestSignalsLabel} />
                     </td>
                     <td className="data-table-td">
                       {job.pipelineRunId || job.weeklyDigestId ? (
