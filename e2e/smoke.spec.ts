@@ -83,6 +83,16 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page.getByRole('heading', { level: 1, name: /Report Builder/i })).toBeVisible();
   });
 
+  test('login ignores unsafe next (open redirect)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto(`/login?next=${encodeURIComponent('//evil.com')}`);
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+  });
+
   test('seed user can reach core app surfaces', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_USERNAME ?? 'demo';

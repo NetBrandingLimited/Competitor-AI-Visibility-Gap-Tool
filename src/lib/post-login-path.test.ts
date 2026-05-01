@@ -25,6 +25,8 @@ describe('safeLoginNextQuery', () => {
   it('returns null when unsafe or empty', () => {
     expect(safeLoginNextQuery(undefined)).toBe(null);
     expect(safeLoginNextQuery('//x')).toBe(null);
+    expect(safeLoginNextQuery('https://example.com')).toBe(null);
+    expect(safeLoginNextQuery('')).toBe(null);
   });
 
   it('returns path when safe', () => {
