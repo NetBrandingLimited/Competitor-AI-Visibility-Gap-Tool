@@ -54,6 +54,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: /Dashboard v1/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Recalculate score/i })).toBeVisible();
 
     await page.goto('/settings/connectors');
     await expect(page.getByRole('heading', { level: 1, name: /Data connectors/i })).toBeVisible();
