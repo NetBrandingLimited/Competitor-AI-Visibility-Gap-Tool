@@ -336,6 +336,13 @@ export default async function OpsPage() {
               </thead>
               <tbody>
                 {jobs.map((job) => {
+                  const jobIdCell = tableCellEllipsisParts(job.id, UI_INLINE_ID_DISPLAY_MAX);
+                  const pipelineRunIdCell = job.pipelineRunId
+                    ? tableCellEllipsisParts(job.pipelineRunId, UI_INLINE_ID_DISPLAY_MAX)
+                    : null;
+                  const weeklyDigestIdCell = job.weeklyDigestId
+                    ? tableCellEllipsisParts(job.weeklyDigestId, UI_INLINE_ID_DISPLAY_MAX)
+                    : null;
                   const detailsCell = tableCellEllipsisParts(describeSchedulerJob(job));
                   const queryCell = tableCellEllipsisParts(job.query);
                   const pipelineDocsLabel = job.pipelineRunId
@@ -351,7 +358,7 @@ export default async function OpsPage() {
                   <tr key={job.id}>
                     <td className="data-table-td data-table-sticky-col data-table-sticky-col-id">
                       <div className="id-cell-stack">
-                        <span>{job.id}</span>
+                        <span title={jobIdCell.title}>{jobIdCell.display}</span>
                         <CopyTextButton
                           text={job.id}
                           label="Copy id"
@@ -376,11 +383,19 @@ export default async function OpsPage() {
                       {queryCell.display}
                     </td>
                     <td className="data-table-td data-table-td-break-all">
-                      {job.pipelineRunId ? <Link href={`/reports/runs/${job.pipelineRunId}`}>{job.pipelineRunId}</Link> : '-'}
+                      {job.pipelineRunId ? (
+                        <Link href={`/reports/runs/${job.pipelineRunId}`} title={pipelineRunIdCell?.title}>
+                          {pipelineRunIdCell?.display}
+                        </Link>
+                      ) : (
+                        '-'
+                      )}
                     </td>
                     <td className="data-table-td data-table-td-break-all">
                       {job.weeklyDigestId ? (
-                        <Link href={`/reports/digest/${job.weeklyDigestId}`}>{job.weeklyDigestId}</Link>
+                        <Link href={`/reports/digest/${job.weeklyDigestId}`} title={weeklyDigestIdCell?.title}>
+                          {weeklyDigestIdCell?.display}
+                        </Link>
                       ) : (
                         '-'
                       )}
