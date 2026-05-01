@@ -15,8 +15,16 @@ test.describe('public pages', () => {
   test('login page shows credentials form', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
-    await expect(page.locator('input[name="username"]')).toBeVisible();
-    await expect(page.locator('input[name="password"]')).toBeVisible();
+    await expect(page.locator('#login-username')).toBeVisible();
+    await expect(page.locator('#login-password')).toBeVisible();
+  });
+
+  test('register page shows workspace signup form', async ({ page }) => {
+    await page.goto('/register');
+    await expect(page.getByRole('heading', { level: 1, name: /Create your workspace/i })).toBeVisible();
+    await expect(page.locator('#register-email')).toBeVisible();
+    await expect(page.locator('#register-password')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Create account/i })).toBeVisible();
   });
 });
 

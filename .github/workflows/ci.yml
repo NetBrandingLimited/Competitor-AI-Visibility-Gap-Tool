@@ -33,17 +33,11 @@ jobs:
       - name: Seed demo user (Playwright auth smoke)
         run: npm run db:seed
 
-      - name: Type check (if present)
-        run: npm run typecheck --if-present
-
-      - name: Lint (if present)
-        run: npm run lint --if-present
+      - name: Lint, typecheck, and unit tests
+        run: npm run check --if-present
 
       - name: Build (if present)
         run: npm run build --if-present
-
-      - name: Test (if present)
-        run: npm test --if-present
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4

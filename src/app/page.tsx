@@ -13,6 +13,9 @@ export default function HomePage() {
       <ul>
         <li>npm install</li>
         <li>npx prisma migrate deploy &amp;&amp; npm run db:seed</li>
+        <li>
+          Quality gate (lint + TypeScript + Vitest): <code>npm run check</code>
+        </li>
         <li>npm run dev</li>
         <li>
           Phase 3 debug: <code>/api/debug/extract-cluster?text=best%20seo%20tool%20vs%20alternatives</code>
