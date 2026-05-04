@@ -114,11 +114,33 @@ test.describe('public API', () => {
     }
   });
 
-  test('GET /api/orgs/[orgId] returns 401 JSON when signed out', async ({ request }) => {
-    const res = await request.get('/api/orgs/org-1');
+  test('GET session-protected JSON API routes return 401 when signed out', async ({ request }) => {
+    const paths = [
+      '/api/orgs/org-1',
+      '/api/debug/config',
+      '/api/debug/extract-cluster',
+      '/api/debug/ingestion',
+      '/api/debug/pipeline/run',
+      '/api/debug/scheduler/run',
+      '/api/debug/trends/run'
+    ] as const;
+    for (const path of paths) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(401);
+      expect(((await res.json()) as { error?: string }).error, path).toBe('unauthorized');
+    }
+  });
+
+  test('POST /api/reports/weekly-digest returns 401 when signed out', async ({ request }) => {
+    const res = await request.post('/api/reports/weekly-digest');
     expect(res.status()).toBe(401);
-    const body = (await res.json()) as { error?: string };
-    expect(body.error).toBe('unauthorized');
+    expect(((await res.json()) as { error?: string }).error).toBe('unauthorized');
+  });
+
+  test('GET /api/cron/weekly-scheduler returns 401 without valid cron secret', async ({ request }) => {
+    const res = await request.get('/api/cron/weekly-scheduler');
+    expect(res.status()).toBe(401);
+    expect(((await res.json()) as { error?: string }).error).toBe('unauthorized');
   });
 });
 
