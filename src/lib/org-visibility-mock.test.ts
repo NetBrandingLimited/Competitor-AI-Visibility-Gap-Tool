@@ -4,6 +4,8 @@ import type { OrgBrandFields } from './org-visibility-mock';
 import {
   defaultPipelineQueryFromOrg,
   enrichDocumentsWithOrgContext,
+  getDashboardSnapshot,
+  getDashboardSnapshotForOrganization,
   simpleHash
 } from './org-visibility-mock';
 
@@ -76,5 +78,29 @@ describe('enrichDocumentsWithOrgContext', () => {
     expect(out[0].content).toContain('body');
     expect(out[0].content).toContain('Acme');
     expect(out[0].content).toContain('CRM');
+  });
+});
+
+describe('getDashboardSnapshotForOrganization', () => {
+  const fixedNow = new Date('2026-03-01T10:00:00.000Z');
+
+  it('returns five leaderboard rows and shareOfVoice that sums to 1', () => {
+    const snap = getDashboardSnapshotForOrganization(
+      { brandName: 'Acme', category: 'SaaS', competitorA: 'Beta', competitorB: 'Gamma', competitorC: 'Delta' },
+      fixedNow
+    );
+    expect(snap.generatedAt).toBe(fixedNow.toISOString());
+    expect(snap.leaderboard).toHaveLength(5);
+    const sum = snap.leaderboard.reduce((s, r) => s + r.shareOfVoice, 0);
+    expect(sum).toBeCloseTo(1, 5);
+    expect(snap.recent.length).toBeGreaterThan(0);
+  });
+});
+
+describe('getDashboardSnapshot', () => {
+  it('returns a snapshot with default placeholder labels', () => {
+    const snap = getDashboardSnapshot();
+    expect(snap.leaderboard).toHaveLength(5);
+    expect(snap.leaderboard[0].brand).toContain('Brand settings');
   });
 });
