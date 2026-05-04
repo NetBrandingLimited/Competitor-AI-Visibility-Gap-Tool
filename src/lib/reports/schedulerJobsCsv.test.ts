@@ -56,6 +56,45 @@ describe('buildSchedulerJobsCsv', () => {
     expect(longSummary.endsWith('…')).toBe(false);
   });
 
+  it('fills digest columns without pipeline run id or provenance maps', () => {
+    const csv = buildSchedulerJobsCsv(
+      [
+        {
+          id: 'job-digest-only',
+          startedAt: '2026-04-29T00:00:00.000Z',
+          completedAt: '2026-04-29T00:02:00.000Z',
+          status: 'success',
+          query: 'weekly digest',
+          weeklyDigestId: 'dg-2'
+        }
+      ],
+      { 'dg-2': 'cache (within TTL)' },
+      {}
+    );
+    expect(csv).toContain('dg-2');
+    expect(csv).toContain('cache (within TTL)');
+    expect(csv).not.toContain('live_gsc_queries');
+    expect(csv).not.toContain('Search Console');
+  });
+
+  it('includes error message when the job failed', () => {
+    const csv = buildSchedulerJobsCsv(
+      [
+        {
+          id: 'job-err',
+          startedAt: '2026-04-29T00:00:00.000Z',
+          completedAt: '2026-04-29T00:02:00.000Z',
+          status: 'failed',
+          query: 'q',
+          errorMessage: 'SMTP timeout'
+        }
+      ],
+      {},
+      {}
+    );
+    expect(csv).toContain('SMTP timeout');
+  });
+
   it('leaves GSC summary column empty when map is omitted', () => {
     const csv = buildSchedulerJobsCsv(
       [
