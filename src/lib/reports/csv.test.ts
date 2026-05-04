@@ -3,6 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { buildCsvDocument, escapeCsv } from './csv';
 
 describe('escapeCsv', () => {
+  it('stringifies numbers without extra quoting when safe', () => {
+    expect(escapeCsv(42)).toBe('42');
+    expect(escapeCsv(0)).toBe('0');
+  });
+
   it('escapes commas and quotes', () => {
     expect(escapeCsv('a,"b"')).toBe('"a,""b"""');
   });

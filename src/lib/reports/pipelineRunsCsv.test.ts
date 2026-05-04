@@ -55,4 +55,20 @@ describe('buildPipelineRunsCsv', () => {
     expect(csv).toContain(full);
     expect(full.endsWith('…')).toBe(false);
   });
+
+  it('leaves ingestion and GSC columns empty when those fields are absent', () => {
+    const csv = buildPipelineRunsCsv([
+      baseRun({
+        ingestionSource: undefined,
+        gscIngestionDiagnostics: undefined
+      })
+    ]);
+    expect(csv).not.toContain('attempt=');
+    expect(csv).toContain('crm alternatives,,,');
+  });
+
+  it('includes mock ingestion source when present', () => {
+    const csv = buildPipelineRunsCsv([baseRun({ ingestionSource: 'mock_ingestion' })]);
+    expect(csv).toContain('mock_ingestion');
+  });
 });
