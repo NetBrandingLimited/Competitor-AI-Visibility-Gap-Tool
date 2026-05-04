@@ -2,6 +2,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { WeeklyDigestSummary } from '@/lib/digest/weekly';
 
+const smtpMocks = vi.hoisted(() => {
+  const sendMail = vi.fn().mockResolvedValue(undefined);
+  const createTransport = vi.fn(() => ({ sendMail }));
+  return { sendMail, createTransport };
+});
+
+vi.mock('nodemailer', () => ({
+  default: { createTransport: smtpMocks.createTransport },
+  createTransport: smtpMocks.createTransport
+}));
+
 import { sendWeeklyDigestEmail } from './weeklyDigestEmail';
 
 const summary: WeeklyDigestSummary = {
@@ -22,6 +33,9 @@ describe('sendWeeklyDigestEmail', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+    smtpMocks.createTransport.mockClear();
+    smtpMocks.sendMail.mockClear();
+    smtpMocks.sendMail.mockResolvedValue(undefined);
   });
 
   it('returns no_recipient when to is missing or only whitespace', async () => {
@@ -112,6 +126,75 @@ describe('sendWeeklyDigestEmail', () => {
       sent: false,
       reason: 'error',
       detail: 'network down'
+    });
+  });
+
+  it('sends via SMTP when SMTP_URL and SMTP_FROM are set and Resend is not', async () => {
+    vi.stubEnv('RESEND_API_KEY', '');
+    vi.stubEnv('RESEND_FROM_EMAIL', '');
+    vi.stubEnv('SMTP_URL', 'smtps://user:pass@host');
+    vi.stubEnv('SMTP_FROM', 'digest@example.com');
+
+    const result = await sendWeeklyDigestEmail({
+      ...baseParams,
+      to: 'recipient@example.com'
+    });
+
+    expect(result).toEqual({ sent: true, provider: 'smtp' });
+    expect(smtpMocks.createTransport).toHaveBeenCalledWith('smtps://user:pass@host');
+    expect(smtpMocks.sendMail).toHaveBeenCalledTimes(1);
+    expect(smtpMocks.sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'digest@example.com',
+        to: 'recipient@example.com',
+        subject: expect.stringContaining('Acme Inc'),
+        text: expect.stringContaining('Opportunity one')
+      })
+    );
+  });
+
+  it('uses EMAIL_FROM when SMTP_FROM is absent from the environment', async () => {
+    vi.stubEnv('RESEND_API_KEY', '');
+    vi.stubEnv('RESEND_FROM_EMAIL', '');
+    vi.stubEnv('SMTP_URL', 'smtps://user:pass@host');
+    vi.stubEnv('EMAIL_FROM', 'fallback@example.com');
+    const hadSmtpFrom = 'SMTP_FROM' in process.env;
+    const prevSmtpFrom = process.env.SMTP_FROM;
+    delete process.env.SMTP_FROM;
+
+    try {
+      const result = await sendWeeklyDigestEmail({
+        ...baseParams,
+        to: 'recipient@example.com'
+      });
+
+      expect(result).toEqual({ sent: true, provider: 'smtp' });
+      expect(smtpMocks.sendMail).toHaveBeenCalledWith(
+        expect.objectContaining({ from: 'fallback@example.com' })
+      );
+    } finally {
+      if (hadSmtpFrom) {
+        process.env.SMTP_FROM = prevSmtpFrom;
+      }
+    }
+  });
+
+  it('returns error when SMTP sendMail throws', async () => {
+    smtpMocks.sendMail.mockRejectedValueOnce(new Error('smtp refused'));
+    vi.stubEnv('RESEND_API_KEY', '');
+    vi.stubEnv('RESEND_FROM_EMAIL', '');
+    vi.stubEnv('SMTP_URL', 'smtps://user:pass@host');
+    vi.stubEnv('SMTP_FROM', 'digest@example.com');
+
+    const result = await sendWeeklyDigestEmail({
+      ...baseParams,
+      to: 'recipient@example.com'
+    });
+
+    expect(result).toEqual({
+      sent: false,
+      reason: 'error',
+      detail: 'smtp refused'
     });
   });
 });
