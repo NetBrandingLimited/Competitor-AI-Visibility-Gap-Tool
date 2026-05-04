@@ -47,6 +47,10 @@ async function loadActiveOrg(
   };
 }
 
+/**
+ * Use in **Route Handlers** (`app/api/.../route.ts`) and any code that receives a `NextRequest`.
+ * Session cookies are read from the request (works in Vitest; avoids `cookies()` request-scope issues).
+ */
 export async function resolveActiveOrgSessionForRequest(
   request: NextRequest
 ): Promise<ActiveOrgSession | null> {
@@ -55,6 +59,10 @@ export async function resolveActiveOrgSessionForRequest(
   return loadActiveOrg(userId, orgCookie);
 }
 
+/**
+ * Use in **Server Components** (`page.tsx`, `layout.tsx`). Uses `cookies()` from `next/headers`.
+ * For `route.ts` handlers, use {@link resolveActiveOrgSessionForRequest} instead.
+ */
 export async function resolveActiveOrgSessionForServerComponent(): Promise<ActiveOrgSession | null> {
   const cookieStore = await cookies();
   const userId = cookieStore.get(SESSION_USER_ID_COOKIE)?.value?.trim();

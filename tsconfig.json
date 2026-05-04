@@ -34,8 +34,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/types/**/*.ts"
   ],
   // Omit `.next/dev` so `**/*.ts` does not typecheck Turbopack dev artifacts (can be incomplete and break `tsc`).
   "exclude": [
