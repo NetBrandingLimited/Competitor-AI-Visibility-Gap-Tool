@@ -10,6 +10,7 @@ describe('escapeCsv', () => {
   it('guards against spreadsheet formula injection', () => {
     expect(escapeCsv('=SUM(A1:A2)')).toBe("'=SUM(A1:A2)");
     expect(escapeCsv('+cmd')).toBe("'+cmd");
+    expect(escapeCsv('-cmd')).toBe("'-cmd");
     expect(escapeCsv('@user')).toBe("'@user");
   });
 
