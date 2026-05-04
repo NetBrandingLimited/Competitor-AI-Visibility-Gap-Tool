@@ -21,6 +21,7 @@ const baseParams = {
 describe('sendWeeklyDigestEmail', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it('returns no_recipient when to is missing or only whitespace', async () => {
@@ -43,5 +44,74 @@ describe('sendWeeklyDigestEmail', () => {
     });
 
     expect(result).toEqual({ sent: false, reason: 'no_provider_config' });
+  });
+
+  it('sends via Resend when configured and API returns ok', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key');
+    vi.stubEnv('RESEND_FROM_EMAIL', 'digest@example.com');
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => '{}'
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await sendWeeklyDigestEmail({
+      ...baseParams,
+      to: 'recipient@example.com'
+    });
+
+    expect(result).toEqual({ sent: true, provider: 'resend' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://api.resend.com/emails');
+    expect(init.method).toBe('POST');
+    const body = JSON.parse(String(init.body)) as Record<string, unknown>;
+    expect(body.from).toBe('digest@example.com');
+    expect(body.to).toEqual(['recipient@example.com']);
+    expect(String(body.subject)).toContain('Acme Inc');
+    expect(String(body.text)).toContain('Opportunity one');
+  });
+
+  it('returns error when Resend responds non-ok', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key');
+    vi.stubEnv('RESEND_FROM_EMAIL', 'digest@example.com');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 422,
+        text: async () => '{"message":"invalid"}'
+      })
+    );
+
+    const result = await sendWeeklyDigestEmail({
+      ...baseParams,
+      to: 'recipient@example.com'
+    });
+
+    expect(result).toEqual({
+      sent: false,
+      reason: 'error',
+      detail: 'Resend 422: {"message":"invalid"}'
+    });
+  });
+
+  it('returns error when Resend fetch throws', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test_key');
+    vi.stubEnv('RESEND_FROM_EMAIL', 'digest@example.com');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network down')));
+
+    const result = await sendWeeklyDigestEmail({
+      ...baseParams,
+      to: 'recipient@example.com'
+    });
+
+    expect(result).toEqual({
+      sent: false,
+      reason: 'error',
+      detail: 'network down'
+    });
   });
 });
