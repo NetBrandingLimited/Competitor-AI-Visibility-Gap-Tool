@@ -37,6 +37,34 @@ describe('visibility serializers', () => {
     expect(payload.signalCount).toBe(3);
   });
 
+  it('labels mock pipeline provenance in latest snapshot payload', () => {
+    const payload = serializeVisibilityScore({
+      score: 40,
+      createdAt: '2026-04-29T06:00:00.000Z',
+      reasons,
+      inputs: {
+        pipelineRunId: 'run-m',
+        pipelineIngestionSource: 'mock_ingestion',
+        pipelineGscDiagnosticsSummary: null,
+        documentCount: 5,
+        triggerCount: 1,
+        clusterCount: 1,
+        trendDate: '2026-04-29',
+        totalMentions: 10,
+        topBrand: 'Acme',
+        topBrandMentions: 5,
+        brandName: 'Acme',
+        connectorSignalCount: 1,
+        connectorSignalSource: 'live',
+        connectorSignalCacheKind: null,
+        connectorSignalsAsOf: '2026-04-29'
+      }
+    });
+
+    expect(payload.pipelineIngestionSource).toBe('mock_ingestion');
+    expect(payload.pipelineIngestionSourceLabel).toBe('Mock templates');
+  });
+
   it('labels missing pipeline provenance as not recorded for recalc payload', () => {
     const payload = serializeVisibilityResult({
       score: 49,

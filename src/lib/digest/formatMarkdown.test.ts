@@ -63,6 +63,27 @@ describe('formatWeeklyDigestMarkdown', () => {
     expect(md).toContain('- **GSC ingestion (latest pipeline):** attempt=filtered; cap=3');
   });
 
+  it('escapes pipe characters in topic gap table cells', () => {
+    const md = formatWeeklyDigestMarkdown({
+      ...baseParams,
+      summary: {
+        ...baseParams.summary,
+        topics: [
+          {
+            topic: 'A | B',
+            gapScore: 5,
+            triggerCount: 1,
+            clusterWeight: 2,
+            recommendation: 'See X | Y'
+          }
+        ]
+      }
+    });
+    expect(md).toContain('## Topic gap breakdown');
+    expect(md).toContain('A \\| B');
+    expect(md).toContain('See X \\| Y');
+  });
+
   it('includes pipeline run path under opportunities when pipelineRunIdForGsc is set', () => {
     const md = formatWeeklyDigestMarkdown({
       ...baseParams,
