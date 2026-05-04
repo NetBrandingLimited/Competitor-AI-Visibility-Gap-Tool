@@ -124,17 +124,50 @@ test.describe('public API', () => {
   test('GET session-protected JSON API routes return 401 when signed out', async ({ request }) => {
     const paths = [
       '/api/orgs/org-1',
+      '/api/orgs/org-1/insights/gaps',
+      '/api/orgs/org-1/digest/schedule',
+      '/api/orgs/org-1/digest/weekly',
+      '/api/orgs/org-1/digest/weekly/digest-1',
+      '/api/orgs/org-1/digest/weekly/digest-1/export-md',
       '/api/debug/config',
       '/api/debug/extract-cluster',
       '/api/debug/ingestion',
       '/api/debug/pipeline/run',
+      '/api/debug/pipeline/run-1',
       '/api/debug/scheduler/run',
       '/api/debug/trends/run'
     ] as const;
-    for (const path of paths) {
-      const res = await request.get(path);
-      expect(res.status(), path).toBe(401);
-      expect(((await res.json()) as { error?: string }).error, path).toBe('unauthorized');
+    await Promise.all(
+      paths.map(async (path) => {
+        const res = await request.get(path);
+        expect(res.status(), path).toBe(401);
+        expect(((await res.json()) as { error?: string }).error, path).toBe('unauthorized');
+      })
+    );
+  });
+
+  test('Org-scoped mutating API routes return 401 when signed out', async ({ request }) => {
+    const json = { data: {} };
+    const cases = [
+      { label: 'PATCH /api/orgs/.../brand', run: () => request.patch('/api/orgs/org-1/brand', json) },
+      { label: 'PATCH /api/orgs/.../connectors', run: () => request.patch('/api/orgs/org-1/connectors', json) },
+      { label: 'POST /api/orgs/.../connectors', run: () => request.post('/api/orgs/org-1/connectors', json) },
+      { label: 'POST /api/orgs/.../connectors/signals', run: () => request.post('/api/orgs/org-1/connectors/signals') },
+      {
+        label: 'DELETE /api/orgs/.../connectors/signals',
+        run: () => request.delete('/api/orgs/org-1/connectors/signals')
+      },
+      {
+        label: 'PATCH /api/orgs/.../digest/schedule',
+        run: () => request.patch('/api/orgs/org-1/digest/schedule', json)
+      },
+      { label: 'POST /api/orgs/.../digest/weekly', run: () => request.post('/api/orgs/org-1/digest/weekly') },
+      { label: 'POST /api/orgs/.../visibility', run: () => request.post('/api/orgs/org-1/visibility') }
+    ] as const;
+    for (const { label, run } of cases) {
+      const res = await run();
+      expect(res.status(), label).toBe(401);
+      expect(((await res.json()) as { error?: string }).error, label).toBe('unauthorized');
     }
   });
 
