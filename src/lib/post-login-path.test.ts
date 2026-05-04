@@ -32,4 +32,8 @@ describe('safeLoginNextQuery', () => {
   it('returns path when safe', () => {
     expect(safeLoginNextQuery('/reports')).toBe('/reports');
   });
+
+  it('trims whitespace before validating next path', () => {
+    expect(safeLoginNextQuery(' /reports ')).toBe('/reports');
+  });
 });

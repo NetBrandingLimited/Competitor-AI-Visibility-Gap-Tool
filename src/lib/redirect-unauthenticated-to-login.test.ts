@@ -26,6 +26,11 @@ describe('redirectUnauthenticatedToLogin', () => {
     expect(redirectMock).toHaveBeenCalledWith('/login?next=%2Freports');
   });
 
+  it('trims return path before encoding next', () => {
+    expect(() => redirectUnauthenticatedToLogin(' /reports ')).toThrow('redirect');
+    expect(redirectMock).toHaveBeenCalledWith('/login?next=%2Freports');
+  });
+
   it('calls redirect with bare /login when return path is not a safe next value', () => {
     expect(() => redirectUnauthenticatedToLogin('//evil.com')).toThrow('redirect');
     expect(redirectMock).toHaveBeenCalledWith('/login');

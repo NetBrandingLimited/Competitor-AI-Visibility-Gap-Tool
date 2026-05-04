@@ -98,6 +98,22 @@ describe('parseWeeklyDigestSummaryJson', () => {
     expect(s.topOpportunities).toEqual([]);
   });
 
+  it('returns empty summary when JSON parses to null', () => {
+    const s = parseWeeklyDigestSummaryJson('null');
+    expect(s.score).toBeNull();
+    expect(s.topOpportunities).toEqual([]);
+  });
+
+  it('treats whitespace-only pipelineGscDiagnosticsSummary as null', () => {
+    const raw = JSON.stringify({
+      score: 1,
+      signalSource: 'live',
+      topOpportunities: [],
+      pipelineGscDiagnosticsSummary: '   \t  '
+    });
+    expect(parseWeeklyDigestSummaryJson(raw).pipelineGscDiagnosticsSummary).toBeNull();
+  });
+
   it('parses pipelineRunIdForGsc on opportunities when present', () => {
     const raw = JSON.stringify({
       score: 1,
