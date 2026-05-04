@@ -105,6 +105,21 @@ test.describe('public API', () => {
     expect(body.ok).toBe(true);
     expect(body.service).toBe('health');
   });
+
+  test('GET CSV routes return 401 body when signed out', async ({ request }) => {
+    for (const path of ['/api/reports/export.csv', '/api/ops/scheduler-jobs.csv'] as const) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(401);
+      expect((await res.text()).trim()).toBe('Unauthorized');
+    }
+  });
+
+  test('GET /api/orgs/[orgId] returns 401 JSON when signed out', async ({ request }) => {
+    const res = await request.get('/api/orgs/org-1');
+    expect(res.status()).toBe(401);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe('unauthorized');
+  });
 });
 
 const authSuite = process.env.E2E_AUTH === '1' ? test.describe : test.describe.skip;
