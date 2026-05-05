@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
- * That suite includes UI smoke, `GET /api/reports/trends.csv` (editor + viewer), and viewer `403` on editor-only
- * `POST /api/orgs/seed-demo-org/visibility`.
+ * That suite includes UI smoke, `GET /api/reports/trends.csv` (editor + viewer), editor `POST` visibility recalc,
+ * and viewer `403` on editor-only `POST /api/orgs/seed-demo-org/visibility` + `PATCH .../brand`.
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -297,6 +297,24 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     expect(body).toContain('topBrand');
   });
 
+  test('editor session can POST visibility recalc', async ({ page }) => {
+    test.setTimeout(120_000);
+    const orgId = 'seed-demo-org';
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.post(`/api/orgs/${orgId}/visibility`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toContain('application/json');
+    const json = (await res.json()) as { organizationId?: string; score?: number };
+    expect(json.organizationId).toBe(orgId);
+    expect(typeof json.score).toBe('number');
+  });
+
   test('viewer session can download trends CSV (read-only export)', async ({ page }) => {
     test.setTimeout(90_000);
     const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
@@ -326,6 +344,25 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const res = await page.request.post(`/api/orgs/${orgId}/visibility`);
     expect(res.status()).toBe(403);
     expect(res.headers()['content-type'] ?? '').toContain('application/json');
+    const json = (await res.json()) as { error?: string; required?: string };
+    expect(json.error).toBe('forbidden');
+    expect(json.required).toBe('EDITOR');
+  });
+
+  test('viewer receives 403 when PATCHing brand settings (editor-only)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const orgId = 'seed-demo-org';
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.patch(`/api/orgs/${orgId}/brand`, {
+      json: { brandName: 'E2E viewer must not apply this' }
+    });
+    expect(res.status()).toBe(403);
     const json = (await res.json()) as { error?: string; required?: string };
     expect(json.error).toBe('forbidden');
     expect(json.required).toBe('EDITOR');
