@@ -3,8 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
- * That suite includes UI smoke, `GET /api/reports/trends.csv` (editor + viewer), editor `POST` visibility recalc,
- * and viewer `403` on editor-only `POST /api/orgs/seed-demo-org/visibility` + `PATCH .../brand`.
+ * That suite includes UI smoke, `GET /api/reports/trends.csv` + full `export.csv` (editor), editor `POST` visibility
+ * recalc, and viewer `403` on editor-only org routes (`POST visibility`, `PATCH brand`, `PATCH digest/schedule`).
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -297,6 +297,29 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     expect(body).toContain('topBrand');
   });
 
+  test('editor session can download full visibility export CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/export.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    const disposition = res.headers()['content-disposition'] ?? '';
+    expect(disposition).toContain('attachment');
+    expect(disposition.toLowerCase()).toContain('visibility-report.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('section');
+    expect(body).toContain('visibilityScore');
+    expect(body).toContain('digestPipelineIngestionSource');
+  });
+
   test('editor session can POST visibility recalc', async ({ page }) => {
     test.setTimeout(120_000);
     const orgId = 'seed-demo-org';
@@ -361,6 +384,25 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
 
     const res = await page.request.patch(`/api/orgs/${orgId}/brand`, {
       json: { brandName: 'E2E viewer must not apply this' }
+    });
+    expect(res.status()).toBe(403);
+    const json = (await res.json()) as { error?: string; required?: string };
+    expect(json.error).toBe('forbidden');
+    expect(json.required).toBe('EDITOR');
+  });
+
+  test('viewer receives 403 when PATCHing weekly digest schedule (editor-only)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const orgId = 'seed-demo-org';
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.patch(`/api/orgs/${orgId}/digest/schedule`, {
+      json: { enabled: true, dayUtc: 2, hourUtc: 10 }
     });
     expect(res.status()).toBe(403);
     const json = (await res.json()) as { error?: string; required?: string };
