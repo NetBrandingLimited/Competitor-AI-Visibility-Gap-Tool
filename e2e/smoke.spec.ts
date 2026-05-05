@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
+ * That suite includes UI smoke plus `GET /api/reports/trends.csv` using the browser cookie jar (editor + viewer).
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -269,6 +270,46 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await page.goto('/ops');
     await expect(page.getByRole('heading', { level: 1, name: /Ops Monitor/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Run scheduled job now/i })).toBeVisible();
+  });
+
+  test('editor session can download trends CSV via API with cookies', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/trends.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    const disposition = res.headers()['content-disposition'] ?? '';
+    expect(disposition).toContain('attachment');
+    expect(disposition.toLowerCase()).toContain('visibility-trends.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('date');
+    expect(body).toContain('generatedAt');
+    expect(body).toContain('totalMentions');
+    expect(body).toContain('topBrand');
+  });
+
+  test('viewer session can download trends CSV (read-only export)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/trends.csv');
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('date');
   });
 
   test('viewer has read-only brand/connectors and no editor-only job controls', async ({ page }) => {
