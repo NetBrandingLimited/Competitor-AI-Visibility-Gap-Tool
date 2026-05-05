@@ -49,6 +49,7 @@ model Organization {
   schedulerJobs           SchedulerJob[]
   visibilityScoreSnapshots VisibilityScoreSnapshot[]
   weeklyDigests           WeeklyDigest[]
+  trackedPrompts        TrackedPrompt[]
 }
 
 model OrganizationMember {
@@ -136,4 +137,22 @@ model WeeklyDigest {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, generatedAt])
+}
+
+/// Prompt library for future AI-answer monitoring: each row is one measurement intent (prompt × target surfaces).
+model TrackedPrompt {
+  id                  String       @id @default(cuid())
+  organizationId      String
+  text                String
+  label               String?
+  category            String?
+  isActive            Boolean      @default(true)
+  sortOrder           Int          @default(0)
+  /// JSON array of surface ids (see `PROMPT_SURFACE_IDS` in src/lib/ai-visibility/measurement.ts)
+  targetSurfacesJson  String       @default("[]")
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, sortOrder])
 }

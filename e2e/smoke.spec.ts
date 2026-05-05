@@ -91,7 +91,7 @@ test.describe('public pages', () => {
     }
   });
 
-  for (const path of ['/dashboard', '/reports', '/ops', '/settings/brand', '/settings/connectors'] as const) {
+  for (const path of ['/dashboard', '/reports', '/ops', '/settings/brand', '/settings/prompts', '/settings/connectors'] as const) {
     test(`protected ${path} redirects to login when signed out`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(/\/login/);
@@ -195,6 +195,15 @@ test.describe('public API', () => {
       {
         label: 'PATCH /api/orgs/.../digest/schedule',
         run: () => request.patch('/api/orgs/org-1/digest/schedule', { data: {} })
+      },
+      {
+        label: 'PUT /api/orgs/.../tracked-prompts',
+        run: () =>
+          request.fetch('/api/orgs/org-1/tracked-prompts', {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            data: JSON.stringify({ prompts: [] })
+          })
       },
       { label: 'POST /api/orgs/.../digest/weekly', run: () => request.post('/api/orgs/org-1/digest/weekly') },
       { label: 'POST /api/orgs/.../visibility', run: () => request.post('/api/orgs/org-1/visibility') }

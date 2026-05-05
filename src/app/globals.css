@@ -1064,3 +1064,25 @@ thead .data-table-sticky-col {
   color: #334155;
 }
 
+.brand-form .field-checkbox-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.brand-form .field-checkbox-row span {
+  margin: 0;
+}
+.prompt-surface-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px 16px;
+  margin-top: 8px;
+}
+.prompt-surface-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+

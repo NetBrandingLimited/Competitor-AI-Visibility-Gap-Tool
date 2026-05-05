@@ -17,6 +17,7 @@ const navItems: NavItem[] = [
   { label: 'Reports', href: '/reports', sectionLabel: 'Reports' },
   { label: 'Ops', href: '/ops', sectionLabel: 'Operations' },
   { label: 'Brand', href: '/settings/brand', sectionLabel: 'Brand settings' },
+  { label: 'Prompts', href: '/settings/prompts', sectionLabel: 'AI prompt library' },
   { label: 'Connectors', href: '/settings/connectors', sectionLabel: 'Connectors' }
 ];
 const navGroups = [

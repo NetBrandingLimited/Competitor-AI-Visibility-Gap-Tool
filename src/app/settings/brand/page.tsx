@@ -20,6 +20,8 @@ export default async function BrandSettingsPage() {
       <p>These values are stored on your organization and used for visibility tracking workflows.</p>
       <BrandSettingsForm />
       <p className="mt-24">
+        <Link href="/settings/prompts">AI prompt library</Link>
+        {' · '}
         <Link href="/settings/connectors">Data connectors</Link>
         {' · '}
         <Link href="/dashboard">Dashboard</Link>
