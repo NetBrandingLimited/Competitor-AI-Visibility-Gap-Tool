@@ -23,7 +23,7 @@ import { prisma } from '@/lib/prisma';
 import { readSchedulerJobs } from '@/lib/scheduler/store';
 import { readTrendSnapshots } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
-import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { getLatestVisibilityScore, visibilityUsesLlmMentionSignal } from '@/lib/visibility/scoreV1';
 import { safeLoginNextQuery } from '@/lib/post-login-path';
 import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
@@ -246,6 +246,10 @@ export default async function OpsPage({
               <>
                 <strong>{Math.round(latestVisibility.score)}</strong>/100 ·{' '}
                 {pipelineIngestionProvenanceLabel(latestVisibility.inputs.pipelineIngestionSource)}
+                {' · '}
+                {visibilityUsesLlmMentionSignal(latestVisibility.inputs)
+                  ? 'mention signal: LLM answers'
+                  : 'mention signal: trend snapshot'}
                 {latestVisibility.inputs.pipelineGscDiagnosticsSummary &&
                 latestVisibility.inputs.pipelineRunId ? (
                   <>

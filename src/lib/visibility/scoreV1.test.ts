@@ -20,6 +20,10 @@ function makeInputs(overrides: Partial<VisibilityInputsV1> = {}): VisibilityInpu
     connectorSignalCacheKind: null,
     connectorSignalsAsOf: '2026-04-29',
     pipelineBrandShareOfVoice: null,
+    llmAvgBrandShareOfMentions: null,
+    llmShareSampleCount: 0,
+    llmBrandTopOrTiedRate: null,
+    llmAnswerSamplesScanned: 0,
     ...overrides
   };
 }
@@ -66,6 +70,47 @@ describe('computeVisibilityScoreV1', () => {
     expect(aligned.breakdown.brandAlignment).toBe(10);
     expect(misaligned.breakdown.brandAlignment).toBe(0);
     expect(aligned.score - misaligned.score).toBe(10);
+  });
+
+  it('uses LLM mention share instead of trend snapshot when LLM samples have mentions', () => {
+    const trendHeavy = computeVisibilityScoreV1(
+      makeInputs({
+        totalMentions: 100,
+        topBrandMentions: 90,
+        topBrand: 'Other',
+        brandName: 'Acme',
+        llmAvgBrandShareOfMentions: 0.2,
+        llmShareSampleCount: 3,
+        llmBrandTopOrTiedRate: 0,
+        llmAnswerSamplesScanned: 10
+      })
+    );
+    expect(trendHeavy.breakdown.mentionShare).toBeCloseTo(14, 5);
+  });
+
+  it('adds brand alignment from LLM top/tied rate when using LLM mention signal', () => {
+    const low = computeVisibilityScoreV1(
+      makeInputs({
+        brandName: 'Acme',
+        topBrand: 'Acme',
+        llmAvgBrandShareOfMentions: 0.5,
+        llmShareSampleCount: 2,
+        llmBrandTopOrTiedRate: 0.4,
+        llmAnswerSamplesScanned: 5
+      })
+    );
+    const high = computeVisibilityScoreV1(
+      makeInputs({
+        brandName: 'Acme',
+        topBrand: 'Other',
+        llmAvgBrandShareOfMentions: 0.5,
+        llmShareSampleCount: 2,
+        llmBrandTopOrTiedRate: 0.6,
+        llmAnswerSamplesScanned: 5
+      })
+    );
+    expect(low.breakdown.brandAlignment).toBe(0);
+    expect(high.breakdown.brandAlignment).toBe(10);
   });
 
   it('adds pipelineMentions from pipeline brand share-of-voice when present', () => {

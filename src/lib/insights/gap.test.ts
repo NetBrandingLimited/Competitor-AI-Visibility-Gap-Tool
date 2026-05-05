@@ -106,7 +106,11 @@ describe('buildGapInsightsFromLatestData', () => {
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
           connectorSignalsAsOf: null,
-          pipelineBrandShareOfVoice: null
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: null,
+          llmShareSampleCount: 0,
+          llmBrandTopOrTiedRate: null,
+          llmAnswerSamplesScanned: 0
         }
       }
     );
@@ -188,7 +192,11 @@ describe('buildGapInsightsFromLatestData', () => {
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
           connectorSignalsAsOf: null,
-          pipelineBrandShareOfVoice: null
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: null,
+          llmShareSampleCount: 0,
+          llmBrandTopOrTiedRate: null,
+          llmAnswerSamplesScanned: 0
         }
       }
     );

@@ -27,7 +27,11 @@ describe('visibility serializers', () => {
         connectorSignalSource: 'live',
         connectorSignalCacheKind: null,
         connectorSignalsAsOf: '2026-04-29',
-        pipelineBrandShareOfVoice: 0.35
+        pipelineBrandShareOfVoice: 0.35,
+        llmAvgBrandShareOfMentions: null,
+        llmShareSampleCount: 0,
+        llmBrandTopOrTiedRate: null,
+        llmAnswerSamplesScanned: 0
       }
     });
 
@@ -38,6 +42,39 @@ describe('visibility serializers', () => {
     expect(payload.signalCount).toBe(3);
     expect(payload.pipelineBrandShareOfVoice).toBe(0.35);
     expect(payload.inputs.pipelineBrandShareOfVoice).toBe(0.35);
+    expect(payload.mentionShareSource).toBe('trend_snapshot');
+  });
+
+  it('sets mentionShareSource to llm_answers when LLM rollup is active', () => {
+    const payload = serializeVisibilityScore({
+      score: 70,
+      createdAt: '2026-04-29T06:00:00.000Z',
+      reasons,
+      inputs: {
+        pipelineRunId: 'run-1',
+        pipelineIngestionSource: 'mock_ingestion',
+        pipelineGscDiagnosticsSummary: null,
+        documentCount: 0,
+        triggerCount: 0,
+        clusterCount: 0,
+        trendDate: null,
+        totalMentions: 0,
+        topBrand: null,
+        topBrandMentions: 0,
+        brandName: 'Acme',
+        connectorSignalCount: 0,
+        connectorSignalSource: 'live',
+        connectorSignalCacheKind: null,
+        connectorSignalsAsOf: null,
+        pipelineBrandShareOfVoice: null,
+        llmAvgBrandShareOfMentions: 0.4,
+        llmShareSampleCount: 2,
+        llmBrandTopOrTiedRate: 0.5,
+        llmAnswerSamplesScanned: 8
+      }
+    });
+    expect(payload.mentionShareSource).toBe('llm_answers');
+    expect(payload.llmShareSampleCount).toBe(2);
   });
 
   it('labels mock pipeline provenance in latest snapshot payload', () => {
@@ -61,7 +98,11 @@ describe('visibility serializers', () => {
         connectorSignalSource: 'live',
         connectorSignalCacheKind: null,
         connectorSignalsAsOf: '2026-04-29',
-        pipelineBrandShareOfVoice: null
+        pipelineBrandShareOfVoice: null,
+        llmAvgBrandShareOfMentions: null,
+        llmShareSampleCount: 0,
+        llmBrandTopOrTiedRate: null,
+        llmAnswerSamplesScanned: 0
       }
     });
 
@@ -89,7 +130,11 @@ describe('visibility serializers', () => {
         connectorSignalSource: 'cache',
         connectorSignalCacheKind: 'ttl',
         connectorSignalsAsOf: null,
-        pipelineBrandShareOfVoice: null
+        pipelineBrandShareOfVoice: null,
+        llmAvgBrandShareOfMentions: null,
+        llmShareSampleCount: 0,
+        llmBrandTopOrTiedRate: null,
+        llmAnswerSamplesScanned: 0
       }
     });
 

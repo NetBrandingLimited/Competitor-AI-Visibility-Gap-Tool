@@ -95,7 +95,11 @@ describe('buildVisibilityReportCsv', () => {
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
           connectorSignalsAsOf: '2026-04-29',
-          pipelineBrandShareOfVoice: null
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: null,
+          llmShareSampleCount: 0,
+          llmBrandTopOrTiedRate: null,
+          llmAnswerSamplesScanned: 0
         }
       }
     );
@@ -137,7 +141,11 @@ describe('buildVisibilityReportCsv', () => {
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
           connectorSignalsAsOf: '2026-04-29',
-          pipelineBrandShareOfVoice: null
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: null,
+          llmShareSampleCount: 0,
+          llmBrandTopOrTiedRate: null,
+          llmAnswerSamplesScanned: 0
         }
       }
     );

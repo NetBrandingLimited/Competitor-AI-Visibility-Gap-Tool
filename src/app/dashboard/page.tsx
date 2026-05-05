@@ -29,7 +29,7 @@ import { prisma } from '@/lib/prisma';
 import { readRecentPipelineRuns } from '@/lib/pipeline/store';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import { FreshnessSectionCard } from '@/lib/ui/freshness';
-import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { getLatestVisibilityScore, visibilityUsesLlmMentionSignal } from '@/lib/visibility/scoreV1';
 import { redirectUnauthenticatedToLogin } from '@/lib/redirect-unauthenticated-to-login';
 
 import VisibilityScoreCard from './VisibilityScoreCard';
@@ -111,7 +111,14 @@ export default async function DashboardPage() {
                 signalCacheKind: visibility.inputs.connectorSignalCacheKind,
                 signalCount: visibility.inputs.connectorSignalCount,
                 signalsAsOf: visibility.inputs.connectorSignalsAsOf,
-                pipelineBrandShareOfVoice: visibility.inputs.pipelineBrandShareOfVoice
+                pipelineBrandShareOfVoice: visibility.inputs.pipelineBrandShareOfVoice,
+                mentionShareSource: visibilityUsesLlmMentionSignal(visibility.inputs)
+                  ? 'llm_answers'
+                  : 'trend_snapshot',
+                llmAvgBrandShareOfMentions: visibility.inputs.llmAvgBrandShareOfMentions,
+                llmShareSampleCount: visibility.inputs.llmShareSampleCount,
+                llmBrandTopOrTiedRate: visibility.inputs.llmBrandTopOrTiedRate,
+                llmAnswerSamplesScanned: visibility.inputs.llmAnswerSamplesScanned
               }
             : null
         }

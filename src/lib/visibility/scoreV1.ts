@@ -1,3 +1,4 @@
+import { loadLlmRollupForScoring } from '@/lib/ai-visibility/rollupLlmSamples';
 import { collectAllConnectorSignals } from '@/lib/connectors';
 import type { VisibilitySignal } from '@/lib/connectors/types';
 import { savedBrandShareFromPipelineDocs } from '@/lib/dashboard/pipelineSnapshot';
@@ -35,10 +36,30 @@ export type VisibilityInputsV1 = {
   connectorSignalsAsOf: string | null;
   /**
    * Share of voice (0–1) for the saved brand in the latest pipeline run’s document text (null if no run / no brand / no docs).
-   * Primary “real” text signal from ingested queries/pages (GSC or mock).
+   * Supplemental signal from ingested page/query text (GSC or mock).
    */
   pipelineBrandShareOfVoice: number | null;
+  /**
+   * Recent stored LLM assistant answers (up to 50): mean brand mention share among answers that mention any tracked brand.
+   * When present, this drives the mention-share and brand-alignment slices of the score instead of the trend snapshot.
+   */
+  llmAvgBrandShareOfMentions: number | null;
+  /** Count of LLM answers in the rollup window that had ≥1 tracked-brand mention (denominator for the average). */
+  llmShareSampleCount: number;
+  /** Among those mention-bearing LLM answers, fraction where the workspace brand ties or leads on raw mention counts. */
+  llmBrandTopOrTiedRate: number | null;
+  /** How many LLM answer rows were read for the rollup (≤50). */
+  llmAnswerSamplesScanned: number;
 };
+
+/** True when the visibility score uses LLM answer text for mention-share / alignment (not the mock trend snapshot). */
+export function visibilityUsesLlmMentionSignal(inputs: VisibilityInputsV1): boolean {
+  return (
+    inputs.llmShareSampleCount > 0 &&
+    inputs.llmAvgBrandShareOfMentions != null &&
+    Number.isFinite(inputs.llmAvgBrandShareOfMentions)
+  );
+}
 
 function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
   const cacheKind =
@@ -60,11 +81,41 @@ function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
     inputs.pipelineBrandShareOfVoice <= 1
       ? inputs.pipelineBrandShareOfVoice
       : null;
+  const llmShareSampleCount =
+    typeof inputs.llmShareSampleCount === 'number' &&
+    Number.isFinite(inputs.llmShareSampleCount) &&
+    inputs.llmShareSampleCount >= 0
+      ? Math.floor(inputs.llmShareSampleCount)
+      : 0;
+  const llmAnswerSamplesScanned =
+    typeof inputs.llmAnswerSamplesScanned === 'number' &&
+    Number.isFinite(inputs.llmAnswerSamplesScanned) &&
+    inputs.llmAnswerSamplesScanned >= 0
+      ? Math.floor(inputs.llmAnswerSamplesScanned)
+      : 0;
+  const llmAvgBrandShareOfMentions =
+    typeof inputs.llmAvgBrandShareOfMentions === 'number' &&
+    Number.isFinite(inputs.llmAvgBrandShareOfMentions) &&
+    inputs.llmAvgBrandShareOfMentions >= 0 &&
+    inputs.llmAvgBrandShareOfMentions <= 1
+      ? inputs.llmAvgBrandShareOfMentions
+      : null;
+  const llmBrandTopOrTiedRate =
+    typeof inputs.llmBrandTopOrTiedRate === 'number' &&
+    Number.isFinite(inputs.llmBrandTopOrTiedRate) &&
+    inputs.llmBrandTopOrTiedRate >= 0 &&
+    inputs.llmBrandTopOrTiedRate <= 1
+      ? inputs.llmBrandTopOrTiedRate
+      : null;
   return {
     ...inputs,
     pipelineIngestionSource,
     pipelineGscDiagnosticsSummary,
     pipelineBrandShareOfVoice,
+    llmShareSampleCount,
+    llmAnswerSamplesScanned,
+    llmAvgBrandShareOfMentions,
+    llmBrandTopOrTiedRate,
     connectorSignalSource:
       inputs.connectorSignalSource === 'cache' || inputs.connectorSignalSource === 'live'
         ? inputs.connectorSignalSource
@@ -169,16 +220,25 @@ function latestSignalAsOf(signals: VisibilitySignal[]): string | null {
 }
 
 /**
- * v1 heuristic score (0–100) from pipeline text mention share, pipeline metadata, trend snapshot, and connector signals.
+ * v1 heuristic score (0–100): mention share from recent LLM answers when available, else trend snapshot;
+ * plus pipeline doc share, pipeline metadata, and connector signals.
  */
 export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: number; breakdown: Record<string, number> } {
   const triggerPoints = Math.min(28, inputs.triggerCount * 2.5);
   const clusterPoints = Math.min(18, inputs.clusterCount * 2.2);
   const docPoints = Math.min(10, inputs.documentCount * 1.2);
+  const usesLlm = visibilityUsesLlmMentionSignal(inputs);
   const trendShare =
     inputs.totalMentions > 0 ? inputs.topBrandMentions / inputs.totalMentions : 0;
-  const trendPoints = Math.min(24, trendShare * 70);
-  const brandAlignPoints = brandMatchesTop(inputs.brandName, inputs.topBrand) ? 10 : 0;
+  const mentionShareForPoints = usesLlm ? inputs.llmAvgBrandShareOfMentions! : trendShare;
+  const mentionSharePoints = Math.min(24, mentionShareForPoints * 70);
+  const brandAlignPoints = usesLlm
+    ? inputs.llmBrandTopOrTiedRate != null && inputs.llmBrandTopOrTiedRate >= 0.5
+      ? 10
+      : 0
+    : brandMatchesTop(inputs.brandName, inputs.topBrand)
+      ? 10
+      : 0;
   const connectorPoints = Math.min(10, inputs.connectorSignalCount * 3);
   const pipelineMentionPoints =
     inputs.pipelineBrandShareOfVoice != null
@@ -190,7 +250,7 @@ export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: n
     triggerPoints +
     clusterPoints +
     docPoints +
-    trendPoints +
+    mentionSharePoints +
     brandAlignPoints +
     connectorPoints +
     pipelineMentionPoints;
@@ -203,7 +263,7 @@ export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: n
       triggers: triggerPoints,
       clusters: clusterPoints,
       documents: docPoints,
-      trendShare: trendPoints,
+      mentionShare: mentionSharePoints,
       brandAlignment: brandAlignPoints,
       connectors: connectorPoints,
       pipelineMentions: pipelineMentionPoints
@@ -238,7 +298,7 @@ export function buildWhyChanged(
     return [
       {
         code: 'BASELINE',
-        message: `First visibility score recorded (${nextScore}/100). Run pipeline + trend jobs again to see why-changed deltas.`
+        message: `First visibility score recorded (${nextScore}/100). Recalculate after pipeline runs, trend jobs, or new LLM answer samples to see deltas.`
       }
     ];
   }
@@ -279,24 +339,68 @@ export function buildWhyChanged(
     reasons.push(c);
   }
 
-  const prevShare = p.totalMentions > 0 ? p.topBrandMentions / p.totalMentions : 0;
-  const nextShare = n.totalMentions > 0 ? n.topBrandMentions / n.totalMentions : 0;
-  if (Math.abs(nextShare - prevShare) > 0.001 || p.topBrand !== n.topBrand) {
+  const prevUsesLlm = visibilityUsesLlmMentionSignal(p);
+  const nextUsesLlm = visibilityUsesLlmMentionSignal(n);
+
+  if (prevUsesLlm !== nextUsesLlm) {
     reasons.push({
-      code: 'TREND_TOP_BRAND',
-      message: `Trend snapshot: top brand is now "${n.topBrand ?? '—'}" with ${(nextShare * 100).toFixed(1)}% share of mock mentions (was "${p.topBrand ?? '—'}" at ${(prevShare * 100).toFixed(1)}%).`
+      code: 'MENTION_SIGNAL_SOURCE',
+      message: nextUsesLlm
+        ? `Mention share in this score now comes from recent LLM assistant answers (${n.llmAnswerSamplesScanned}-sample window, ${n.llmShareSampleCount} with tracked-brand mentions) instead of the trend snapshot.`
+        : 'Mention share in this score now uses the trend snapshot again (no recent LLM answers mention tracked brands).'
     });
   }
 
-  const prevAlign = brandMatchesTop(p.brandName, p.topBrand);
-  const nextAlign = brandMatchesTop(n.brandName, n.topBrand);
-  if (prevAlign !== nextAlign) {
-    reasons.push({
-      code: 'BRAND_ALIGNMENT',
-      message: nextAlign
-        ? 'Your saved brand now aligns with the top brand in the latest trend snapshot (+weight in score).'
-        : 'Your saved brand no longer matches the top brand in the trend snapshot (alignment weight removed).'
-    });
+  if (nextUsesLlm) {
+    const prevAvg = prevUsesLlm ? p.llmAvgBrandShareOfMentions : null;
+    const nextAvg = n.llmAvgBrandShareOfMentions;
+    if (
+      !prevUsesLlm ||
+      prevAvg == null ||
+      nextAvg == null ||
+      Math.abs(nextAvg - prevAvg) > 0.02 ||
+      p.llmShareSampleCount !== n.llmShareSampleCount
+    ) {
+      reasons.push({
+        code: 'LLM_MENTION_SHARE',
+        message: `LLM answers: average brand mention share is ${((nextAvg ?? 0) * 100).toFixed(1)}% across ${n.llmShareSampleCount} answer(s) with mentions (scanned ${n.llmAnswerSamplesScanned} recent samples).`
+      });
+    }
+  } else {
+    const prevShare = p.totalMentions > 0 ? p.topBrandMentions / p.totalMentions : 0;
+    const nextShare = n.totalMentions > 0 ? n.topBrandMentions / n.totalMentions : 0;
+    if (Math.abs(nextShare - prevShare) > 0.001 || p.topBrand !== n.topBrand) {
+      reasons.push({
+        code: 'TREND_TOP_BRAND',
+        message: `Trend snapshot: top brand is now "${n.topBrand ?? '—'}" with ${(nextShare * 100).toFixed(1)}% share of mock mentions (was "${p.topBrand ?? '—'}" at ${(prevShare * 100).toFixed(1)}%).`
+      });
+    }
+  }
+
+  if (nextUsesLlm) {
+    const prevRate = prevUsesLlm ? p.llmBrandTopOrTiedRate : null;
+    const nextRate = n.llmBrandTopOrTiedRate;
+    const prevAlign = Boolean(prevUsesLlm && prevRate != null && prevRate >= 0.5);
+    const nextAlign = Boolean(nextRate != null && nextRate >= 0.5);
+    if (prevAlign !== nextAlign) {
+      reasons.push({
+        code: 'BRAND_ALIGNMENT',
+        message: nextAlign
+          ? 'Your brand now leads or ties on mentions in a majority of recent LLM answers (+weight in score).'
+          : 'Your brand no longer leads or ties on mentions in a majority of recent LLM answers (alignment weight removed).'
+      });
+    }
+  } else {
+    const prevAlign = brandMatchesTop(p.brandName, p.topBrand);
+    const nextAlign = brandMatchesTop(n.brandName, n.topBrand);
+    if (prevAlign !== nextAlign) {
+      reasons.push({
+        code: 'BRAND_ALIGNMENT',
+        message: nextAlign
+          ? 'Your saved brand now aligns with the top brand in the latest trend snapshot (+weight in score).'
+          : 'Your saved brand no longer matches the top brand in the trend snapshot (alignment weight removed).'
+      });
+    }
   }
 
   if (p.connectorSignalCount !== n.connectorSignalCount) {
@@ -391,22 +495,16 @@ export function buildWhyChanged(
 }
 
 export async function buildInputsForOrg(organizationId: string): Promise<VisibilityInputsV1> {
-  const [org, latestRun, latestTrend, signalState] = await Promise.all([
-    prisma.organization.findUnique({
-      where: { id: organizationId },
-      select: {
-        brandName: true,
-        category: true,
-        competitorA: true,
-        competitorB: true,
-        competitorC: true
-      }
-    }),
-    readLatestPipelineRun(organizationId),
-    readLatestTrendSnapshot(organizationId),
-    readSignalsForScoring(organizationId)
-  ]);
-  const signals = signalState.signals;
+  const org = await prisma.organization.findUnique({
+    where: { id: organizationId },
+    select: {
+      brandName: true,
+      category: true,
+      competitorA: true,
+      competitorB: true,
+      competitorC: true
+    }
+  });
   const orgFields = org
     ? {
         brandName: org.brandName,
@@ -416,6 +514,14 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
         competitorC: org.competitorC
       }
     : {};
+
+  const [latestRun, latestTrend, signalState, llmRollup] = await Promise.all([
+    readLatestPipelineRun(organizationId),
+    readLatestTrendSnapshot(organizationId),
+    readSignalsForScoring(organizationId),
+    loadLlmRollupForScoring(organizationId, orgFields)
+  ]);
+  const signals = signalState.signals;
 
   return {
     pipelineRunId: latestRun?.id ?? null,
@@ -435,7 +541,11 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
     connectorSignalSource: signalState.source,
     connectorSignalCacheKind: signalState.cacheKind,
     connectorSignalsAsOf: latestSignalAsOf(signals),
-    pipelineBrandShareOfVoice: savedBrandShareFromPipelineDocs(orgFields, latestRun)
+    pipelineBrandShareOfVoice: savedBrandShareFromPipelineDocs(orgFields, latestRun),
+    llmAvgBrandShareOfMentions: llmRollup.avgBrandShareOfMentions,
+    llmShareSampleCount: llmRollup.shareSampleCount,
+    llmBrandTopOrTiedRate: llmRollup.brandTopOrTiedRate,
+    llmAnswerSamplesScanned: llmRollup.answerSamplesScanned
   };
 }
 
