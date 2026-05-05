@@ -50,6 +50,7 @@ model Organization {
   visibilityScoreSnapshots VisibilityScoreSnapshot[]
   weeklyDigests           WeeklyDigest[]
   trackedPrompts        TrackedPrompt[]
+  aiAnswerSamples       AiAnswerSample[]
 }
 
 model OrganizationMember {
@@ -153,6 +154,30 @@ model TrackedPrompt {
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
   organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  answerSamples         AiAnswerSample[]
 
   @@index([organizationId, sortOrder])
+}
+
+/// One stored assistant reply for a tracked prompt × surface (from provider API, not search/doc ingestion).
+model AiAnswerSample {
+  id                String       @id @default(cuid())
+  organizationId    String
+  trackedPromptId   String
+  /// PromptSurfaceId string e.g. openai_chatgpt
+  surface           String
+  /// Provider id e.g. openai, anthropic
+  provider          String
+  /// Model name returned by or sent to the API
+  model             String
+  /// Full model output when successful
+  answerText        String       @default("")
+  /// Set when the provider call failed (answerText may be empty)
+  error             String?
+  createdAt         DateTime     @default(now())
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  trackedPrompt     TrackedPrompt @relation(fields: [trackedPromptId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([trackedPromptId, createdAt])
 }

@@ -1,7 +1,7 @@
 /**
  * Measurement unit for the AI-answer visibility vision:
  * one row = **what we ask** (prompt text + metadata) × **where we plan to ask it** (target surfaces).
- * Scheduler / LLM connectors will later execute `(prompt × surface)` runs on a cadence.
+ * Collection uses provider APIs for supported surfaces (see `collectAnswers.ts`); scheduler cadence can reuse that.
  */
 
 /** Named product surfaces where the same prompt may be executed (API or UI automation TBD). */

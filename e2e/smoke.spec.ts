@@ -151,6 +151,8 @@ test.describe('public API', () => {
   test('GET session-protected JSON API routes return 401 when signed out', async ({ request }) => {
     const paths = [
       '/api/orgs/org-1',
+      '/api/orgs/org-1/tracked-prompts',
+      '/api/orgs/org-1/ai-answers',
       '/api/orgs/org-1/insights/gaps',
       '/api/orgs/org-1/digest/schedule',
       '/api/orgs/org-1/digest/weekly',
@@ -203,6 +205,14 @@ test.describe('public API', () => {
             method: 'PUT',
             headers: { 'content-type': 'application/json' },
             data: JSON.stringify({ prompts: [] })
+          })
+      },
+      {
+        label: 'POST /api/orgs/.../ai-answers/collect',
+        run: () =>
+          request.post('/api/orgs/org-1/ai-answers/collect', {
+            headers: { 'content-type': 'application/json' },
+            data: JSON.stringify({})
           })
       },
       { label: 'POST /api/orgs/.../digest/weekly', run: () => request.post('/api/orgs/org-1/digest/weekly') },

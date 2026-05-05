@@ -1086,3 +1086,31 @@ thead .data-table-sticky-col {
   font-size: 14px;
 }
 
+.subheading-prompts {
+  font-size: 1.35rem;
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+.list-plain {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.prompt-snippet {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.answer-pre {
+  margin: 0;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow: auto;
+}
+

@@ -15,6 +15,20 @@ import { membershipCanEdit } from '@/lib/roles';
 
 type Org = { id: string; name: string; role: string };
 
+type AnswerSampleRow = {
+  id: string;
+  trackedPromptId: string;
+  promptText: string;
+  promptLabel: string | null;
+  surface: string;
+  surfaceLabel: string;
+  provider: string;
+  model: string;
+  answerText: string;
+  error: string | null;
+  createdAt: string;
+};
+
 type DraftPrompt = {
   id?: string;
   text: string;
@@ -54,6 +68,10 @@ export default function TrackedPromptsForm() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [samples, setSamples] = useState<AnswerSampleRow[]>([]);
+  const [samplesLoading, setSamplesLoading] = useState(true);
+  const [collecting, setCollecting] = useState(false);
+  const [collectMessage, setCollectMessage] = useState('');
 
   const selected = orgs.find((o) => o.id === orgId);
   const canEdit = selected ? membershipCanEdit(selected.role) : false;
@@ -107,6 +125,81 @@ export default function TrackedPromptsForm() {
       cancelled = true;
     };
   }, [orgId]);
+
+  useEffect(() => {
+    if (!orgId) {
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      setSamplesLoading(true);
+      const res = await fetch(`/api/orgs/${orgId}/ai-answers?limit=30`, { credentials: 'include' });
+      if (cancelled || !res.ok) {
+        setSamplesLoading(false);
+        return;
+      }
+      const data = (await res.json()) as { samples: AnswerSampleRow[] };
+      if (!cancelled) {
+        setSamples(data.samples ?? []);
+      }
+      setSamplesLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [orgId]);
+
+  async function collectAnswers() {
+    if (!orgId || !canEdit) {
+      return;
+    }
+    setCollectMessage('');
+    setCollecting(true);
+    try {
+      const res = await fetch(`/api/orgs/${orgId}/ai-answers/collect`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      const data = (await res.json()) as {
+        summary?: {
+          attempted: number;
+          persisted: number;
+          skippedNoCredentials: { surface: string; reason: string }[];
+          failures: { message: string }[];
+        };
+        envHints?: { openai: boolean; anthropic: boolean };
+      };
+      if (!res.ok) {
+        setCollectMessage(`Collect failed (${res.status}).`);
+        return;
+      }
+      const s = data.summary;
+      const hints = data.envHints;
+      const parts: string[] = [];
+      if (s) {
+        parts.push(`attempted ${s.attempted}, persisted ${s.persisted}`);
+        if (s.skippedNoCredentials.length > 0) {
+          parts.push(`skipped ${s.skippedNoCredentials.length} (missing keys or unsupported surfaces)`);
+        }
+        if (s.failures.length > 0) {
+          parts.push(`${s.failures.length} failure(s) recorded`);
+        }
+      }
+      if (hints && !hints.openai && !hints.anthropic) {
+        parts.push('Set OPENAI_API_KEY and/or ANTHROPIC_API_KEY on the server.');
+      }
+      setCollectMessage(parts.join(' · ') || 'Done.');
+      const refresh = await fetch(`/api/orgs/${orgId}/ai-answers?limit=30`, { credentials: 'include' });
+      if (refresh.ok) {
+        const again = (await refresh.json()) as { samples: AnswerSampleRow[] };
+        setSamples(again.samples ?? []);
+      }
+    } finally {
+      setCollecting(false);
+    }
+  }
 
   function toggleSurface(rowIndex: number, surface: PromptSurfaceId, on: boolean) {
     setRows((prev) =>
@@ -193,7 +286,8 @@ export default function TrackedPromptsForm() {
   }
 
   return (
-    <form method="post" className="brand-form" onSubmit={onSubmit}>
+    <div className="brand-form">
+    <form method="post" onSubmit={onSubmit}>
       {orgs.length > 1 ? (
         <label className="field" htmlFor="prompts-organizationId">
           <span>Workspace</span>
@@ -265,7 +359,7 @@ export default function TrackedPromptsForm() {
           <div className="field">
             <span>Target surfaces</span>
             <small className="field-hint-small">
-              Where you plan to run this prompt when AI-answer collection ships.
+              OpenAI ChatGPT and Anthropic Claude use provider APIs when you click Collect answers below.
             </small>
             <div className="prompt-surface-grid">
               {PROMPT_SURFACE_IDS.map((sid) => (
@@ -329,5 +423,64 @@ export default function TrackedPromptsForm() {
         </p>
       ) : null}
     </form>
+
+    <section className="mt-24">
+      <h2 className="subheading-prompts">AI answers (API)</h2>
+      <p className="text-muted-note-wide">
+        Stores <strong>real assistant output text</strong> from OpenAI / Anthropic APIs — not Search Console rows.
+        Keys are server-side only (<code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>; see{' '}
+        <code>.env.example</code>).
+      </p>
+      {canEdit ? (
+        <div className="actions">
+          <button type="button" className="primary" disabled={collecting} onClick={() => void collectAnswers()}>
+            {collecting ? 'Collecting…' : 'Collect answers now'}
+          </button>
+        </div>
+      ) : (
+        <p className="text-muted-small">Editors can run collection; viewers see samples only.</p>
+      )}
+      {collectMessage ? (
+        <p
+          className={collectMessage.includes('failed') ? 'error' : 'success'}
+          role="status"
+          aria-live="polite"
+        >
+          <EllipsisStatusText text={collectMessage} />
+        </p>
+      ) : null}
+
+      <h3 className="subheading-sm mt-16">Recent samples</h3>
+      {samplesLoading ? (
+        <p className="text-muted-note">Loading samples…</p>
+      ) : samples.length === 0 ? (
+        <p className="text-muted-note">No samples yet.</p>
+      ) : (
+        <ul className="list-plain answers-sample-list">
+          {samples.map((s) => (
+            <li key={s.id} className="panel-box-info mb-12">
+              <p className="text-metric-line">
+                <strong>{s.surfaceLabel}</strong> · {s.provider} · <code>{s.model}</code> ·{' '}
+                {new Date(s.createdAt).toLocaleString()}
+              </p>
+              {s.promptLabel ? (
+                <p className="text-muted-small mt-0 mb-4">
+                  <strong>{s.promptLabel}</strong>
+                </p>
+              ) : null}
+              <p className="text-muted-small-subtle mt-0 mb-6 prompt-snippet">{s.promptText}</p>
+              {s.error ? (
+                <p className="error text-muted-small mt-0">
+                  <strong>Error:</strong> <EllipsisStatusText text={s.error} />
+                </p>
+              ) : (
+                <pre className="answer-pre">{s.answerText || '(empty)'}</pre>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+    </div>
   );
 }

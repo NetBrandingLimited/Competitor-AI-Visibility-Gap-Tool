@@ -18,8 +18,10 @@ export default async function TrackedPromptsSettingsPage() {
     <section>
       <h1>AI prompt library</h1>
       <p>
-        Define the prompts and surfaces that will form each <strong>measurement unit</strong> when AI-answer
-        monitoring is connected. This does not run models yet—it only stores your workspace library.
+        Define prompts and target surfaces for each <strong>measurement unit</strong>. Save your library here; when{' '}
+        <code>OPENAI_API_KEY</code> / <code>ANTHROPIC_API_KEY</code> are set on the server, use{' '}
+        <strong>Collect answers now</strong> to store real API model outputs (separate from Search Console pipeline
+        documents).
       </p>
       <TrackedPromptsForm />
       <p className="mt-24">
