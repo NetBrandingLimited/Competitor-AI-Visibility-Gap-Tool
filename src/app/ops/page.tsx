@@ -139,6 +139,10 @@ export default async function OpsPage({
       <p>
         Workspace: <EllipsisStrong text={active.organizationName} />
       </p>
+      <p className="text-muted-note">
+        Health: <Link href="/api/health">GET /api/health</Link> (liveness, no DB) ·{' '}
+        <Link href="/api/health/ready">GET /api/health/ready</Link> (readiness, checks database; use for load balancers).
+      </p>
       <p>
         Scheduler runs in this workspace only. Default pipeline query comes from your brand settings; optional{' '}
         <code>query=</code> overrides. Weekly digest is generated only when schedule is due (or forced).

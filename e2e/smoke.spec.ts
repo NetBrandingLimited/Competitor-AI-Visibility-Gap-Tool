@@ -110,6 +110,19 @@ test.describe('public API', () => {
     expect(body.service).toBe('health');
   });
 
+  test('GET /api/health/ready returns ok when database is reachable', async ({ request }) => {
+    const response = await request.get('/api/health/ready');
+    expect(response.ok()).toBe(true);
+    const body = (await response.json()) as {
+      ok?: boolean;
+      service?: string;
+      checks?: { database?: string };
+    };
+    expect(body.ok).toBe(true);
+    expect(body.service).toBe('ready');
+    expect(body.checks?.database).toBe('ok');
+  });
+
   test('GET /api/placeholder returns ok without auth', async ({ request }) => {
     const res = await request.get('/api/placeholder');
     expect(res.ok()).toBe(true);
