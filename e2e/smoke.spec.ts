@@ -3,8 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
- * That suite includes UI smoke, `GET /api/reports/trends.csv` + full `export.csv` (editor), editor `POST` visibility
- * recalc, and viewer `403` on editor-only org routes (`POST visibility`, `PATCH brand`, `PATCH digest/schedule`).
+ * That suite includes UI smoke, report CSVs (`trends`, `export`, `pipeline-runs`, `weekly-digests`; viewer can GET
+ * `trends` + `export`), editor `POST` visibility recalc, and viewer `403` on editor-only org routes (`POST visibility`,
+ * `PATCH brand`, `PATCH digest/schedule`).
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -320,6 +321,47 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     expect(body).toContain('digestPipelineIngestionSource');
   });
 
+  test('editor session can download pipeline-runs CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/pipeline-runs.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    expect((res.headers()['content-disposition'] ?? '').toLowerCase()).toContain('pipeline-runs.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('ingestionSource');
+    expect(body).toContain('gscDiagnosticsSummary');
+  });
+
+  test('editor session can download weekly-digests CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/weekly-digests.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    expect((res.headers()['content-disposition'] ?? '').toLowerCase()).toContain('weekly-digests.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('periodStart');
+    expect(body).toContain('connectorSignals');
+    expect(body).toContain('pipelineGscDiagnosticsSummary');
+  });
+
   test('editor session can POST visibility recalc', async ({ page }) => {
     test.setTimeout(120_000);
     const orgId = 'seed-demo-org';
@@ -352,6 +394,26 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const body = await res.text();
     expect(body.startsWith('\uFEFF')).toBe(true);
     expect(body).toContain('date');
+  });
+
+  test('viewer session can download full visibility export CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/reports/export.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    expect((res.headers()['content-disposition'] ?? '').toLowerCase()).toContain('visibility-report.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('section');
+    expect(body).toContain('visibilityScore');
   });
 
   test('viewer receives 403 when POSTing visibility recalc (editor-only)', async ({ page }) => {
