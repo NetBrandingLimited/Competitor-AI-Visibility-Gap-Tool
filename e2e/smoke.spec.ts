@@ -174,11 +174,19 @@ test.describe('public API', () => {
   });
 
   test('Org-scoped mutating API routes return 401 when signed out', async ({ request }) => {
-    const json = { data: {} };
     const cases = [
-      { label: 'PATCH /api/orgs/.../brand', run: () => request.patch('/api/orgs/org-1/brand', json) },
-      { label: 'PATCH /api/orgs/.../connectors', run: () => request.patch('/api/orgs/org-1/connectors', json) },
-      { label: 'POST /api/orgs/.../connectors', run: () => request.post('/api/orgs/org-1/connectors', json) },
+      {
+        label: 'PATCH /api/orgs/.../brand',
+        run: () => request.patch('/api/orgs/org-1/brand', { data: {} })
+      },
+      {
+        label: 'PATCH /api/orgs/.../connectors',
+        run: () => request.patch('/api/orgs/org-1/connectors', { data: {} })
+      },
+      {
+        label: 'POST /api/orgs/.../connectors',
+        run: () => request.post('/api/orgs/org-1/connectors', { data: {} })
+      },
       { label: 'POST /api/orgs/.../connectors/signals', run: () => request.post('/api/orgs/org-1/connectors/signals') },
       {
         label: 'DELETE /api/orgs/.../connectors/signals',
@@ -186,7 +194,7 @@ test.describe('public API', () => {
       },
       {
         label: 'PATCH /api/orgs/.../digest/schedule',
-        run: () => request.patch('/api/orgs/org-1/digest/schedule', json)
+        run: () => request.patch('/api/orgs/org-1/digest/schedule', { data: {} })
       },
       { label: 'POST /api/orgs/.../digest/weekly', run: () => request.post('/api/orgs/org-1/digest/weekly') },
       { label: 'POST /api/orgs/.../visibility', run: () => request.post('/api/orgs/org-1/visibility') }
@@ -534,9 +542,9 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const res = await page.request.post(`/api/orgs/${orgId}/visibility`);
     expect(res.status()).toBe(403);
     expect(res.headers()['content-type'] ?? '').toContain('application/json');
-    const json = (await res.json()) as { error?: string; required?: string };
-    expect(json.error).toBe('forbidden');
-    expect(json.required).toBe('EDITOR');
+    const errorPayload = (await res.json()) as { error?: string; required?: string };
+    expect(errorPayload.error).toBe('forbidden');
+    expect(errorPayload.required).toBe('EDITOR');
   });
 
   test('viewer receives 403 when PATCHing brand settings (editor-only)', async ({ page }) => {
@@ -549,13 +557,14 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await submitLoginForm(page, user, pass);
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
 
-    const res = await page.request.patch(`/api/orgs/${orgId}/brand`, {
+    const res = await page.request.fetch(`/api/orgs/${orgId}/brand`, {
+      method: 'PATCH',
       data: { brandName: 'E2E viewer must not apply this' }
     });
     expect(res.status()).toBe(403);
-    const json = (await res.json()) as { error?: string; required?: string };
-    expect(json.error).toBe('forbidden');
-    expect(json.required).toBe('EDITOR');
+    const errorPayload = (await res.json()) as { error?: string; required?: string };
+    expect(errorPayload.error).toBe('forbidden');
+    expect(errorPayload.required).toBe('EDITOR');
   });
 
   test('viewer receives 403 when PATCHing weekly digest schedule (editor-only)', async ({ page }) => {
@@ -568,13 +577,14 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await submitLoginForm(page, user, pass);
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
 
-    const res = await page.request.patch(`/api/orgs/${orgId}/digest/schedule`, {
+    const res = await page.request.fetch(`/api/orgs/${orgId}/digest/schedule`, {
+      method: 'PATCH',
       data: { enabled: true, dayUtc: 2, hourUtc: 10 }
     });
     expect(res.status()).toBe(403);
-    const json = (await res.json()) as { error?: string; required?: string };
-    expect(json.error).toBe('forbidden');
-    expect(json.required).toBe('EDITOR');
+    const errorPayload = (await res.json()) as { error?: string; required?: string };
+    expect(errorPayload.error).toBe('forbidden');
+    expect(errorPayload.required).toBe('EDITOR');
   });
 
   test('viewer has read-only brand/connectors and no editor-only job controls', async ({ page }) => {
