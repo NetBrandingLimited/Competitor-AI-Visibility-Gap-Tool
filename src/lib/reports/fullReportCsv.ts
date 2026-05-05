@@ -1,12 +1,31 @@
 import { weeklyDigestPipelineLabel, weeklyDigestSignalsLabel, type WeeklyDigest } from '@/lib/digest/weekly';
 import type { GapInsights } from '@/lib/insights/gap';
 import type { TrendSnapshot } from '@/lib/trends/store';
-import type { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { visibilityUsesLlmMentionSignal, type getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
 import { buildCsvDocument } from './csv';
 
 type LatestVisibilitySnapshot = NonNullable<Awaited<ReturnType<typeof getLatestVisibilityScore>>>;
 
-const VIS_COLS_TAIL = ['', '', '', '', ''] as const;
+/** Empty cells for non–visibility-score rows (score + provenance + LLM rollup columns). */
+const VISIBILITY_SCORE_CSV_TAIL_PLACEHOLDER = ['', '', '', '', '', '', '', '', '', '', ''] as const;
+
+function visibilityScoreRowTail(v: LatestVisibilitySnapshot): string[] {
+  const i = v.inputs;
+  const mentionSource = visibilityUsesLlmMentionSignal(i) ? 'llm_answers' : 'trend_snapshot';
+  return [
+    String(Math.round(v.score)),
+    v.createdAt,
+    i.pipelineIngestionSource ?? '',
+    i.pipelineGscDiagnosticsSummary ?? '',
+    i.pipelineRunId ?? '',
+    mentionSource,
+    i.pipelineBrandShareOfVoice != null ? String(i.pipelineBrandShareOfVoice) : '',
+    i.llmAvgBrandShareOfMentions != null ? String(i.llmAvgBrandShareOfMentions) : '',
+    String(i.llmShareSampleCount ?? 0),
+    i.llmBrandTopOrTiedRate != null ? String(i.llmBrandTopOrTiedRate) : '',
+    String(i.llmAnswerSamplesScanned ?? 0)
+  ];
+}
 
 export function buildVisibilityReportCsv(
   snapshots: TrendSnapshot[],
@@ -42,7 +61,13 @@ export function buildVisibilityReportCsv(
     'visibilityCreatedAt',
     'visibilityPipelineIngestionSource',
     'visibilityPipelineGscDiagnosticsSummary',
-    'visibilityPipelineRunId'
+    'visibilityPipelineRunId',
+    'visibilityMentionShareSource',
+    'visibilityPipelineBrandShareOfVoice',
+    'visibilityLlmAvgBrandShareOfMentions',
+    'visibilityLlmShareSampleCount',
+    'visibilityLlmBrandTopOrTiedRate',
+    'visibilityLlmAnswerSamplesScanned'
   ];
 
   const trendRows = snapshots.map((row) =>
@@ -70,13 +95,13 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ...VIS_COLS_TAIL
+      ...VISIBILITY_SCORE_CSV_TAIL_PLACEHOLDER
     ]
   );
 
   const opportunityRows = gapInsights.opportunities.map((item) => {
     const gscRunId = item.pipelineRunIdForGsc?.trim() ?? '';
-    const opportunityVisTail = ['', '', '', '', gscRunId] as const;
+    const opportunityVisTail = ['', '', '', '', gscRunId, '', '', '', '', '', ''] as const;
     return [
       'gap_opportunity',
       '',
@@ -130,7 +155,7 @@ export function buildVisibilityReportCsv(
       '',
       '',
       '',
-      ...VIS_COLS_TAIL
+      ...VISIBILITY_SCORE_CSV_TAIL_PLACEHOLDER
     ]
   );
 
@@ -160,7 +185,7 @@ export function buildVisibilityReportCsv(
           weeklyDigestPipelineLabel(latestDigest.summary),
           latestDigest.summary.pipelineIngestionSource ?? '',
           latestDigest.summary.pipelineGscDiagnosticsSummary ?? '',
-          ...VIS_COLS_TAIL
+          ...VISIBILITY_SCORE_CSV_TAIL_PLACEHOLDER
         ]
       ]
     : [];
@@ -191,11 +216,7 @@ export function buildVisibilityReportCsv(
           '',
           '',
           '',
-          Math.round(latestVisibility.score),
-          latestVisibility.createdAt,
-          latestVisibility.inputs.pipelineIngestionSource ?? '',
-          latestVisibility.inputs.pipelineGscDiagnosticsSummary ?? '',
-          latestVisibility.inputs.pipelineRunId ?? ''
+          ...visibilityScoreRowTail(latestVisibility)
         ]
       ]
     : [];

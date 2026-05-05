@@ -9,7 +9,7 @@ import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
 import { pipelineIngestionProvenanceDescription } from '@/lib/ingestion/sourceDisplayLabel';
 import { readLatestTrendSnapshot } from '@/lib/trends/store';
 import type { TrendSnapshot } from '@/lib/trends/store';
-import { getLatestVisibilityScore } from '@/lib/visibility/scoreV1';
+import { getLatestVisibilityScore, visibilityUsesLlmMentionSignal } from '@/lib/visibility/scoreV1';
 
 export type GapOpportunity = {
   id: string;
@@ -157,14 +157,14 @@ export function buildGapInsightsFromLatestData(
     const top = norm(latestTrend.topBrand);
     const brand = norm(brandName);
     if (brand && top && !top.includes(brand) && !brand.includes(top)) {
+      const scoreUsesLlm = Boolean(visibility && visibilityUsesLlmMentionSignal(visibility.inputs));
+      const leaderDetail = scoreUsesLlm
+        ? `${latestTrend.topBrand} leads in the trend snapshot (mock leaderboard). Your visibility score’s mention weight uses recent LLM answers—check Tracked prompts if real model output tells a different story.`
+        : `${latestTrend.topBrand} is currently leading in mentions. Prioritize comparison/replacement content focused on ${brandName} vs top rival claims.`;
       opportunities.push({
         id: 'trend-leader-gap',
-        title: 'Top-of-mentions leadership gap',
-        detail: appendPipelineGscToDetail(
-          `${latestTrend.topBrand} is currently leading in mentions. Prioritize comparison/replacement content focused on ${brandName} vs top rival claims.`,
-          latestRun,
-          visibility
-        ),
+        title: scoreUsesLlm ? 'Trend snapshot: rival leading (mock leaderboard)' : 'Top-of-mentions leadership gap',
+        detail: appendPipelineGscToDetail(leaderDetail, latestRun, visibility),
         priority: 'high',
         ...gscRunLinkFields
       });
@@ -172,14 +172,14 @@ export function buildGapInsightsFromLatestData(
   }
 
   if (visibility && visibility.score < 55) {
+    const scoreUsesLlm = visibilityUsesLlmMentionSignal(visibility.inputs);
+    const lowScoreDetail = scoreUsesLlm
+      ? `Current score is ${Math.round(visibility.score)}. Mention share is weighted from LLM answers—improve brand presence in tracked prompts and model outputs; keep strengthening high-intent triggers and weak topics.`
+      : `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`;
     opportunities.push({
       id: 'score-under-threshold',
       title: 'Visibility score below target',
-      detail: appendPipelineGscToDetail(
-        `Current score is ${Math.round(visibility.score)}. Focus on high-intent triggers and coverage depth in weak topics to move above 60.`,
-        latestRun,
-        visibility
-      ),
+      detail: appendPipelineGscToDetail(lowScoreDetail, latestRun, visibility),
       priority: 'high',
       ...gscRunLinkFields
     });

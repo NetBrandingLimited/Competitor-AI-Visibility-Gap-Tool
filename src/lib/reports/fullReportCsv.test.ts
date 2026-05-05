@@ -62,6 +62,7 @@ describe('buildVisibilityReportCsv', () => {
     expect(csv).toContain('Search Console');
     expect(csv).toContain('live_gsc_queries');
     expect(csv).toContain('visibilityScore');
+    expect(csv).toContain('visibilityMentionShareSource');
     expect(csv).toContain('run-gap-csv');
   });
 
@@ -108,6 +109,51 @@ describe('buildVisibilityReportCsv', () => {
     expect(csv).toContain('run-vis');
     expect(csv).toContain('attempt=filtered; cap=9');
     expect(csv).toContain('61');
+    expect(csv).toContain('trend_snapshot');
+  });
+
+  it('exports llm_answers mention source and LLM rollup on visibility row when present', () => {
+    const csv = buildVisibilityReportCsv(
+      [],
+      {
+        generatedAt: '2026-04-29T00:05:00.000Z',
+        upstreamAsOf: '2026-04-29T00:00:00.000Z',
+        opportunities: [],
+        topics: []
+      },
+      null,
+      {
+        score: 88,
+        createdAt: '2026-04-29T00:20:00.000Z',
+        reasons: [],
+        inputs: {
+          pipelineRunId: 'run-vis',
+          pipelineIngestionSource: 'live_gsc_queries',
+          pipelineGscDiagnosticsSummary: null,
+          documentCount: 0,
+          triggerCount: 0,
+          clusterCount: 0,
+          trendDate: '2026-04-29',
+          totalMentions: 0,
+          topBrand: null,
+          topBrandMentions: 0,
+          brandName: 'Acme',
+          connectorSignalCount: 0,
+          connectorSignalSource: 'live',
+          connectorSignalCacheKind: null,
+          connectorSignalsAsOf: null,
+          pipelineBrandShareOfVoice: 0.25,
+          llmAvgBrandShareOfMentions: 0.4,
+          llmShareSampleCount: 3,
+          llmBrandTopOrTiedRate: 0.66,
+          llmAnswerSamplesScanned: 12
+        }
+      }
+    );
+    expect(csv).toContain('llm_answers');
+    expect(csv).toContain('0.25');
+    expect(csv).toContain('0.4');
+    expect(csv).toContain('12');
   });
 
   it('does not truncate visibilityPipelineGscDiagnosticsSummary on the visibility row', () => {

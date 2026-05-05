@@ -208,4 +208,99 @@ describe('buildGapInsightsFromLatestData', () => {
     expect(trend!.detail).toContain('attempt=unfiltered');
     expect(trend!.pipelineRunIdForGsc).toBe('run-trend');
   });
+
+  it('when visibility uses LLM mention signal, trend leader opportunity references Tracked prompts', () => {
+    const insights = buildGapInsightsFromLatestData(
+      {
+        brandName: 'Acme',
+        competitorA: null,
+        competitorB: null,
+        competitorC: null
+      },
+      null,
+      {
+        date: '2026-04-29',
+        generatedAt: '2026-04-29T00:00:00.000Z',
+        totalMentions: 10,
+        topBrand: 'BetaCo',
+        topBrandMentions: 6
+      },
+      {
+        score: 72,
+        createdAt: '2026-04-29T00:10:00.000Z',
+        reasons: [],
+        inputs: {
+          pipelineRunId: null,
+          pipelineIngestionSource: null,
+          pipelineGscDiagnosticsSummary: null,
+          documentCount: 0,
+          triggerCount: 0,
+          clusterCount: 0,
+          trendDate: null,
+          totalMentions: 0,
+          topBrand: null,
+          topBrandMentions: 0,
+          brandName: 'Acme',
+          connectorSignalCount: 0,
+          connectorSignalSource: 'live',
+          connectorSignalCacheKind: null,
+          connectorSignalsAsOf: null,
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: 0.3,
+          llmShareSampleCount: 2,
+          llmBrandTopOrTiedRate: 0.5,
+          llmAnswerSamplesScanned: 8
+        }
+      }
+    );
+
+    const trend = insights.opportunities.find((o) => o.id === 'trend-leader-gap');
+    expect(trend).toBeDefined();
+    expect(trend!.title).toContain('mock leaderboard');
+    expect(trend!.detail).toContain('Tracked prompts');
+  });
+
+  it('when visibility uses LLM mention signal, low score detail mentions LLM answers', () => {
+    const insights = buildGapInsightsFromLatestData(
+      {
+        brandName: 'Acme',
+        competitorA: null,
+        competitorB: null,
+        competitorC: null
+      },
+      null,
+      null,
+      {
+        score: 40,
+        createdAt: '2026-04-29T00:10:00.000Z',
+        reasons: [],
+        inputs: {
+          pipelineRunId: null,
+          pipelineIngestionSource: null,
+          pipelineGscDiagnosticsSummary: null,
+          documentCount: 0,
+          triggerCount: 0,
+          clusterCount: 0,
+          trendDate: null,
+          totalMentions: 0,
+          topBrand: null,
+          topBrandMentions: 0,
+          brandName: 'Acme',
+          connectorSignalCount: 0,
+          connectorSignalSource: 'live',
+          connectorSignalCacheKind: null,
+          connectorSignalsAsOf: null,
+          pipelineBrandShareOfVoice: null,
+          llmAvgBrandShareOfMentions: 0.1,
+          llmShareSampleCount: 1,
+          llmBrandTopOrTiedRate: 0,
+          llmAnswerSamplesScanned: 5
+        }
+      }
+    );
+
+    const low = insights.opportunities.find((o) => o.id === 'score-under-threshold');
+    expect(low).toBeDefined();
+    expect(low!.detail).toContain('LLM answers');
+  });
 });
