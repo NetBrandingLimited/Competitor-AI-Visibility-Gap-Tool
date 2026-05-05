@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
 import type { OrgBrandFields } from '@/lib/org-visibility-mock';
+import { getAiAnswerSampleDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 
 import { analyzeLlmOutput } from './analyzeLlmOutput';
 
@@ -20,12 +20,22 @@ export async function loadLlmRollupForScoring(
   orgFields: OrgBrandFields | null,
   limit = DEFAULT_LIMIT
 ): Promise<LlmRollupForScoring> {
-  const rows = await prisma.aiAnswerSample.findMany({
+  const AiAnswerSample = getAiAnswerSampleDelegate();
+  if (!AiAnswerSample) {
+    return {
+      answerSamplesScanned: 0,
+      avgBrandShareOfMentions: null,
+      shareSampleCount: 0,
+      brandTopOrTiedRate: null
+    };
+  }
+
+  const rows = (await AiAnswerSample.findMany({
     where: { organizationId },
     orderBy: { createdAt: 'desc' },
     take: limit,
     select: { answerText: true, error: true }
-  });
+  })) as Array<{ answerText: string; error: string | null }>;
 
   const shares: number[] = [];
   let topOrTiedCount = 0;

@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { analyzeLlmOutput, type LlmAnswerAnalytics } from '@/lib/ai-visibility/analyzeLlmOutput';
 import { isPromptSurfaceId, PROMPT_SURFACE_LABELS } from '@/lib/ai-visibility/measurement';
 import { requireOrgRole } from '@/lib/auth';
+import { getAiAnswerSampleDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest, context: { params: Promise<{ orgId: string }> }) {
@@ -23,6 +24,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ org
   }
   const includeAnalytics = searchParams.get('analytics') !== '0';
 
+  const AiAnswerSample = getAiAnswerSampleDelegate();
   const [org, rows] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: orgId },
@@ -34,14 +36,28 @@ export async function GET(request: NextRequest, context: { params: Promise<{ org
         competitorC: true
       }
     }),
-    prisma.aiAnswerSample.findMany({
-      where: { organizationId: orgId },
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      include: {
-        trackedPrompt: { select: { id: true, text: true, label: true } }
-      }
-    })
+    AiAnswerSample
+      ? (AiAnswerSample.findMany({
+          where: { organizationId: orgId },
+          orderBy: { createdAt: 'desc' },
+          take: limit,
+          include: {
+            trackedPrompt: { select: { id: true, text: true, label: true } }
+          }
+        }) as Promise<
+          Array<{
+            id: string;
+            trackedPromptId: string;
+            surface: string;
+            provider: string;
+            model: string;
+            answerText: string;
+            error: string | null;
+            createdAt: Date;
+            trackedPrompt: { id: string; text: string; label: string | null };
+          }>
+        >)
+      : Promise.resolve([])
   ]);
 
   const orgFields = org

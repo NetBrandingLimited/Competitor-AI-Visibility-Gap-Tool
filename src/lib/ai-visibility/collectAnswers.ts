@@ -1,6 +1,7 @@
-import { prisma } from '@/lib/prisma';
-
 import { normalizeTargetSurfaces, type PromptSurfaceId } from '@/lib/ai-visibility/measurement';
+import { prisma } from '@/lib/prisma';
+import type { AiAnswerSamplePrismaDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
+import { getAiAnswerSampleDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 import { fetchAnthropicMessage } from '@/lib/ai-visibility/providers/anthropic';
 import { fetchOpenAiChatCompletion } from '@/lib/ai-visibility/providers/openai';
 
@@ -24,7 +25,9 @@ async function collectOne(args: {
   trackedPromptId: string;
   promptText: string;
   surface: PromptSurfaceId;
+  aiAnswerSample: AiAnswerSamplePrismaDelegate;
 }): Promise<{ persisted: boolean; failureMessage?: string }> {
+  const { aiAnswerSample } = args;
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
 
@@ -38,7 +41,7 @@ async function collectOne(args: {
         model: openAiModel(),
         userPrompt: args.promptText
       });
-      await prisma.aiAnswerSample.create({
+      await aiAnswerSample.create({
         data: {
           organizationId: args.organizationId,
           trackedPromptId: args.trackedPromptId,
@@ -61,7 +64,7 @@ async function collectOne(args: {
         model: anthropicModel(),
         userPrompt: args.promptText
       });
-      await prisma.aiAnswerSample.create({
+      await aiAnswerSample.create({
         data: {
           organizationId: args.organizationId,
           trackedPromptId: args.trackedPromptId,
@@ -81,7 +84,7 @@ async function collectOne(args: {
     };
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Unknown error';
-    await prisma.aiAnswerSample.create({
+    await aiAnswerSample.create({
       data: {
         organizationId: args.organizationId,
         trackedPromptId: args.trackedPromptId,
@@ -120,6 +123,17 @@ export async function collectAiAnswersForOrganization(args: {
     skippedNoCredentials: [],
     failures: []
   };
+
+  const aiAnswerSample = getAiAnswerSampleDelegate();
+  if (!aiAnswerSample) {
+    summary.failures.push({
+      trackedPromptId: '—',
+      surface: '—',
+      message:
+        'Prisma client has no AiAnswerSample model. Run `npx prisma generate`, apply migrations, and restart the server.'
+    });
+    return summary;
+  }
 
   const where: { organizationId: string; isActive: boolean; id?: { in: string[] } } = {
     organizationId: args.organizationId,
@@ -164,7 +178,8 @@ export async function collectAiAnswersForOrganization(args: {
         organizationId: args.organizationId,
         trackedPromptId: p.id,
         promptText: p.text,
-        surface
+        surface,
+        aiAnswerSample
       });
       if (result.persisted) {
         summary.persisted += 1;
