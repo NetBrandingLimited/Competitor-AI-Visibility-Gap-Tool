@@ -5,6 +5,7 @@ import { startTransition, useEffect, useState, type FormEvent } from 'react';
 
 import EllipsisStatusText from '@/app/components/EllipsisStatusText';
 import { redirectToLogin } from '@/lib/client/redirect-to-login';
+import type { LlmAnswerAnalytics } from '@/lib/ai-visibility/analyzeLlmOutput';
 import {
   PROMPT_SURFACE_IDS,
   PROMPT_SURFACE_LABELS,
@@ -27,6 +28,24 @@ type AnswerSampleRow = {
   answerText: string;
   error: string | null;
   createdAt: string;
+  analytics?: LlmAnswerAnalytics | null;
+};
+
+function formatMentionBreakdown(a: LlmAnswerAnalytics): string {
+  const parts = Object.entries(a.mentionsByBrand)
+    .filter(([, n]) => n > 0)
+    .sort((x, y) => y[1] - x[1])
+    .map(([b, n]) => `${b}: ${n}`);
+  return parts.length > 0 ? parts.join(' · ') : 'No mentions of tracked brands';
+}
+
+type AiAnswersApiPayload = {
+  samples: AnswerSampleRow[];
+  analyticsRollup?: {
+    samplesWithAnalytics: number;
+    avgBrandShareOfMentions: number | null;
+    shareCount: number;
+  };
 };
 
 type DraftPrompt = {
@@ -69,6 +88,7 @@ export default function TrackedPromptsForm() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [samples, setSamples] = useState<AnswerSampleRow[]>([]);
+  const [analyticsRollup, setAnalyticsRollup] = useState<AiAnswersApiPayload['analyticsRollup'] | null>(null);
   const [samplesLoading, setSamplesLoading] = useState(true);
   const [collecting, setCollecting] = useState(false);
   const [collectMessage, setCollectMessage] = useState('');
@@ -138,9 +158,10 @@ export default function TrackedPromptsForm() {
         setSamplesLoading(false);
         return;
       }
-      const data = (await res.json()) as { samples: AnswerSampleRow[] };
+      const data = (await res.json()) as AiAnswersApiPayload;
       if (!cancelled) {
         setSamples(data.samples ?? []);
+        setAnalyticsRollup(data.analyticsRollup ?? null);
       }
       setSamplesLoading(false);
     })();
@@ -193,8 +214,9 @@ export default function TrackedPromptsForm() {
       setCollectMessage(parts.join(' · ') || 'Done.');
       const refresh = await fetch(`/api/orgs/${orgId}/ai-answers?limit=30`, { credentials: 'include' });
       if (refresh.ok) {
-        const again = (await refresh.json()) as { samples: AnswerSampleRow[] };
+        const again = (await refresh.json()) as AiAnswersApiPayload;
         setSamples(again.samples ?? []);
+        setAnalyticsRollup(again.analyticsRollup ?? null);
       }
     } finally {
       setCollecting(false);
@@ -451,6 +473,17 @@ export default function TrackedPromptsForm() {
       ) : null}
 
       <h3 className="subheading-sm mt-16">Recent samples</h3>
+      <p className="text-muted-note-wide">
+        Mention analytics use your workspace <strong>Brand &amp; competitors</strong> names with the same rules as the
+        pipeline leaderboard (whole-word matches for single tokens).
+      </p>
+      {analyticsRollup && analyticsRollup.shareCount > 0 && analyticsRollup.avgBrandShareOfMentions != null ? (
+        <p className="text-metric-line llm-rollup-line">
+          <strong>Rollup:</strong> average your-brand mention share{' '}
+          <strong>{(analyticsRollup.avgBrandShareOfMentions * 100).toFixed(0)}%</strong> across{' '}
+          {analyticsRollup.shareCount} sample(s) with at least one tracked-brand mention (of {samples.length} loaded).
+        </p>
+      ) : null}
       {samplesLoading ? (
         <p className="text-muted-note">Loading samples…</p>
       ) : samples.length === 0 ? (
@@ -474,7 +507,24 @@ export default function TrackedPromptsForm() {
                   <strong>Error:</strong> <EllipsisStatusText text={s.error} />
                 </p>
               ) : (
-                <pre className="answer-pre">{s.answerText || '(empty)'}</pre>
+                <>
+                  {s.analytics ? (
+                    <p className="text-metric-line llm-analytics-line">
+                      <strong>Mentions:</strong> {formatMentionBreakdown(s.analytics)} (total{' '}
+                      {s.analytics.totalMentions}) · <strong>Your brand share:</strong>{' '}
+                      {s.analytics.brandShareOfMentions != null
+                        ? `${(s.analytics.brandShareOfMentions * 100).toFixed(0)}%`
+                        : '—'}{' '}
+                      · <strong>Top:</strong> {s.analytics.topBrandByMentions ?? '—'}
+                      {s.analytics.brandIsTopOrTied ? ' · your brand tied or leads' : ''}
+                    </p>
+                  ) : s.answerText ? (
+                    <p className="text-muted-xs mt-0 mb-8">
+                      Save brand and competitors under Brand settings to compute mention analytics.
+                    </p>
+                  ) : null}
+                  <pre className="answer-pre">{s.answerText || '(empty)'}</pre>
+                </>
               )}
             </li>
           ))}
