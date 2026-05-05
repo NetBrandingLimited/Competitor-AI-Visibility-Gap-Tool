@@ -1,11 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
- * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
- * That suite includes UI smoke, report CSVs (`trends`, `export`, `pipeline-runs`, `weekly-digests`; viewer can GET
- * `trends` + `export`), editor `POST` visibility recalc, and viewer `403` on editor-only org routes (`POST visibility`,
- * `PATCH brand`, `PATCH digest/schedule`).
+ * Public tests always run (parallel by default).
+ *
+ * Authenticated suite (`E2E_AUTH=1`, after migrate + `npm run db:seed`) is the **full** check for seeded org
+ * `seed-demo-org`: UI smoke, **every** session CSV (`/api/reports/*.csv` + `/api/ops/scheduler-jobs.csv`) for both
+ * demo (ADMIN) and viewer (VIEWER), `GET /api/orgs/seed-demo-org` for each role, editor `POST` visibility recalc, and
+ * viewer `403` on `POST visibility`, `PATCH brand`, `PATCH digest/schedule`.
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -362,6 +363,26 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     expect(body).toContain('pipelineGscDiagnosticsSummary');
   });
 
+  test('editor session can download scheduler-jobs CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_USERNAME ?? 'demo';
+    const pass = process.env.E2E_PASSWORD ?? 'demo123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/ops/scheduler-jobs.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    expect((res.headers()['content-disposition'] ?? '').toLowerCase()).toContain('scheduler-jobs.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('startedAt');
+    expect(body).toContain('weeklyDigestGscDiagnosticsSummary');
+  });
+
   test('editor session can POST visibility recalc', async ({ page }) => {
     test.setTimeout(120_000);
     const orgId = 'seed-demo-org';
@@ -378,6 +399,15 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const json = (await res.json()) as { organizationId?: string; score?: number };
     expect(json.organizationId).toBe(orgId);
     expect(typeof json.score).toBe('number');
+
+    const orgRes = await page.request.get(`/api/orgs/${orgId}`);
+    expect(orgRes.status()).toBe(200);
+    const orgJson = (await orgRes.json()) as {
+      organization?: { id: string };
+      viewer?: { role: string };
+    };
+    expect(orgJson.organization?.id).toBe(orgId);
+    expect(orgJson.viewer?.role).toBe('ADMIN');
   });
 
   test('viewer session can download trends CSV (read-only export)', async ({ page }) => {
@@ -414,6 +444,68 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     expect(body.startsWith('\uFEFF')).toBe(true);
     expect(body).toContain('section');
     expect(body).toContain('visibilityScore');
+  });
+
+  test('viewer session can download pipeline-runs and weekly-digests CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const runs = await page.request.get('/api/reports/pipeline-runs.csv');
+    expect(runs.status()).toBe(200);
+    const runsBody = await runs.text();
+    expect(runsBody.startsWith('\uFEFF')).toBe(true);
+    expect(runsBody).toContain('ingestionSource');
+
+    const digests = await page.request.get('/api/reports/weekly-digests.csv');
+    expect(digests.status()).toBe(200);
+    const digestsBody = await digests.text();
+    expect(digestsBody.startsWith('\uFEFF')).toBe(true);
+    expect(digestsBody).toContain('connectorSignals');
+  });
+
+  test('viewer session can download scheduler-jobs CSV', async ({ page }) => {
+    test.setTimeout(90_000);
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get('/api/ops/scheduler-jobs.csv');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'] ?? '').toMatch(/text\/csv/i);
+    expect((res.headers()['content-disposition'] ?? '').toLowerCase()).toContain('scheduler-jobs.csv');
+
+    const body = await res.text();
+    expect(body.startsWith('\uFEFF')).toBe(true);
+    expect(body).toContain('startedAt');
+    expect(body).toContain('pipelineRunGscDiagnosticsSummary');
+  });
+
+  test('viewer GET /api/orgs/seed-demo-org returns VIEWER membership', async ({ page }) => {
+    test.setTimeout(90_000);
+    const orgId = 'seed-demo-org';
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.get(`/api/orgs/${orgId}`);
+    expect(res.status()).toBe(200);
+    const json = (await res.json()) as {
+      organization?: { id: string };
+      viewer?: { role: string };
+    };
+    expect(json.organization?.id).toBe(orgId);
+    expect(json.viewer?.role).toBe('VIEWER');
   });
 
   test('viewer receives 403 when POSTing visibility recalc (editor-only)', async ({ page }) => {
