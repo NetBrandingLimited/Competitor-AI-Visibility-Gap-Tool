@@ -1,5 +1,6 @@
 import { collectAllConnectorSignals } from '@/lib/connectors';
 import type { VisibilitySignal } from '@/lib/connectors/types';
+import { savedBrandShareFromPipelineDocs } from '@/lib/dashboard/pipelineSnapshot';
 import { formatGscIngestionDiagnosticsSummary } from '@/lib/ingestion/gscDiagnostics';
 import { prisma } from '@/lib/prisma';
 import { readLatestPipelineRun } from '@/lib/pipeline/store';
@@ -32,6 +33,11 @@ export type VisibilityInputsV1 = {
   /** When source is cache: why cached signals were used (TTL vs empty live fallback). */
   connectorSignalCacheKind: 'ttl' | 'stale_fallback' | null;
   connectorSignalsAsOf: string | null;
+  /**
+   * Share of voice (0–1) for the saved brand in the latest pipeline run’s document text (null if no run / no brand / no docs).
+   * Primary “real” text signal from ingested queries/pages (GSC or mock).
+   */
+  pipelineBrandShareOfVoice: number | null;
 };
 
 function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
@@ -47,10 +53,18 @@ function normalizeInputsV1(inputs: VisibilityInputsV1): VisibilityInputsV1 {
     typeof inputs.pipelineGscDiagnosticsSummary === 'string' && inputs.pipelineGscDiagnosticsSummary.trim().length > 0
       ? inputs.pipelineGscDiagnosticsSummary.trim()
       : null;
+  const pipelineBrandShareOfVoice =
+    typeof inputs.pipelineBrandShareOfVoice === 'number' &&
+    Number.isFinite(inputs.pipelineBrandShareOfVoice) &&
+    inputs.pipelineBrandShareOfVoice >= 0 &&
+    inputs.pipelineBrandShareOfVoice <= 1
+      ? inputs.pipelineBrandShareOfVoice
+      : null;
   return {
     ...inputs,
     pipelineIngestionSource,
     pipelineGscDiagnosticsSummary,
+    pipelineBrandShareOfVoice,
     connectorSignalSource:
       inputs.connectorSignalSource === 'cache' || inputs.connectorSignalSource === 'live'
         ? inputs.connectorSignalSource
@@ -155,8 +169,7 @@ function latestSignalAsOf(signals: VisibilitySignal[]): string | null {
 }
 
 /**
- * v1 heuristic score (0–100) from pipeline + trend mock data + connector signals (when present).
- * Replace weights / features when real GSC/GA4 metrics land.
+ * v1 heuristic score (0–100) from pipeline text mention share, pipeline metadata, trend snapshot, and connector signals.
  */
 export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: number; breakdown: Record<string, number> } {
   const triggerPoints = Math.min(28, inputs.triggerCount * 2.5);
@@ -167,9 +180,20 @@ export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: n
   const trendPoints = Math.min(24, trendShare * 70);
   const brandAlignPoints = brandMatchesTop(inputs.brandName, inputs.topBrand) ? 10 : 0;
   const connectorPoints = Math.min(10, inputs.connectorSignalCount * 3);
+  const pipelineMentionPoints =
+    inputs.pipelineBrandShareOfVoice != null
+      ? Math.min(20, Math.round(inputs.pipelineBrandShareOfVoice * 55))
+      : 0;
 
   const raw =
-    10 + triggerPoints + clusterPoints + docPoints + trendPoints + brandAlignPoints + connectorPoints;
+    10 +
+    triggerPoints +
+    clusterPoints +
+    docPoints +
+    trendPoints +
+    brandAlignPoints +
+    connectorPoints +
+    pipelineMentionPoints;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
 
   return {
@@ -181,7 +205,8 @@ export function computeVisibilityScoreV1(inputs: VisibilityInputsV1): { score: n
       documents: docPoints,
       trendShare: trendPoints,
       brandAlignment: brandAlignPoints,
-      connectors: connectorPoints
+      connectors: connectorPoints,
+      pipelineMentions: pipelineMentionPoints
     }
   };
 }
@@ -339,6 +364,29 @@ export function buildWhyChanged(
     });
   }
 
+  const prevPso = p.pipelineBrandShareOfVoice;
+  const nextPso = n.pipelineBrandShareOfVoice;
+  if (prevPso == null && nextPso != null) {
+    reasons.push({
+      code: 'PIPELINE_BRAND_SHARE',
+      message: `Pipeline document mention share for your brand is now ${(nextPso * 100).toFixed(1)}%.`
+    });
+  } else if (prevPso != null && nextPso == null) {
+    reasons.push({
+      code: 'PIPELINE_BRAND_SHARE',
+      message: 'Pipeline document mention share is no longer available (no ingested text for the latest run).'
+    });
+  } else if (
+    prevPso != null &&
+    nextPso != null &&
+    Math.abs(nextPso - prevPso) > 0.02
+  ) {
+    reasons.push({
+      code: 'PIPELINE_BRAND_SHARE',
+      message: `Pipeline document mention share moved from ${(prevPso * 100).toFixed(1)}% to ${(nextPso * 100).toFixed(1)}%.`
+    });
+  }
+
   return reasons;
 }
 
@@ -346,13 +394,28 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
   const [org, latestRun, latestTrend, signalState] = await Promise.all([
     prisma.organization.findUnique({
       where: { id: organizationId },
-      select: { brandName: true }
+      select: {
+        brandName: true,
+        category: true,
+        competitorA: true,
+        competitorB: true,
+        competitorC: true
+      }
     }),
     readLatestPipelineRun(organizationId),
     readLatestTrendSnapshot(organizationId),
     readSignalsForScoring(organizationId)
   ]);
   const signals = signalState.signals;
+  const orgFields = org
+    ? {
+        brandName: org.brandName,
+        category: org.category,
+        competitorA: org.competitorA,
+        competitorB: org.competitorB,
+        competitorC: org.competitorC
+      }
+    : {};
 
   return {
     pipelineRunId: latestRun?.id ?? null,
@@ -371,7 +434,8 @@ export async function buildInputsForOrg(organizationId: string): Promise<Visibil
     connectorSignalCount: signals.length,
     connectorSignalSource: signalState.source,
     connectorSignalCacheKind: signalState.cacheKind,
-    connectorSignalsAsOf: latestSignalAsOf(signals)
+    connectorSignalsAsOf: latestSignalAsOf(signals),
+    pipelineBrandShareOfVoice: savedBrandShareFromPipelineDocs(orgFields, latestRun)
   };
 }
 

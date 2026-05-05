@@ -94,7 +94,8 @@ describe('buildVisibilityReportCsv', () => {
           connectorSignalCount: 2,
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
-          connectorSignalsAsOf: '2026-04-29'
+          connectorSignalsAsOf: '2026-04-29',
+          pipelineBrandShareOfVoice: null
         }
       }
     );
@@ -135,7 +136,8 @@ describe('buildVisibilityReportCsv', () => {
           connectorSignalCount: 0,
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
-          connectorSignalsAsOf: '2026-04-29'
+          connectorSignalsAsOf: '2026-04-29',
+          pipelineBrandShareOfVoice: null
         }
       }
     );

@@ -14,6 +14,7 @@ export function serializeVisibilityScore(latest: LatestVisibility) {
     pipelineIngestionSource: latest.inputs.pipelineIngestionSource,
     pipelineIngestionSourceLabel: pipelineIngestionProvenanceLabel(latest.inputs.pipelineIngestionSource),
     pipelineGscDiagnosticsSummary: latest.inputs.pipelineGscDiagnosticsSummary,
+    pipelineBrandShareOfVoice: latest.inputs.pipelineBrandShareOfVoice,
     signalSource: latest.inputs.connectorSignalSource,
     signalCount: latest.inputs.connectorSignalCount,
     signalsAsOf: latest.inputs.connectorSignalsAsOf
@@ -28,6 +29,7 @@ export function serializeVisibilityResult(result: VisibilityResult) {
     pipelineIngestionSource: result.inputs.pipelineIngestionSource,
     pipelineIngestionSourceLabel: pipelineIngestionProvenanceLabel(result.inputs.pipelineIngestionSource),
     pipelineGscDiagnosticsSummary: result.inputs.pipelineGscDiagnosticsSummary,
+    pipelineBrandShareOfVoice: result.inputs.pipelineBrandShareOfVoice,
     signalSource: result.inputs.connectorSignalSource,
     signalCount: result.inputs.connectorSignalCount,
     signalsAsOf: result.inputs.connectorSignalsAsOf

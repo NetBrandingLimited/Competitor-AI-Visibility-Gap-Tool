@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import type { UnifiedPipelineRun } from '@/lib/pipeline/types';
 
-import { buildPipelineDashboardSnapshot, countLabelMentions } from './pipelineSnapshot';
+import {
+  buildPipelineDashboardSnapshot,
+  countLabelMentions,
+  savedBrandShareFromPipelineDocs
+} from './pipelineSnapshot';
 
 describe('countLabelMentions', () => {
   it('returns 0 for labels shorter than 2 characters', () => {
@@ -102,5 +106,47 @@ describe('buildPipelineDashboardSnapshot', () => {
     const beta = snap!.leaderboard.find((r) => r.brand === 'Beta');
     expect(acme?.delta7d).toBeGreaterThan(0);
     expect(beta?.delta7d).toBeLessThan(0);
+  });
+});
+
+describe('savedBrandShareFromPipelineDocs', () => {
+  const baseRun: UnifiedPipelineRun = {
+    id: 'run-1',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    query: 'visibility',
+    limitPerConnector: 2,
+    documentCount: 1,
+    triggerCount: 0,
+    clusterCount: 0,
+    ingestionEvents: [],
+    documents: [
+      {
+        id: 'd1',
+        source: 'reddit-mock',
+        url: 'https://example.com/1',
+        title: 'Acme vs Beta',
+        content: 'We love Acme and Acme wins over Beta.',
+        publishedAt: '2026-01-02T00:00:00.000Z'
+      }
+    ],
+    triggers: [],
+    clusters: []
+  };
+
+  it('returns null when there is no run', () => {
+    expect(savedBrandShareFromPipelineDocs({ brandName: 'Acme' }, null)).toBeNull();
+  });
+
+  it('returns null when workspace brand is not set', () => {
+    expect(savedBrandShareFromPipelineDocs({ competitorA: 'Beta' }, baseRun)).toBeNull();
+  });
+
+  it('returns saved brand share-of-voice vs competitors in document text', () => {
+    const share = savedBrandShareFromPipelineDocs(
+      { brandName: 'Acme', competitorA: 'Beta' },
+      baseRun
+    );
+    // Title + body: Acme 1+2, Beta 1+1 → 3/5
+    expect(share).toBeCloseTo(0.6, 5);
   });
 });

@@ -19,6 +19,7 @@ function makeInputs(overrides: Partial<VisibilityInputsV1> = {}): VisibilityInpu
     connectorSignalSource: 'live',
     connectorSignalCacheKind: null,
     connectorSignalsAsOf: '2026-04-29',
+    pipelineBrandShareOfVoice: null,
     ...overrides
   };
 }
@@ -65,6 +66,19 @@ describe('computeVisibilityScoreV1', () => {
     expect(aligned.breakdown.brandAlignment).toBe(10);
     expect(misaligned.breakdown.brandAlignment).toBe(0);
     expect(aligned.score - misaligned.score).toBe(10);
+  });
+
+  it('adds pipelineMentions from pipeline brand share-of-voice when present', () => {
+    const none = computeVisibilityScoreV1(makeInputs({ pipelineBrandShareOfVoice: null }));
+    const partial = computeVisibilityScoreV1(makeInputs({ pipelineBrandShareOfVoice: 0.1 }));
+    expect(none.breakdown.pipelineMentions).toBe(0);
+    expect(partial.breakdown.pipelineMentions).toBe(6);
+    expect(partial.score - none.score).toBe(6);
+  });
+
+  it('caps pipelineMentions at 20', () => {
+    const { breakdown } = computeVisibilityScoreV1(makeInputs({ pipelineBrandShareOfVoice: 0.99 }));
+    expect(breakdown.pipelineMentions).toBe(20);
   });
 });
 
@@ -134,5 +148,24 @@ describe('buildWhyChanged', () => {
     expect(reason).toBeTruthy();
     expect(reason?.message).toContain('not recorded / legacy');
     expect(reason?.message).toContain('Search Console pipeline documents');
+  });
+
+  it('includes PIPELINE_BRAND_SHARE when mention share appears or moves', () => {
+    const appear = buildWhyChanged(
+      { score: 50, inputs: makeInputs({ pipelineBrandShareOfVoice: null }) },
+      55,
+      makeInputs({ pipelineBrandShareOfVoice: 0.4 })
+    );
+    expect(appear.some((r) => r.code === 'PIPELINE_BRAND_SHARE')).toBe(true);
+    expect(appear.find((r) => r.code === 'PIPELINE_BRAND_SHARE')?.message).toContain('40.0%');
+
+    const move = buildWhyChanged(
+      { score: 55, inputs: makeInputs({ pipelineBrandShareOfVoice: 0.2 }) },
+      58,
+      makeInputs({ pipelineBrandShareOfVoice: 0.5 })
+    );
+    expect(move.some((r) => r.code === 'PIPELINE_BRAND_SHARE')).toBe(true);
+    expect(move.find((r) => r.code === 'PIPELINE_BRAND_SHARE')?.message).toContain('20.0%');
+    expect(move.find((r) => r.code === 'PIPELINE_BRAND_SHARE')?.message).toContain('50.0%');
   });
 });

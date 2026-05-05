@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { consumeAuthRegisterSlot } from '@/lib/http/authRateLimit';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/password';
 import {
@@ -13,6 +14,17 @@ import {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
+  const limited = consumeAuthRegisterSlot(request);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: 'rate_limited', retryAfterSeconds: limited.retryAfterSec },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(limited.retryAfterSec) }
+      }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     email?: string;
     password?: string;

@@ -149,3 +149,36 @@ export function buildPipelineDashboardSnapshot(
     recent
   };
 }
+
+function normBrandLabel(s: string): string {
+  return s.trim().toLowerCase();
+}
+
+/**
+ * Share of voice (0–1) for the saved workspace brand in the latest pipeline run’s ingested text.
+ * Uses the same mention counts as the dashboard leaderboard (Search Console or mock pipeline documents).
+ */
+export function savedBrandShareFromPipelineDocs(
+  org: OrgBrandFields,
+  run: UnifiedPipelineRun | null
+): number | null {
+  if (!run) {
+    return null;
+  }
+  const snap = buildPipelineDashboardSnapshot(org, run, null);
+  if (!snap) {
+    return null;
+  }
+  const raw = org.brandName?.trim();
+  if (!raw) {
+    return null;
+  }
+  const want = normBrandLabel(raw);
+  const row =
+    snap.leaderboard.find((r) => normBrandLabel(r.brand) === want) ??
+    snap.leaderboard.find((r) => {
+      const rb = normBrandLabel(r.brand);
+      return rb.includes(want) || want.includes(rb);
+    });
+  return row ? row.shareOfVoice : null;
+}

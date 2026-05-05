@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { consumeAuthLoginSlot } from '@/lib/http/authRateLimit';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
 import {
@@ -11,6 +12,17 @@ import {
 } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
+  const limited = consumeAuthLoginSlot(request);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: 'rate_limited', retryAfterSeconds: limited.retryAfterSec },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(limited.retryAfterSec) }
+      }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     username?: string;
     password?: string;

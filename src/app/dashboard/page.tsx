@@ -110,7 +110,8 @@ export default async function DashboardPage() {
                 signalSource: visibility.inputs.connectorSignalSource,
                 signalCacheKind: visibility.inputs.connectorSignalCacheKind,
                 signalCount: visibility.inputs.connectorSignalCount,
-                signalsAsOf: visibility.inputs.connectorSignalsAsOf
+                signalsAsOf: visibility.inputs.connectorSignalsAsOf,
+                pipelineBrandShareOfVoice: visibility.inputs.pipelineBrandShareOfVoice
               }
             : null
         }

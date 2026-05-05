@@ -105,7 +105,8 @@ describe('buildGapInsightsFromLatestData', () => {
           connectorSignalCount: 0,
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
-          connectorSignalsAsOf: null
+          connectorSignalsAsOf: null,
+          pipelineBrandShareOfVoice: null
         }
       }
     );
@@ -186,7 +187,8 @@ describe('buildGapInsightsFromLatestData', () => {
           connectorSignalCount: 0,
           connectorSignalSource: 'live',
           connectorSignalCacheKind: null,
-          connectorSignalsAsOf: null
+          connectorSignalsAsOf: null,
+          pipelineBrandShareOfVoice: null
         }
       }
     );

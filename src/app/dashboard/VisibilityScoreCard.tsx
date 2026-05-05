@@ -22,6 +22,8 @@ type Props = {
     signalCacheKind?: 'ttl' | 'stale_fallback' | null;
     signalsAsOf?: string | null;
     signalCount?: number;
+    /** Share of brand mentions in latest pipeline document text (0–1), when computable. */
+    pipelineBrandShareOfVoice?: number | null;
   } | null;
 };
 
@@ -49,7 +51,8 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
     <div className="panel-box-info mb-28">
       <h2 className="mt-0">Visibility score (v1)</h2>
       <p className="text-muted-note mt-0">
-        Heuristic score from your latest pipeline run + trend snapshot + connector signals (when configured).{' '}
+        Heuristic score from pipeline document text (brand mention share), pipeline metadata, trend snapshot, and
+        connector signals (when configured).{' '}
         <Link
           href={`/api/orgs/${organizationId}/visibility`}
           target="_blank"
@@ -99,6 +102,12 @@ export default function VisibilityScoreCard({ organizationId, canRecalculate, la
             {typeof latest.signalCount === 'number' ? ` · count: ${latest.signalCount}` : ''}
             {latest.signalsAsOf ? ` · asOf: ${latest.signalsAsOf}` : ''}
           </p>
+          {typeof latest.pipelineBrandShareOfVoice === 'number' ? (
+            <p className="text-muted-note mt-8 mb-0">
+              Brand share in pipeline documents: {(latest.pipelineBrandShareOfVoice * 100).toFixed(1)}% (your brand vs
+              saved competitors in ingested page text).
+            </p>
+          ) : null}
           {freshness ? (
             <p className="status-chip-row">
               <span className={`status-chip status-chip-${freshness.tone}`}>signal recency: {freshness.label}</span>

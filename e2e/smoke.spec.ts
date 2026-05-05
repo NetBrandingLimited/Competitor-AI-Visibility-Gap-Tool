@@ -537,7 +537,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
 
     const res = await page.request.patch(`/api/orgs/${orgId}/brand`, {
-      json: { brandName: 'E2E viewer must not apply this' }
+      data: { brandName: 'E2E viewer must not apply this' }
     });
     expect(res.status()).toBe(403);
     const json = (await res.json()) as { error?: string; required?: string };
@@ -556,7 +556,7 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
 
     const res = await page.request.patch(`/api/orgs/${orgId}/digest/schedule`, {
-      json: { enabled: true, dayUtc: 2, hourUtc: 10 }
+      data: { enabled: true, dayUtc: 2, hourUtc: 10 }
     });
     expect(res.status()).toBe(403);
     const json = (await res.json()) as { error?: string; required?: string };

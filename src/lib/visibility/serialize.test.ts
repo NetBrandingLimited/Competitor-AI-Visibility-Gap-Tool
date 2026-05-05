@@ -26,7 +26,8 @@ describe('visibility serializers', () => {
         connectorSignalCount: 3,
         connectorSignalSource: 'live',
         connectorSignalCacheKind: null,
-        connectorSignalsAsOf: '2026-04-29'
+        connectorSignalsAsOf: '2026-04-29',
+        pipelineBrandShareOfVoice: 0.35
       }
     });
 
@@ -35,6 +36,8 @@ describe('visibility serializers', () => {
     expect(payload.pipelineGscDiagnosticsSummary).toBe('attempt=filtered; cap=3');
     expect(payload.signalSource).toBe('live');
     expect(payload.signalCount).toBe(3);
+    expect(payload.pipelineBrandShareOfVoice).toBe(0.35);
+    expect(payload.inputs.pipelineBrandShareOfVoice).toBe(0.35);
   });
 
   it('labels mock pipeline provenance in latest snapshot payload', () => {
@@ -57,7 +60,8 @@ describe('visibility serializers', () => {
         connectorSignalCount: 1,
         connectorSignalSource: 'live',
         connectorSignalCacheKind: null,
-        connectorSignalsAsOf: '2026-04-29'
+        connectorSignalsAsOf: '2026-04-29',
+        pipelineBrandShareOfVoice: null
       }
     });
 
@@ -84,7 +88,8 @@ describe('visibility serializers', () => {
         connectorSignalCount: 0,
         connectorSignalSource: 'cache',
         connectorSignalCacheKind: 'ttl',
-        connectorSignalsAsOf: null
+        connectorSignalsAsOf: null,
+        pipelineBrandShareOfVoice: null
       }
     });
 
