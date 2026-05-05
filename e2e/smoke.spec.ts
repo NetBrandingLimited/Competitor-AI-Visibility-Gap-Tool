@@ -3,7 +3,8 @@ import { expect, test, type Page } from '@playwright/test';
 /**
  * Public tests always run (parallel by default). Authenticated suite runs when `E2E_AUTH=1` (see CI workflow):
  * migrate, `npm run db:seed` (demo + viewer users), then Playwright.
- * That suite includes UI smoke plus `GET /api/reports/trends.csv` using the browser cookie jar (editor + viewer).
+ * That suite includes UI smoke, `GET /api/reports/trends.csv` (editor + viewer), and viewer `403` on editor-only
+ * `POST /api/orgs/seed-demo-org/visibility`.
  *
  * Env (optional): `E2E_USERNAME` / `E2E_PASSWORD` (default demo / demo123),
  * `E2E_VIEWER_USERNAME` / `E2E_VIEWER_PASSWORD` (default viewer / viewer123).
@@ -310,6 +311,24 @@ authSuite('authenticated smoke (E2E_AUTH=1)', () => {
     const body = await res.text();
     expect(body.startsWith('\uFEFF')).toBe(true);
     expect(body).toContain('date');
+  });
+
+  test('viewer receives 403 when POSTing visibility recalc (editor-only)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const orgId = 'seed-demo-org';
+    const user = process.env.E2E_VIEWER_USERNAME ?? 'viewer';
+    const pass = process.env.E2E_VIEWER_PASSWORD ?? 'viewer123';
+
+    await page.goto('/login');
+    await submitLoginForm(page, user, pass);
+    await expect(page).toHaveURL(/\/settings\/brand/, { timeout: 30_000 });
+
+    const res = await page.request.post(`/api/orgs/${orgId}/visibility`);
+    expect(res.status()).toBe(403);
+    expect(res.headers()['content-type'] ?? '').toContain('application/json');
+    const json = (await res.json()) as { error?: string; required?: string };
+    expect(json.error).toBe('forbidden');
+    expect(json.required).toBe('EDITOR');
   });
 
   test('viewer has read-only brand/connectors and no editor-only job controls', async ({ page }) => {
