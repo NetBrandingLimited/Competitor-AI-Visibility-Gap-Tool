@@ -162,6 +162,36 @@ export default async function OpsPage({
       <p className="text-muted-note">
         The CSV uses full text in each column; the scheduler jobs table below may truncate for layout.
       </p>
+
+      <h2 className="mt-28">Operational reality</h2>
+      <div className="panel-box-info mb-20">
+        <ul className="list-indent mb-0">
+          <li className="li-tight">
+            <strong>Database and Prisma.</strong> New migrations must be applied (
+            <code>npx prisma migrate deploy</code> in production, <code>migrate dev</code> locally). The generated
+            client must match the schema: run <code>npx prisma generate</code> after pulls or schema changes. On
+            Windows, if generate fails with <code>EPERM</code> on the query engine DLL, stop the dev server (and other
+            Node processes) and retry.
+          </li>
+          <li className="li-tight">
+            <strong>Visibility score.</strong> The mention-share slice prefers{' '}
+            <Link href="/settings/prompts">stored LLM answers</Link> when they include your tracked brand names;
+            otherwise it uses the <strong>trend snapshot</strong> (mock leaderboard). Pipeline document mention share
+            and connector metrics are separate inputs. Recalculate on the dashboard after meaningful new data.
+          </li>
+          <li className="li-tight">
+            <strong>Connector signals (GSC / GA4).</strong> Metrics are cached for about 24 hours. The score may use a
+            live fetch, fresh cache, or last cache if live returns empty—check the dashboard visibility card when
+            debugging zeros.
+          </li>
+          <li className="li-tight">
+            <strong>Scheduler and cron.</strong> Manual runs and the table below are per workspace. Hourly cron only
+            advances weekly digests unless you add <code>&amp;full=1</code> (see <code>vercel.json</code> and the
+            paragraph above).
+          </li>
+        </ul>
+      </div>
+
       <p>
         <Link href="/reports">Go to reports</Link>
       </p>
