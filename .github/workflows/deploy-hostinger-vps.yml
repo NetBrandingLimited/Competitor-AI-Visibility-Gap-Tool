@@ -1,0 +1,65 @@
+# Deploy NetBrandingLimited/Competitor-AI-Visibility-Gap-Tool to a Hostinger VPS over SSH.
+# Target URL: https://competitor-ai-visibility-gap.netbranding.co.nz/
+#
+# One-time on the server:
+#   sudo apt update && sudo apt install -y git nginx certbot python3-certbot-nginx
+#   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+#   sudo apt install -y nodejs
+#   sudo npm i -g pm2
+#   sudo mkdir -p /var/www && sudo chown $USER:$USER /var/www
+#   cd /var/www && git clone https://github.com/NetBrandingLimited/Competitor-AI-Visibility-Gap-Tool.git
+#   cd Competitor-AI-Visibility-Gap-Tool && cp .env.example .env && nano .env
+#   npm ci && npx prisma migrate deploy && npx prisma generate && npm run build
+#   pm2 start npm --name competitor-ai-visibility-gap -- start
+#   pm2 save && pm2 startup
+# Install Nginx site from docs/deployment/nginx-competitor-ai-visibility-gap.netbranding.co.nz.conf
+#
+# GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
+#   DEPLOY_HOST          VPS public IP or hostname
+#   DEPLOY_USER          SSH user (e.g. ubuntu, deploy, root)
+#   DEPLOY_SSH_KEY       Private key (PEM) for that user; public key in ~/.ssh/authorized_keys on VPS
+#   DEPLOY_PATH          Absolute path to repo on server, e.g. /var/www/Competitor-AI-Visibility-Gap-Tool
+# SSH port: default 22. For a non-default port, add `port: YOUR_PORT` under `with:` below.
+
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hostinger-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: SSH pull, migrate, build, pm2 restart
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git remote set-url origin https://github.com/NetBrandingLimited/Competitor-AI-Visibility-Gap-Tool.git
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+            npm ci
+            export NODE_ENV=production
+            npx prisma migrate deploy
+            npx prisma generate
+            npm run build
+            if pm2 describe competitor-ai-visibility-gap >/dev/null 2>&1; then
+              pm2 restart competitor-ai-visibility-gap --update-env
+            else
+              pm2 start npm --name competitor-ai-visibility-gap -- start
+              pm2 save
+            fi
