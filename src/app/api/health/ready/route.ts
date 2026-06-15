@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { postgresEnvPresence, resolveDatabaseUrl } from '@/lib/dbEnv';
+import { databaseUrlSchemeHint, isPostgresDatabaseUrl, postgresEnvPresence, resolveDatabaseUrl } from '@/lib/dbEnv';
 import { prisma } from '@/lib/prisma';
 
 /** Max wait for the DB probe (load balancers often use ~1–5s readiness budgets). */
@@ -20,7 +20,8 @@ export async function GET() {
   const config = {
     databaseUrlSet: databaseUrl.length > 0,
     directUrlSet: Boolean(process.env.DIRECT_URL?.trim()),
-    databaseUrlIsPostgres: databaseUrl.startsWith('postgresql://'),
+    databaseUrlIsPostgres: isPostgresDatabaseUrl(databaseUrl),
+    databaseUrlScheme: databaseUrlSchemeHint(databaseUrl),
     env
   };
 
@@ -44,7 +45,7 @@ export async function GET() {
         ok: false,
         service: 'ready',
         checks: { database: 'error', ...config },
-        hint: 'Database URL must start with postgresql:// (Supabase pooler URI, not SQLite file:).',
+        hint: `Database URL must start with postgresql:// or postgres:// (got scheme "${config.databaseUrlScheme ?? 'none'}"). Remove quotes; use Supabase pooler URI on port 6543.`,
         ts: new Date().toISOString()
       },
       { status: 503 }
