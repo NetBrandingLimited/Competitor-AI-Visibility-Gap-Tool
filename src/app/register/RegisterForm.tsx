@@ -40,6 +40,10 @@ export default function RegisterForm({ nextPath }: Props) {
           setMessage('Use a password of at least 8 characters.');
         } else if (data.error === 'invalid_email') {
           setMessage('Enter a valid email address.');
+        } else if (response.status === 404) {
+          setMessage(
+            'Registration API not found (404). Restart the dev server with npm run dev (webpack), not dev:turbo.'
+          );
         } else {
           setMessage(`Registration failed (${data.error ?? response.status}).`);
         }

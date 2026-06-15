@@ -125,7 +125,7 @@ env.NODE_PATH = env.NODE_PATH
   : nodeModules;
 
 const nextCli = path.join(root, 'node_modules', 'next', 'dist', 'bin', 'next');
-const child = spawn(process.execPath, [nextCli, 'dev'], {
+const child = spawn(process.execPath, [nextCli, 'dev', '--webpack'], {
   cwd: root,
   stdio: 'inherit',
   env
