@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 
+import { postgresEnvPresence, resolveDatabaseUrl } from '@/lib/dbEnv';
 import { prisma } from '@/lib/prisma';
 
 /** Max wait for the DB probe (load balancers often use ~1–5s readiness budgets). */
@@ -14,12 +15,13 @@ export const HEALTH_READY_DB_TIMEOUT_MS = Math.min(
  */
 export async function GET() {
   const started = Date.now();
-  const databaseUrl = process.env.DATABASE_URL?.trim() ?? '';
-  const directUrl = process.env.DIRECT_URL?.trim() ?? '';
+  const databaseUrl = resolveDatabaseUrl();
+  const env = postgresEnvPresence();
   const config = {
     databaseUrlSet: databaseUrl.length > 0,
-    directUrlSet: directUrl.length > 0,
-    databaseUrlIsPostgres: databaseUrl.startsWith('postgresql://')
+    directUrlSet: Boolean(process.env.DIRECT_URL?.trim()),
+    databaseUrlIsPostgres: databaseUrl.startsWith('postgresql://'),
+    env
   };
 
   if (!config.databaseUrlSet) {
@@ -28,7 +30,8 @@ export async function GET() {
         ok: false,
         service: 'ready',
         checks: { database: 'error', ...config },
-        hint: 'Set DATABASE_URL in Vercel (Supabase → Connect → Prisma → Transaction pooler, port 6543).',
+        hint:
+          'No Postgres URL in this deployment. In Vercel → Settings → Environment Variables → Production, add DATABASE_URL (pooler :6543) and DIRECT_URL (pooler :5432), then Redeploy. Or connect the Supabase Vercel integration (sets POSTGRES_PRISMA_URL).',
         ts: new Date().toISOString()
       },
       { status: 503 }
@@ -41,7 +44,7 @@ export async function GET() {
         ok: false,
         service: 'ready',
         checks: { database: 'error', ...config },
-        hint: 'DATABASE_URL must be a postgresql:// URI (not SQLite file:). Use the Supabase pooler string.',
+        hint: 'Database URL must start with postgresql:// (Supabase pooler URI, not SQLite file:).',
         ts: new Date().toISOString()
       },
       { status: 503 }
@@ -69,7 +72,7 @@ export async function GET() {
         service: 'ready',
         checks: { database: 'error', ...config },
         hint:
-          'DATABASE_URL is set but the DB did not answer. In Supabase → Connect → Prisma, use Transaction pooler (6543) for DATABASE_URL, run prisma/supabase-init.sql, then redeploy.',
+          'Postgres URL is set but the DB did not answer. Use aws-1-ap-southeast-2 pooler host, confirm password, ensure tables exist (prisma/supabase-init.sql), then redeploy.',
         ts: new Date().toISOString()
       },
       { status: 503 }
