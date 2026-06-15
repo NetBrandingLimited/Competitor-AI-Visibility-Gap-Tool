@@ -14,6 +14,40 @@ export const HEALTH_READY_DB_TIMEOUT_MS = Math.min(
  */
 export async function GET() {
   const started = Date.now();
+  const databaseUrl = process.env.DATABASE_URL?.trim() ?? '';
+  const directUrl = process.env.DIRECT_URL?.trim() ?? '';
+  const config = {
+    databaseUrlSet: databaseUrl.length > 0,
+    directUrlSet: directUrl.length > 0,
+    databaseUrlIsPostgres: databaseUrl.startsWith('postgresql://')
+  };
+
+  if (!config.databaseUrlSet) {
+    return NextResponse.json(
+      {
+        ok: false,
+        service: 'ready',
+        checks: { database: 'error', ...config },
+        hint: 'Set DATABASE_URL in Vercel (Supabase → Connect → Prisma → Transaction pooler, port 6543).',
+        ts: new Date().toISOString()
+      },
+      { status: 503 }
+    );
+  }
+
+  if (!config.databaseUrlIsPostgres) {
+    return NextResponse.json(
+      {
+        ok: false,
+        service: 'ready',
+        checks: { database: 'error', ...config },
+        hint: 'DATABASE_URL must be a postgresql:// URI (not SQLite file:). Use the Supabase pooler string.',
+        ts: new Date().toISOString()
+      },
+      { status: 503 }
+    );
+  }
+
   try {
     await Promise.race([
       prisma.$queryRaw`SELECT 1`,
@@ -24,7 +58,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       service: 'ready',
-      checks: { database: 'ok' },
+      checks: { database: 'ok', ...config },
       latencyMs: Date.now() - started,
       ts: new Date().toISOString()
     });
@@ -33,7 +67,9 @@ export async function GET() {
       {
         ok: false,
         service: 'ready',
-        checks: { database: 'error' },
+        checks: { database: 'error', ...config },
+        hint:
+          'DATABASE_URL is set but the DB did not answer. In Supabase → Connect → Prisma, use Transaction pooler (6543) for DATABASE_URL, run prisma/supabase-init.sql, then redeploy.',
         ts: new Date().toISOString()
       },
       { status: 503 }
