@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 
-import { databaseUrlSchemeHint, isPostgresDatabaseUrl, postgresEnvPresence, resolveDatabaseUrl } from '@/lib/dbEnv';
+import {
+  databaseUrlDiagnostics,
+  databaseUrlSchemeHint,
+  isPostgresDatabaseUrl,
+  postgresEnvPresence,
+  resolveDatabaseUrl
+} from '@/lib/dbEnv';
 import { prisma } from '@/lib/prisma';
 
 /** Max wait for the DB probe (load balancers often use ~1–5s readiness budgets). */
@@ -22,6 +28,7 @@ export async function GET() {
     directUrlSet: Boolean(process.env.DIRECT_URL?.trim()),
     databaseUrlIsPostgres: isPostgresDatabaseUrl(databaseUrl),
     databaseUrlScheme: databaseUrlSchemeHint(databaseUrl),
+    databaseUrl: databaseUrlDiagnostics(databaseUrl),
     env
   };
 
@@ -45,7 +52,7 @@ export async function GET() {
         ok: false,
         service: 'ready',
         checks: { database: 'error', ...config },
-        hint: `Database URL must start with postgresql:// or postgres:// (got scheme "${config.databaseUrlScheme ?? 'none'}"). Remove quotes; use Supabase pooler URI on port 6543.`,
+        hint: `Database URL must be a postgres URI (scheme "${config.databaseUrlScheme ?? 'none'}"). Delete DATABASE_URL in Vercel, re-paste the :6543 pooler URI with no quotes, then redeploy.`,
         ts: new Date().toISOString()
       },
       { status: 503 }
