@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import type { AiAnswerSamplePrismaDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 import { getAiAnswerSampleDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 import { fetchAnthropicMessage } from '@/lib/ai-visibility/providers/anthropic';
+import { fetchGeminiGenerateContent } from '@/lib/ai-visibility/providers/gemini';
 import { fetchOpenAiChatCompletion } from '@/lib/ai-visibility/providers/openai';
 
 export type CollectAnswersSummary = {
@@ -20,6 +21,36 @@ function anthropicModel(): string {
   return process.env.ANTHROPIC_ANSWER_MODEL?.trim() || 'claude-3-5-sonnet-20241022';
 }
 
+function geminiModel(): string {
+  return (
+    process.env.GOOGLE_GENERATIVE_AI_ANSWER_MODEL?.trim() ||
+    process.env.GEMINI_ANSWER_MODEL?.trim() ||
+    'gemini-2.0-flash'
+  );
+}
+
+export function resolveGeminiApiKey(): string {
+  return (
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+    process.env.GEMINI_API_KEY?.trim() ||
+    ''
+  );
+}
+
+function providerForSurface(surface: PromptSurfaceId): string {
+  if (surface === 'openai_chatgpt') return 'openai';
+  if (surface === 'anthropic_claude') return 'anthropic';
+  if (surface === 'google_gemini') return 'google';
+  return 'unknown';
+}
+
+function modelForSurface(surface: PromptSurfaceId): string {
+  if (surface === 'openai_chatgpt') return openAiModel();
+  if (surface === 'anthropic_claude') return anthropicModel();
+  if (surface === 'google_gemini') return geminiModel();
+  return '—';
+}
+
 async function collectOne(args: {
   organizationId: string;
   trackedPromptId: string;
@@ -30,6 +61,7 @@ async function collectOne(args: {
   const { aiAnswerSample } = args;
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const geminiKey = resolveGeminiApiKey();
 
   try {
     if (args.surface === 'openai_chatgpt') {
@@ -78,6 +110,32 @@ async function collectOne(args: {
       return { persisted: true };
     }
 
+    if (args.surface === 'google_gemini') {
+      if (!geminiKey) {
+        return {
+          persisted: false,
+          failureMessage: 'GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY) is not set'
+        };
+      }
+      const { text, model } = await fetchGeminiGenerateContent({
+        apiKey: geminiKey,
+        model: geminiModel(),
+        userPrompt: args.promptText
+      });
+      await aiAnswerSample.create({
+        data: {
+          organizationId: args.organizationId,
+          trackedPromptId: args.trackedPromptId,
+          surface: args.surface,
+          provider: 'google',
+          model,
+          answerText: text,
+          error: null
+        }
+      });
+      return { persisted: true };
+    }
+
     return {
       persisted: false,
       failureMessage: `No API collector implemented for surface "${args.surface}" yet`
@@ -89,18 +147,8 @@ async function collectOne(args: {
         organizationId: args.organizationId,
         trackedPromptId: args.trackedPromptId,
         surface: args.surface,
-        provider:
-          args.surface === 'openai_chatgpt'
-            ? 'openai'
-            : args.surface === 'anthropic_claude'
-              ? 'anthropic'
-              : 'unknown',
-        model:
-          args.surface === 'openai_chatgpt'
-            ? openAiModel()
-            : args.surface === 'anthropic_claude'
-              ? anthropicModel()
-              : '—',
+        provider: providerForSurface(args.surface),
+        model: modelForSurface(args.surface),
         answerText: '',
         error: message.slice(0, 4000)
       }
@@ -150,6 +198,13 @@ export async function collectAiAnswersForOrganization(args: {
 
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const geminiKey = resolveGeminiApiKey();
+
+  const implementedSurfaces = new Set<PromptSurfaceId>([
+    'openai_chatgpt',
+    'anthropic_claude',
+    'google_gemini'
+  ]);
 
   for (const p of prompts) {
     let surfaces: PromptSurfaceId[];
@@ -169,7 +224,14 @@ export async function collectAiAnswersForOrganization(args: {
         summary.skippedNoCredentials.push({ surface, reason: 'ANTHROPIC_API_KEY' });
         continue;
       }
-      if (surface !== 'openai_chatgpt' && surface !== 'anthropic_claude') {
+      if (surface === 'google_gemini' && !geminiKey) {
+        summary.skippedNoCredentials.push({
+          surface,
+          reason: 'GOOGLE_GENERATIVE_AI_API_KEY'
+        });
+        continue;
+      }
+      if (!implementedSurfaces.has(surface)) {
         summary.skippedNoCredentials.push({ surface, reason: 'no_provider_implemented' });
         continue;
       }
