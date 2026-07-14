@@ -4,7 +4,9 @@ import type { AiAnswerSamplePrismaDelegate } from '@/lib/prisma/aiAnswerSampleDe
 import { getAiAnswerSampleDelegate } from '@/lib/prisma/aiAnswerSampleDelegate';
 import { fetchAnthropicMessage } from '@/lib/ai-visibility/providers/anthropic';
 import { fetchGeminiGenerateContent } from '@/lib/ai-visibility/providers/gemini';
+import { fetchGroqChatCompletion } from '@/lib/ai-visibility/providers/groq';
 import { fetchOpenAiChatCompletion } from '@/lib/ai-visibility/providers/openai';
+import { fetchOpenRouterChatCompletion } from '@/lib/ai-visibility/providers/openrouter';
 
 export type CollectAnswersSummary = {
   attempted: number;
@@ -29,6 +31,14 @@ function geminiModel(): string {
   );
 }
 
+function groqModel(): string {
+  return process.env.GROQ_ANSWER_MODEL?.trim() || 'llama-3.3-70b-versatile';
+}
+
+function openRouterModel(): string {
+  return process.env.OPENROUTER_ANSWER_MODEL?.trim() || 'openrouter/auto';
+}
+
 export function resolveGeminiApiKey(): string {
   return (
     process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
@@ -41,6 +51,8 @@ function providerForSurface(surface: PromptSurfaceId): string {
   if (surface === 'openai_chatgpt') return 'openai';
   if (surface === 'anthropic_claude') return 'anthropic';
   if (surface === 'google_gemini') return 'google';
+  if (surface === 'groq') return 'groq';
+  if (surface === 'openrouter') return 'openrouter';
   return 'unknown';
 }
 
@@ -48,6 +60,8 @@ function modelForSurface(surface: PromptSurfaceId): string {
   if (surface === 'openai_chatgpt') return openAiModel();
   if (surface === 'anthropic_claude') return anthropicModel();
   if (surface === 'google_gemini') return geminiModel();
+  if (surface === 'groq') return groqModel();
+  if (surface === 'openrouter') return openRouterModel();
   return '—';
 }
 
@@ -62,6 +76,8 @@ async function collectOne(args: {
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
   const geminiKey = resolveGeminiApiKey();
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  const openRouterKey = process.env.OPENROUTER_API_KEY?.trim();
 
   try {
     if (args.surface === 'openai_chatgpt') {
@@ -136,6 +152,52 @@ async function collectOne(args: {
       return { persisted: true };
     }
 
+    if (args.surface === 'groq') {
+      if (!groqKey) {
+        return { persisted: false, failureMessage: 'GROQ_API_KEY is not set' };
+      }
+      const { text, model } = await fetchGroqChatCompletion({
+        apiKey: groqKey,
+        model: groqModel(),
+        userPrompt: args.promptText
+      });
+      await aiAnswerSample.create({
+        data: {
+          organizationId: args.organizationId,
+          trackedPromptId: args.trackedPromptId,
+          surface: args.surface,
+          provider: 'groq',
+          model,
+          answerText: text,
+          error: null
+        }
+      });
+      return { persisted: true };
+    }
+
+    if (args.surface === 'openrouter') {
+      if (!openRouterKey) {
+        return { persisted: false, failureMessage: 'OPENROUTER_API_KEY is not set' };
+      }
+      const { text, model } = await fetchOpenRouterChatCompletion({
+        apiKey: openRouterKey,
+        model: openRouterModel(),
+        userPrompt: args.promptText
+      });
+      await aiAnswerSample.create({
+        data: {
+          organizationId: args.organizationId,
+          trackedPromptId: args.trackedPromptId,
+          surface: args.surface,
+          provider: 'openrouter',
+          model,
+          answerText: text,
+          error: null
+        }
+      });
+      return { persisted: true };
+    }
+
     return {
       persisted: false,
       failureMessage: `No API collector implemented for surface "${args.surface}" yet`
@@ -199,11 +261,15 @@ export async function collectAiAnswersForOrganization(args: {
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
   const anthropicKey = process.env.ANTHROPIC_API_KEY?.trim();
   const geminiKey = resolveGeminiApiKey();
+  const groqKey = process.env.GROQ_API_KEY?.trim();
+  const openRouterKey = process.env.OPENROUTER_API_KEY?.trim();
 
   const implementedSurfaces = new Set<PromptSurfaceId>([
     'openai_chatgpt',
     'anthropic_claude',
-    'google_gemini'
+    'google_gemini',
+    'groq',
+    'openrouter'
   ]);
 
   for (const p of prompts) {
@@ -229,6 +295,14 @@ export async function collectAiAnswersForOrganization(args: {
           surface,
           reason: 'GOOGLE_GENERATIVE_AI_API_KEY'
         });
+        continue;
+      }
+      if (surface === 'groq' && !groqKey) {
+        summary.skippedNoCredentials.push({ surface, reason: 'GROQ_API_KEY' });
+        continue;
+      }
+      if (surface === 'openrouter' && !openRouterKey) {
+        summary.skippedNoCredentials.push({ surface, reason: 'OPENROUTER_API_KEY' });
         continue;
       }
       if (!implementedSurfaces.has(surface)) {
